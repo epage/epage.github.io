@@ -2,7 +2,6 @@ extends: default.liquid
 
 title: Blog Transition
 date: 17 February 2017 09:00:30 -0500
-path: /:year/:month
 ---
 
 # Blog transition
