@@ -1,0 +1,7 @@
+rss: rss.xml
+name: epage
+description: Hiking programmer or programming hiker?
+source: src
+dest: build
+drafts: _drafts
+link: https://epage.github.io
