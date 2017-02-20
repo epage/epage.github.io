@@ -42,4 +42,4 @@ It has now been almost two years since my surgery. My vision is approximately wh
 
 I’d recommend looking into LASIK, even if you have nystagmus. I hope my experience helps someone else with this condition.
 
-Originally published at [http://eopage.blogspot.com/2017/01/off-to-shaky-start-getting-lasik-with.html](eopage.blogspot.com) on January 31, 2017.
+Originally published at [eopage.blogspot.com](http://eopage.blogspot.com/2017/01/off-to-shaky-start-getting-lasik-with.html) on January 31, 2017.
