@@ -2,8 +2,13 @@ sudo: false
 language: rust
 
 before_script:
-  - cargo install cobalt-bin --features="syntax-highlight"
+  - cargo install cobalt-bin --force --features="syntax-highlight"
   - export PATH="$PATH:/home/travis/.cargo/bin"
+
+cache: cargo
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
 
 script:
   - cobalt build
