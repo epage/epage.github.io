@@ -1,6 +1,6 @@
 extends: default.liquid
 
-title: Off To A Shaky Start: LASIK and Nystagmus
+title: Off To A Shaky Start - LASIK and Nystagmus
 date: 20 February 2017 09:00:30 -0500
 ---
 
