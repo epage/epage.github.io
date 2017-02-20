@@ -2,7 +2,7 @@
   float: right;
 }
 
-body {
+.cover-image {
   background-image: url(img/background.jpg);
   background-position: 75%;
   background-repeat: no-repeat;
