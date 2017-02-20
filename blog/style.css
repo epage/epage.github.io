@@ -1,0 +1,14 @@
+.me-image {
+  float: right;
+}
+
+body {
+  background-image: url(img/background.jpg);
+  background-position: 75%;
+  background-repeat: no-repeat;
+
+  background-size: cover;
+  margin: 0 auto;
+  max-height: 1536px;
+  max-width: 2048px;
+}

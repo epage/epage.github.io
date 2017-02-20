@@ -1,6 +1,17 @@
-<div>
-  <h2>{{ title }}</h2>
-  <p>
-    {{content}}
-  </p>
-</div>
+<!DOCTYPE html>
+<html>
+  <head>
+    {{ include "_layouts/_head.liquid" }}
+  </head>
+<body data-route={{route}}>
+  {{ include "_layouts/_menu.liquid" }}
+  <main>
+    <article>
+      <h1>{{ title }}</h1>
+      <time pubdate="pubdate">{{ date }}</time>
+      {{ content }}
+    </article>
+  </main>
+  {{ include "_layouts/_footer.liquid" }}
+</body>
+</html>
