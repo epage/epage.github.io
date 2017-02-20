@@ -1,4 +1,4 @@
-extends: default.liquid
+extends: post.liquid
 
 title: Blog Transition
 date: 17 February 2017 09:00:30 -0500
