@@ -5,7 +5,6 @@ before_script:
   - cargo install cobalt-bin --features="syntax-highlight"
   - export PATH="$PATH:/home/travis/.cargo/bin"
 
-cache: cargo
 script:
   - cobalt build
 
