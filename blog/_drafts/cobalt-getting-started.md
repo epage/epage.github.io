@@ -39,3 +39,5 @@ sudo: false
 
 
 https://stackoverflow.com/questions/39978856/unable-to-change-source-branch-in-github-pages
+
+Be sure to have "Build only if .travis.yml is present" set
