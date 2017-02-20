@@ -16,3 +16,7 @@ after_success: |
   git config user.name "Travis CI Worker" &&
   git config user.email "eopage@byu.net" &&
   git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+
+env:
+   global:
+      secure: "nnLvi7Z4JyrGlsgpNoNjk4H+bvsU7+gsBo0a/oCvv3wxHX6cI9oGyHG89v2DdtK4EVPas17jYZdPA/e93NkRTlX6DPoN8wchKxTtuzx1NMXl3TajyaJO1ll+lATSefqnW7um7c6F7aySqMzEN8HfnCG/tO6SKugnGoSJuRTrglrLzUH7EX42SqF6AU1imoUDrOhJsB/m01TGSSY+y80YVLWEvoQxiWEVLiwhOCv+4GlT1w1IAQGiK5gkgQswMtIZXajMADU4rIjhMKiTWJhwu8RgRg4toO+KOpdQMvMNtQRUlBuY5WLecmRtyX0eHqySk/IXEIUesGp3IqO0U0IGo2wm7lo3TJOIlCehi5I5Eb4uW0ao0MakuIvOez615qyMZOsfcFCUYrvhYi4i4zky9NEuiNNaB3Mh/mew4By00B1Xk10eiBvk2VKGYSJOSxNSy7tKBvq19eA5BDPc+wsCgnaRsy/lt/Itr4/Z4ZdVjB0d6TW36nO5b0Q2BqdoyFkFeacLnYfH0sLdK3d1DPRlpCVVxN9zYc68sTicSdARgS9ZXuA2WLJqfD3WR0srip/+L1+lr+hELjWOGF7gk1sUDJMrjsvjb11KmiigRpJtUZ6XW20YjXR47oUhcipSl2jAUO9dJvwG0rfeslD3eoP3xTXJQMQ1/hvxOsX14sVR+Ik="
