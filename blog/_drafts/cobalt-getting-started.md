@@ -36,3 +36,6 @@ Went with practices recommended in llogiq's [https://llogiq.github.io/2016/07/05
 '''yaml
 sudo: false
 '''
+
+
+https://stackoverflow.com/questions/39978856/unable-to-change-source-branch-in-github-pages
