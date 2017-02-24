@@ -12,8 +12,8 @@
                </div>
                <div class="navbar-right">
                   <ul class="list-unstyled">
-                     {% if tags %}<li><i class="fa fa-tags"></i> {{ tags }}</li>{% endif %}
                      <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time></li>
+                     {% if tags %}<li><i class="fa fa-tags"></i> {{ tags }}</li>{% endif %}
                   </ul>
                </div>
             </div>
