@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    {{ include "_layouts/_head.liquid" }}
-  </head>
-<body>
-  {{ include "_layouts/_header.liquid" }}
-  <main>
-    <article>
-      <h1>{{ title }}</h1>
-      <time pubdate="pubdate">{{ date }}</time>
-      {{ content }}
-    </article>
-  </main>
-  {{ include "_layouts/_footer.liquid" }}
-</body>
+   <head>
+      {{ include "_layouts/_head.liquid" }}
+   </head>
+   <body>
+      <header>
+         <nav class="navbar navbar-default">
+            <div class="container-fluid">
+               <div class="navbar-left">
+                  <h2>{{ title }}</h2>
+               </div>
+               <div class="navbar-right">
+                  <ul class="list-unstyled">
+                     {% if tags %}<li><i class="fa fa-tags"></i> {{ tags }}</li>{% endif %}
+                     <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time></li>
+                  </ul>
+               </div>
+            </div>
+         </nav>
+      </header>
+      <main class="container">
+         <article>
+            {{ content }}
+         </article>
+      </main>
+      {{ include "_layouts/_footer.liquid" }}
+   </body>
 </html>

@@ -1,7 +1,9 @@
-extends: post.liquid
-
 title: Off To A Shaky Start - LASIK and Nystagmus
+tags: personal
+extends: post.liquid
 date: 20 February 2017 09:00:30 -0500
+description: |
+  My personal experience treating nystagmus
 ---
 
 My vision has usually hovered around 20/40 but that is with glasses and when my nystagmus is quietest. I like to be physically active and my vision caused issues. Do I play sports blind or do I risk my glasses being damaged. I’ve flip flopped on that with many broken pairs as a result.

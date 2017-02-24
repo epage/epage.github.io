@@ -1,11 +1,10 @@
-extends: default.liquid
-
 title: Using Cobalt for Blogging
+tags: oss, programming
+extends: default.liquid
 date: 17 February 2017 09:00:30 -0500
-path: /:year/:month
 ---
-
 So I'm trying out [https://github.com/cobalt-org/cobalt.rs](Cobalt) and [https://pages.github.com/](github.io) for blogging.
+
 
 ## [https://pages.github.com/](Setup) my user github.io repo
 
@@ -41,3 +40,29 @@ sudo: false
 https://stackoverflow.com/questions/39978856/unable-to-change-source-branch-in-github-pages
 
 Be sure to have "Build only if .travis.yml is present" set
+
+Used bootstrap for a starting point in CSS
+https://getbootstrap.com/css/
+
+
+officially recognized attributes
+- title
+- extends
+- date
+- description (used for RSS)
+- except (used for RSS)
+- excerpt_separator
+- is_post
+- draft
+- path (or specify it in .cobalt.yml)
+ - Can't access the original template file's name though
+
+ Liquid documentation https://shopify.github.io/liquid/
+
+ Odd, kstep https://github.com/kstep/kstep.github.com  seems to be able to use post.excerpt without it falling back to post.content
+
+ Tries to mirror Jekyll but missing features
+ - blank excerpt separator causes no excerpts to be created (note: default separator is two \n's
+ - :title reflecting file name
+ - :slug for path
+ - site.uri isn't available.  Maybe at least provide link?

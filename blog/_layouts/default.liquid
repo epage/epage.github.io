@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    {{ include "_layouts/_head.liquid" }}
-  </head>
+<head>
+   {{ include "_layouts/_head.liquid" }}
+</head>
 <body>
-  {{ include "_layouts/_header.liquid" }}
-  <main>
-    {{ content }}
-  </main>
-  {{ include "_layouts/_footer.liquid" }}
+   <main class="container">
+      {{ content }}
+   </main>
+   {{ include "_layouts/_footer.liquid" }}
 </body>
 </html>
