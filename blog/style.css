@@ -1,3 +1,5 @@
 img.footer-about {
-   max-height: 20em;
+   max-height: 5em;
+   width: auto;
+   display: block;
 }
