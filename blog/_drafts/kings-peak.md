@@ -2,6 +2,8 @@ title: On Top of Utah - Hiking to Kings Peak
 extends: post.liquid
 date: 17 August 2013 14:46:30 -0500
 tags: hiking
+description: |
+  Trip/equipment report for Kings Peak in Utah
 ---
 
 *[Pictures can be found on G+](https://plus.google.com/photos/113583091680828898069/albums/5913185529979650433)*

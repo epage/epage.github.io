@@ -2,6 +2,8 @@ title: The Lone Star Hiking Trail
 extends: post.liquid
 date: 03 December 2014 22:27:30 -0500
 tags: hiking
+description: |
+  Trip/equipment report for the Long Star Hiking Trail
 ---
 
 *[_Pictures can be found on G+_](https://plus.google.com/photos/113583091680828898069/albums/6087354142572930737?authkey=CNfRhonuiNfjWQ)*

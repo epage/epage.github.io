@@ -1,7 +1,7 @@
 title: Off To A Shaky Start - LASIK and Nystagmus
 tags: personal
 extends: post.liquid
-date: 20 February 2017 09:00:30 -0500
+date: 30 January 2017 17:23:30 -0500
 description: |
   My personal experience treating nystagmus
 ---
