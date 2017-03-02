@@ -102,3 +102,5 @@ Oatmeal Packets: I continue to find oatmeal packets (stored in a ziplock bag to 
 [High Uinta Gear Trekking Pole](http://www.amazon.com/High-Uinta-Gear-GearTMTrekking-Pole/dp/B003MX8XWY/ref=sr_1_1?s=outdoor-recreation&ie=UTF8&qid=1376795664&sr=1-1): Traditionally I use a single pole made from a closet rod that has an eye hook on the end to help in putting bear bags up.  That didn't exactly fit in my luggage so I went with these low cost poles recommended to me by Brian.  They worked great.  I didn't find myself shortening them or relying on the shocks.  My static configuration worked well for me to keep my balance while I admired the surroundings, help me from falling when going downhill, and help me uphill by pulling myself up with my arms.  I'm unsure whether I'll use my closet rod or these once I'm home but I recommend them to others who don't have poles.
 
 _Thanks to Brian for looking over this and reminding me of some parts of the hike and providing some corrections._
+
+*Originally published at [eopage.blogspot.com](https://eopage.blogspot.com/2013/08/on-top-of-utah-hiking-to-kings-peak.html).*
