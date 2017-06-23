@@ -1,7 +1,7 @@
 title: Using Cobalt for Blogging
 tags: oss, programming
 extends: default.liquid
-date: 17 February 2017 09:00:30 -0500
+date: 17 December 2017 09:00:30 -0500
 ---
 So I'm trying out [https://github.com/cobalt-org/cobalt.rs](Cobalt) and [https://pages.github.com/](github.io) for blogging.
 
@@ -66,3 +66,6 @@ officially recognized attributes
  - :title reflecting file name
  - :slug for path
  - site.uri isn't available.  Maybe at least provide link?
+
+
+https://domchristie.github.io/to-markdown/ to convert stuff to markdown
