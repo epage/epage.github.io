@@ -6,9 +6,11 @@ site:
 pages:
   default:
     layout: default.liquid
+    permalink: /{{parent}}/{{name}}/
 posts:
   rss: rss.xml
   default:
+    permalink: /blog/{{year}}/{{month}}/{{slug}}/
     layout: post.liquid
     data:
       tags: ~
