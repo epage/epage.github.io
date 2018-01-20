@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
    <head>
-      {{ include "_layouts/_head.liquid" }}
+      {% include "_head.liquid" %}
    </head>
    <body>
       <header>
          <nav class="navbar navbar-default">
             <div class="container-fluid">
                <div class="navbar-left">
-                  <h2>{{ title }}</h2>
+                  <h2>{{ page.title }}</h2>
                </div>
                <div class="navbar-right">
                   <ul class="list-unstyled">
-                     <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time></li>
-                     {% if tags %}<li><i class="fa fa-tags"></i> {{ tags }}</li>{% endif %}
+                     <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ page.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time></li>
+                     {% if page.data.tags %}<li><i class="fa fa-tags"></i> {{ page.data.tags }}</li>{% endif %}
                   </ul>
                </div>
             </div>
@@ -21,9 +21,9 @@
       </header>
       <main class="container">
          <article>
-            {{ content }}
+            {{ page.content }}
          </article>
       </main>
-      {{ include "_layouts/_footer.liquid" }}
+      {% include "_footer.liquid" %}
    </body>
 </html>

@@ -1,7 +1,8 @@
 title: Developing on github
-tags: programming
-extends: post.liquid
-date: 30 December 2017 17:23:30 -0500
+published_date: "2017-12-30 17:23:30 -0500"
+layout: post.liquid
+data:
+    tags: ["programming"]
 ---
 Setting up a GitHub Project
 Setup appveyeor and travis accounts

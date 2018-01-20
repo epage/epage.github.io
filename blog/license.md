@@ -1,8 +1,6 @@
-extends: default.liquid
-
 title: License
+layout: default.liquid
 ---
-
 # License Information
 
 Copyright 2017 Ed Page.

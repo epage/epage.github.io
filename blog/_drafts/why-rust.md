@@ -1,9 +1,9 @@
-title: Why Rust?
-tags: programming
-extends: post.liquid
-date: 30 December 2017 17:23:30 -0500
+title: "Why Rust?"
+published_date: "2017-12-30 17:23:30 -0500"
+layout: post.liquid
+data:
+    tags: ["programming"]
 ---
-
 I’ve fallen into the pattern of using two kinds of languages: a rapid development language (Python) and a catch-all language (C++). I’ve long watched for something that would unseat C++ and I feel I finally found that in Rust.
 
 A language for rapid development should allow me to quickly iterate on ideas even at the risk of there being bugs. In short, it shouldn’t be work.

@@ -1,11 +1,10 @@
 title: The Lone Star Hiking Trail
-extends: post.liquid
-date: 03 December 2014 22:27:30 -0500
-tags: hiking
-description: |
-  Trip/equipment report for the Long Star Hiking Trail
+description: "Trip/equipment report for the Long Star Hiking Trail\n"
+published_date: "2014-12-03 22:27:30 -0500"
+layout: post.liquid
+data:
+    tags: ["hiking"]
 ---
-
 *[_Pictures can be found on G+_](https://plus.google.com/photos/113583091680828898069/albums/6087354142572930737?authkey=CNfRhonuiNfjWQ)*
 
 [![](//3.bp.blogspot.com/-eE9FjBOrhxw/VHqgoUq0PHI/AAAAAAAANA0/EhS9Fk4gi6w/s1600/20141127%2B47.jpg)](//3.bp.blogspot.com/-eE9FjBOrhxw/VHqgoUq0PHI/AAAAAAAANA0/EhS9Fk4gi6w/s1600/20141127%2B47.jpg) I've lived in the Texas for over 5 years and only recently have I heard about the Lone Star Hiking Trail. I asked around for first hand experiences and not even the people who grew up in Austin or Houston have ever heard of it. I decided to extend my annual back-to-nature / anti-materialism Black Friday hike into a multi-day backpacking trip to test out the trail.

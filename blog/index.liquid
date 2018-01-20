@@ -1,14 +1,14 @@
-extends: default.liquid
-title: epage's blog
+title: "epage's blog"
+layout: default.liquid
 ---
 <div>
   <div>
-    {% for post in posts %}
+    {% for post in collections.posts.pages %}
       <div>
-        <h2><a href="{{post.path}}">{{ post.title }}</a></h2>
+        <h2><a href="{{ post.permalink }}">{{ post.title }}</a></h2>
         {% if post.description %}<p>{{ post.description }}</p>{% elsif post.excerpt %}<p>{{ post.excerpt }}</p>{% else %}<br />{% endif %}
-        {% if post.tags %}<h4><i class="fa fa-tags"></i> {{ post.tags }}</h4>{% endif %}
-        <i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ post.date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time>
+        {% if post.data.tags %}<h4><i class="fa fa-tags"></i> {{ post.data.tags }}</h4>{% endif %}
+        <i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ post.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time>
       </div>
     {% endfor %}
   </div>

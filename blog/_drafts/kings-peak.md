@@ -1,11 +1,10 @@
-title: On Top of Utah - Hiking to Kings Peak
-extends: post.liquid
-date: 17 August 2013 14:46:30 -0500
-tags: hiking
-description: |
-  Trip/equipment report for Kings Peak in Utah
+title: "On Top of Utah - Hiking to Kings Peak"
+description: "Trip/equipment report for Kings Peak in Utah\n"
+published_date: "2013-08-17 14:46:30 -0500"
+layout: post.liquid
+data:
+    tags: ["hiking"]
 ---
-
 *[Pictures can be found on G+](https://plus.google.com/photos/113583091680828898069/albums/5913185529979650433)*
 
 After more than ten years of no camping, this last spring I finally got back into it with trips out to [Pedernalles Falls](https://plus.google.com/photos/113583091680828898069/albums/5853517418104796993?authkey=CMPngsHisOHgJQ), [Lost Maples](https://plus.google.com/photos/113583091680828898069/albums/5856133974319246561), and Lake Georgetown ([car camping](https://plus.google.com/photos/113583091680828898069/albums/5866459684606744145) and [backpacking](https://plus.google.com/photos/113583091680828898069/albums/5876965869108141585)).  I've been itching to get back into real mountains though.  This week I had the opportunity to fly out to Utah and go camping with Brian up in the Uintas.

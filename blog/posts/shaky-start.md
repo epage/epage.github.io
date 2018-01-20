@@ -1,11 +1,10 @@
-title: Off To A Shaky Start - LASIK and Nystagmus
-tags: personal
-extends: post.liquid
-date: 30 January 2017 17:23:30 -0500
-description: |
-  My personal experience treating nystagmus
+title: "Off To A Shaky Start - LASIK and Nystagmus"
+description: "My personal experience treating nystagmus\n"
+published_date: "2017-01-30 17:23:30 -0500"
+layout: post.liquid
+data:
+    tags: ["personal"]
 ---
-
 My vision has usually hovered around 20/40 but that is with glasses and when my nystagmus is quietest. I like to be physically active and my vision caused issues. Do I play sports blind or do I risk my glasses being damaged. I’ve flip flopped on that with many broken pairs as a result.
 
 I had thought most of my vision problems were due to my nystagmus. In my mid to late twenties I started to realize that my nystagmus was responsible for less of my vision issues than I had thought and that I actually had some pretty bad astigmatism. This realization opened up my eyes to the idea of doing something about my vision problems.

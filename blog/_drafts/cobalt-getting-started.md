@@ -1,7 +1,8 @@
 title: Using Cobalt for Blogging
-tags: oss, programming
-extends: default.liquid
-date: 17 December 2017 09:00:30 -0500
+published_date: "2017-12-17 09:00:30 -0500"
+layout: default.liquid
+data:
+    tags: ["oss", "programming"]
 ---
 So I'm trying out [https://github.com/cobalt-org/cobalt.rs](Cobalt) and [https://pages.github.com/](github.io) for blogging.
 

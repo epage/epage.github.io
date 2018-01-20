@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-   {{ include "_layouts/_head.liquid" }}
+   {% include "_head.liquid" %}
 </head>
 <body>
    <main class="container">
-      {{ content }}
+      {{ page.content }}
    </main>
-   {{ include "_layouts/_footer.liquid" }}
+   {% include "_footer.liquid" %}
 </body>
 </html>

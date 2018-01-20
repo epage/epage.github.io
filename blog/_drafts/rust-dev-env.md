@@ -1,7 +1,8 @@
 title: A Rust Development Environment
-tags: programming
-extends: post.liquid
-date: 30 December 2017 17:23:30 -0500
+published_date: "2017-12-30 17:23:30 -0500"
+layout: post.liquid
+data:
+    tags: ["programming"]
 ---
 Sadly, I’ve recently switched to Windows at home for some expediency reasons. I’ll call out the Windows-specific parts
 
