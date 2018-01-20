@@ -1,7 +1,14 @@
 source: blog
-posts:
-  rss: rss.xml
 site:
   title: Ed's Home Page
   description: "Programming and other misc"
   base_url: "https://epage.github.io"
+pages:
+  default:
+    layout: default.liquid
+posts:
+  rss: rss.xml
+  default:
+    layout: post.liquid
+    data:
+      tags: ~

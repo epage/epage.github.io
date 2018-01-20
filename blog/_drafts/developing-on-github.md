@@ -1,6 +1,5 @@
 title: Developing on github
 published_date: "2017-12-30 17:23:30 -0500"
-layout: post.liquid
 data:
     tags: ["programming"]
 ---

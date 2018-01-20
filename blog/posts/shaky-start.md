@@ -1,7 +1,6 @@
 title: "Off To A Shaky Start - LASIK and Nystagmus"
 description: "My personal experience treating nystagmus\n"
 published_date: "2017-01-30 17:23:30 -0500"
-layout: post.liquid
 data:
     tags: ["personal"]
 ---

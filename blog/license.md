@@ -1,5 +1,4 @@
 title: License
-layout: default.liquid
 ---
 # License Information
 

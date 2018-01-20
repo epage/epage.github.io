@@ -1,7 +1,6 @@
 title: The Lone Star Hiking Trail
 description: "Trip/equipment report for the Long Star Hiking Trail\n"
 published_date: "2014-12-03 22:27:30 -0500"
-layout: post.liquid
 data:
     tags: ["hiking"]
 ---
