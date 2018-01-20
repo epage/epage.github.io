@@ -9,6 +9,7 @@ pages:
     permalink: /{{parent}}/{{name}}/
 posts:
   rss: rss.xml
+  dir: blog
   default:
     permalink: /blog/{{year}}/{{month}}/{{slug}}/
     layout: post.liquid
