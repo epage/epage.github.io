@@ -10,7 +10,10 @@ pages:
 posts:
   rss: rss.xml
   dir: blog
+  drafts_dir: _drafts
   default:
+    # For simpler drafts
+    published_date: "2020-03-14 01:59:26 -0500"
     permalink: /blog/{{year}}/{{month}}/{{slug}}/
     layout: post.liquid
     data:

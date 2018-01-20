@@ -1,3 +1,5 @@
+is_draft: true
+---
 anstall rust up
 - Started at the perfect time since rustup hit 1.0
 

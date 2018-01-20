@@ -1,5 +1,5 @@
 title: Developing on github
-published_date: "2017-12-30 17:23:30 -0500"
+is_draft: true
 data:
     tags: ["programming"]
 ---

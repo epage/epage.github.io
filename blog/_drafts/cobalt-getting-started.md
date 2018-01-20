@@ -1,5 +1,5 @@
 title: Using Cobalt for Blogging
-published_date: "2017-12-17 09:00:30 -0500"
+is_draft: true
 data:
     tags: ["oss", "programming"]
 ---
