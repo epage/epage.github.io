@@ -1,19 +1,18 @@
 sudo: false
 before_script:
-  - curl -LSfs https://japaric.github.io/trust/install.sh | sh -s -- --git cobalt-org/cobalt.rs --crate cobalt --force --target x86_64-unknown-linux-gnu
-  - export PATH="$PATH:~/.cargo/bin"
+- curl -LSfs https://japaric.github.io/trust/install.sh | sh -s -- --git cobalt-org/cobalt.rs
+  --crate cobalt --force --target x86_64-unknown-linux-gnu
+- export PATH="$PATH:~/.cargo/bin"
 script:
-  - cobalt build
-
+- cobalt build
 deploy:
   provider: pages
   skip_cleanup: true
-  github_token: $GH_TOKEN
+  github_token: "$GH_TOKEN"
   local_dir: build
   target_branch: master
   on:
     branch: source
-
 env:
-   global:
-      secure: "OEkdUu/+GsbYaZ8gC0TjztNl022B5bbSVlc1KltaFU5VnmfHW3YQ/jXmigSwfhZpOKLVHO3MxjgCCBhJfeDXpYsbJt282PMCtk1hBPh03eF02QzklxCTk7rlwXemkr9MKC6BYE1Snin3QY6XyiZyGhgGSohXCOnOH0YCdwOyVNVIbd5tLy6O6zoxyE4SLs8Yk9X8Vfk5j8eN6itZ4LSS3kcmFtE4dFo+S+DxK7HIRQKot0SM9g7OBB4lEnjqg1D78oksdpl310zoLeNHTgwRzcZ06nEYjgUvmDAicgba79wTOhu6QoTYoDZg6xEFoBNhJqMO3qxov6To59cv3SAUBQcsLqAYHTVgcjjBc4dsZeFXidJFTyckpalJHaTJNtsvfN28yeESB3Yu22Anan5n3socoIyWctoQwrCwwyZT9V1XFhVsoGhzSk/dMXUY9JHdIzBWhI9jRDFPPrS1LUbB6TYrV2C64RPHArKMvlKKshh7m42CeE2WktOxvZB8kaZ/bL9byJmnsMYphBKtoLA3F8OY4CY0T1ir58Fpl3xhAQPUHJIck7zwCx/HV2GToRzYmKK+tnY3b8FLS056+LycfSFRSfok3crCW8s8q+lMvrluLeXE3R191ePsLlrWkc24HqIRBickaDvz+e+mbgmkptHv7IJy6jjXF0hWxzdxWLA="
+  global:
+  - secure: bTnyH3lR0ae31bBpF7XZ8LE6TSw2nHvLALs4itp91gstQPSe9ouStr3bq2plDuZOp81YnztLZoFiOebUjsR5Y1X1DohdzOQm5LcInokzQ/qle3S5KIN/cKmpfIIDq+7YijrZk4qdTx0b9oibEsNyjcAcqBm4QDFrBanKl8y6Af6DFA1KWiRoWSQUoYomYU+aEHsdrFNKvOM2309c1F6Ut5GmOqg/mjUPhONk5V+iZWKCVKO5M03t6H8yK/OKHakumhGj8RKRIyLn/ewwHc7YLJP2NgpWS6+xNpodPXr84MvE8qivpXnljgsOUMXGalRwNmCagpdFubLlpXu9sfyv5YyYiehjTwBOG7h5oXh/squdYWGSQzqx5rVG+PH6CM/CgGvOAfxiUz7EmFolWu0Fi3AjQtcvNQvS2uNBslCMt6QxUebSZltSDHtLb7LiOHnK6PXYFexZuBVATDxyT4ZAlpfzrcAvknVzU/jQvU3nk7fG6n+lNF5F4iaQ//ru3XI2pwlm40pZYvgesoKLIoUZ4JQMpIaT0WUBE3IjPimuBDZuvLFnjXARgFNaA1JlW6nm07MlQQ/sGsybgRwx9n1GS6MfFCg7t8bLJPgZpe4sjnu0/ucI0vrs7HQ+D4MZrcDm1G2JSErj7j76wFgtpL9Yo0l4OKGrbgfD5AwlTyj9weg=
