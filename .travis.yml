@@ -1,25 +1,18 @@
 sudo: false
-language: rust
-
 before_script:
-  - cargo install cobalt-bin --force --features="syntax-highlight"
-  - export PATH="$PATH:/home/travis/.cargo/bin"
-
-cache: cargo
-before_cache:
-  # Travis can't cache files that are not readable by "others"
-  - chmod -R a+r $HOME/.cargo
-
+  - curl -LSfs https://japaric.github.io/trust/install.sh | sh -s -- --git cobalt-org/cobalt.rs --crate cobalt --force --target x86_64-unknown-linux-gnu
+  - export PATH="$PATH:~/.cargo/bin"
 script:
   - cobalt build
 
-after_success: |
-  [ $TRAVIS_BRANCH = source ] &&
-  [ $TRAVIS_PULL_REQUEST = false ] &&
-  cobalt import --branch master &&
-  git config user.name "Travis CI Worker" &&
-  git config user.email "eopage@byu.net" &&
-  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git master
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GH_TOKEN
+  local_dir: build
+  target_branch: master
+  on:
+    branch: source
 
 env:
    global:
