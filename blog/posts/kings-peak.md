@@ -10,7 +10,11 @@ After more than ten years of no camping, this last spring I finally got back int
 
 I flew most of my gear out with me.  I did pick up some Mountain House meals at Emergecy Essentials and stove fuel at Sports Authority.  In Austin it was hard to fathom how cold the mountains will be so I ended up borrowing some cold weather clothes from my brother-in-law as well as a pack (mine didn't fit in my luggage) and a flashlight (either I forgot it or the TSA took it).
 
-## [![](//2.bp.blogspot.com/-RL6SjH7lz5E/Ug_a6g6xotI/AAAAAAAAJBI/paN8j7m5iRc/s320/20130812+01+Hike.jpg)](//2.bp.blogspot.com/-RL6SjH7lz5E/Ug_a6g6xotI/AAAAAAAAJBI/paN8j7m5iRc/s1600/20130812+01+Hike.jpg) Monday
+Monday | Tuesday | Wednesday | Thursday | Friday
+-------|---------|-----------|----------|-------
+[![](//2.bp.blogspot.com/-RL6SjH7lz5E/Ug_a6g6xotI/AAAAAAAAJBI/paN8j7m5iRc/s320/20130812+01+Hike.jpg)](//2.bp.blogspot.com/-RL6SjH7lz5E/Ug_a6g6xotI/AAAAAAAAJBI/paN8j7m5iRc/s1600/20130812+01+Hike.jpg) | [![](//1.bp.blogspot.com/-kVgfnkljiME/Ug_a6sTmivI/AAAAAAAAJBQ/MRtv3QKK6P0/s320/20130813+00+Hike.jpg)](//1.bp.blogspot.com/-kVgfnkljiME/Ug_a6sTmivI/AAAAAAAAJBQ/MRtv3QKK6P0/s1600/20130813+00+Hike.jpg) | [![](//1.bp.blogspot.com/-Oq7_ZZeaYtc/Ug_a7Iw0mJI/AAAAAAAAJBU/S62J7K6X-4M/s320/20130814+00+Hike.jpg)](//1.bp.blogspot.com/-Oq7_ZZeaYtc/Ug_a7Iw0mJI/AAAAAAAAJBU/S62J7K6X-4M/s1600/20130814+00+Hike.jpg) | [![](//1.bp.blogspot.com/-S7ey01nTMPg/Ug_a7qVn7sI/AAAAAAAAJBc/PFOuvOHHqGk/s320/20130815+00+Hike.jpg)](//1.bp.blogspot.com/-S7ey01nTMPg/Ug_a7qVn7sI/AAAAAAAAJBc/PFOuvOHHqGk/s1600/20130815+00+Hike.jpg) | [![](//3.bp.blogspot.com/-o18joc7fS6M/Ug_a7gzUZkI/AAAAAAAAJBg/0POgUusrUdI/s320/20130816+01+Hike.jpg)](//3.bp.blogspot.com/-o18joc7fS6M/Ug_a7gzUZkI/AAAAAAAAJBg/0POgUusrUdI/s1600/20130816+01+Hike.jpg)
+
+## Monday
 
 I dropped off my rental car and got picked up by Brian (Altitude: 4,226 feet).  The guy at the car rental place saw my camping gear and checked an obscure place for damage to the car common to driving out to national parks.  I haven't heard word yet if they will charge me for it or not.
 
@@ -23,7 +27,7 @@ I had a headache during the hike and at camp but I was a bit dehydrated from the
 Our spot along the lake was gorgeous and most of the time the lake was a mirror.  I pulled out and setup my hammock and used it to hold gear like a table as I finished unloading.  I ate my Chicken Alfredo Mountain House meal in my hammock overlooking Bear Lake.  We then cleaned up camp, hung our bear/critter bag, talked over a campfire Brian made thanks to his backpacking saw, and went to bed.
 [](https://www.blogger.com/null)
 
-## [![](//1.bp.blogspot.com/-kVgfnkljiME/Ug_a6sTmivI/AAAAAAAAJBQ/MRtv3QKK6P0/s320/20130813+00+Hike.jpg)](//1.bp.blogspot.com/-kVgfnkljiME/Ug_a6sTmivI/AAAAAAAAJBQ/MRtv3QKK6P0/s1600/20130813+00+Hike.jpg) Tuesday
+## Tuesday
 
 Brian took my pump to get himself water for the day and it was going terribly slow.  This is only my second time using my pump and didn't pay attention to the field servicing or post-trip servicing instructions.  After some examining of the pump I hypothesized that the filter needed cleaning and luckily Brian had a scrub pad I could use.  That did the trick.  Overall we found we liked my [MSR Miniworks EX Microfilter](http://www.amazon.com/MSR-56425-MiniWorks-EX-Microfilter/dp/B000BBF2RY/ref=wl_it_dp_o_pC_nS_nC?ie=UTF8&colid=3T1QU49SM6X99&coliid=I2RFWZBSTRAQ3P&psc=1) due to the side pump action (works great as a Thighmaster!), the serviceable filter, and the easy separation between contaminated and clean parts.
 
@@ -33,7 +37,7 @@ We used the sign as a guide for us to find Island Lake which turned out pretty e
 
 The weather changed on us every hour.  It was a light sprinkle when we setup tents and then as I pumped water it alternated between hot, rainy, and sleeting    We then cooked our meals (Mountain House Lasagna for me) and again I ate then relaxed in the hammock.  Brian took the time to find edible or medicinal plants and came back with a natural insect replant   We intended to go to bed early so we could have an early start on Kings Peak tomorrow but Brian's "quick" fire was not so quick thanks to some really dense wood we found that burns long and hot.
 
-## [![](//1.bp.blogspot.com/-Oq7_ZZeaYtc/Ug_a7Iw0mJI/AAAAAAAAJBU/S62J7K6X-4M/s320/20130814+00+Hike.jpg)](//1.bp.blogspot.com/-Oq7_ZZeaYtc/Ug_a7Iw0mJI/AAAAAAAAJBU/S62J7K6X-4M/s1600/20130814+00+Hike.jpg) Wednesday
+## Wednesday
 
 We got up, ate, loaded our day packs, and left camp around 8am.  We took the trail to Gunsight Pass.  Unfortunately the map was misleading.  It showed the trail going straight to the Dollar Lake / Henry Lake trails joining up to go to Gunsight Pass.  It turns out the trail actually curves back around to Dollar Lake.  There is a turn off to head to Gunsight Pass but it starts off not being worn at all and you have to rely on walking between two cairns off to the side of the trail and heading straight between the next two cairns.  After that it is well traveled.
 
@@ -49,7 +53,7 @@ Just about every half hour Brian made some kind of Lord of the Rings reference, 
 
 We got back to camp at 5:50 pm.  We pumped enough water to drink immediately and then more to cook.  During the after-dinner pumping I felt feverishly hot.  I went to bed as soon as possible.  At one point in the night I woke up and was sweating bullets but later woke up and was perfectly fine.
 
-## [![](//1.bp.blogspot.com/-S7ey01nTMPg/Ug_a7qVn7sI/AAAAAAAAJBc/PFOuvOHHqGk/s320/20130815+00+Hike.jpg)](//1.bp.blogspot.com/-S7ey01nTMPg/Ug_a7qVn7sI/AAAAAAAAJBc/PFOuvOHHqGk/s1600/20130815+00+Hike.jpg) Thursday
+## Thursday
 
 We were playing today by ear, our plans depending on if I still had a temperature and how Brian's legs/feet were doing.  We felt well enough to head on to Bear Lake.  We lazily packed up camp and got to Bear in time to unpack and cook lunch.
 
@@ -59,7 +63,7 @@ Brian went on another edible/medicinal plant hunt.  He came back with Indian Pai
 
 We burned a short fire and went to bed early so we could break camp early on Friday.
 
-## [![](//3.bp.blogspot.com/-o18joc7fS6M/Ug_a7gzUZkI/AAAAAAAAJBg/0POgUusrUdI/s320/20130816+01+Hike.jpg)](//3.bp.blogspot.com/-o18joc7fS6M/Ug_a7gzUZkI/AAAAAAAAJBg/0POgUusrUdI/s1600/20130816+01+Hike.jpg) Friday
+##  Friday
 
 We gathered everything up and left camp at 7:45 am.  We made it back to the truck at 11:50 am to enjoy our can of peaches each.
 
