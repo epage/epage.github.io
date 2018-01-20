@@ -6,13 +6,13 @@ data:
 ---
 *[_Pictures can be found on G+_](https://plus.google.com/photos/113583091680828898069/albums/6087354142572930737?authkey=CNfRhonuiNfjWQ)*
 
-[![](//3.bp.blogspot.com/-eE9FjBOrhxw/VHqgoUq0PHI/AAAAAAAANA0/EhS9Fk4gi6w/s1600/20141127%2B47.jpg)](//3.bp.blogspot.com/-eE9FjBOrhxw/VHqgoUq0PHI/AAAAAAAANA0/EhS9Fk4gi6w/s1600/20141127%2B47.jpg) I've lived in the Texas for over 5 years and only recently have I heard about the Lone Star Hiking Trail. I asked around for first hand experiences and not even the people who grew up in Austin or Houston have ever heard of it. I decided to extend my annual back-to-nature / anti-materialism Black Friday hike into a multi-day backpacking trip to test out the trail.
+I've lived in the Texas for over 5 years and only recently have I heard about the Lone Star Hiking Trail. I asked around for first hand experiences and not even the people who grew up in Austin or Houston have ever heard of it. I decided to extend my annual back-to-nature / anti-materialism Black Friday hike into a multi-day backpacking trip to test out the trail.
 
 I took with me two friends who were wanting to give a longer backpacking trip a try. I decided to create a loop out of the Lone Star Hiking Trail and Little Lake Creek Loop Trail to keep things interesting for the group. According to the trail website, we were going to be out during hunting season which put restrictions on where we camped.
 
 ## Thursday
 
-[![Day 1: 6 Miles](//1.bp.blogspot.com/-Wm0Z5yMOwhk/VHqgWIymlHI/AAAAAAAAM9w/6A9z8Peq7TY/s1600/20141127%2B01.png)](//1.bp.blogspot.com/-Wm0Z5yMOwhk/VHqgWIymlHI/AAAAAAAAM9w/6A9z8Peq7TY/s1600/20141127%2B01.png)
+<img src="//1.bp.blogspot.com/-Wm0Z5yMOwhk/VHqgWIymlHI/AAAAAAAAM9w/6A9z8Peq7TY/s1600/20141127%2B01.png" title="Day 1: 6 Miles" width="75%" height="75%" />
 
 We met up early in the morning, loaded up the car, and headed out to Trail Head #1\. The drive out to the trail head was pretty straight forward. I had brought fresh apples for us to eat before heading out but we forgot about them.
 
@@ -28,7 +28,7 @@ First, we had a terrible water source.  After setting up camp, I went to pump us
 
 Second, throughout the afternoon and evening, we heard gunfire from the hunters which isn't the most appealing interruption for a relaxing day in the woods.  We also had howling in the distance from coyotes, we presume.  There was some rustling in the brush around us but we never determine the cause.
 
-[![Preparing a fire at Sand Branch](//4.bp.blogspot.com/-kFLjVDD3oKs/VHqgvkHwNjI/AAAAAAAANCA/SW1Ybk7mIFg/s1600/20141127%2B70%2BAndrea%2BKevin.jpg)](//4.bp.blogspot.com/-kFLjVDD3oKs/VHqgvkHwNjI/AAAAAAAANCA/SW1Ybk7mIFg/s1600/20141127%2B70%2BAndrea%2BKevin.jpg)
+<img src="//4.bp.blogspot.com/-kFLjVDD3oKs/VHqgvkHwNjI/AAAAAAAANCA/SW1Ybk7mIFg/s1600/20141127%2B70%2BAndrea%2BKevin.jpg" title="Preparing a fire at Sand Branch" width="50%" height="50%" />
 
 ### Backpacking Thanksgiving Dinner
 
@@ -38,7 +38,8 @@ Overall a delicious, satisfying, thanksgiving dinner without being gluttonous li
 
 ## Friday
 
-[![Day 2: 12 Miles](//2.bp.blogspot.com/-yAPh0YkmDS8/VHqgySHggoI/AAAAAAAANCo/58MvnI6_QLg/s1600/20141128%2B00.png)](//2.bp.blogspot.com/-yAPh0YkmDS8/VHqgySHggoI/AAAAAAAANCo/58MvnI6_QLg/s1600/20141128%2B00.png)</td>
+<img src="//2.bp.blogspot.com/-yAPh0YkmDS8/VHqgySHggoI/AAAAAAAANCo/58MvnI6_QLg/s1600/20141128%2B00.png" title="Day 2: 12 Miles" width="65%" height="65%" /> | <img src="//1.bp.blogspot.com/-TC3SbTqoPJ4/VHqhAR8nguI/AAAAAAAANE4/dKBiqjWX4u0/s1600/20141128%2B172%2BAndrea.jpg" title="The camp marker" width="30%" height="30%" />
+
 It was a bit chilly in the morning.  Unfortunately, I overestimated the effectiveness of the sleeping bag and bivvy combination I had loaned to one of my friends. I was the only one who was warm last night.  The cold had me delay pumping water for our hike as long as possible.
 
 Today's hike was pretty rough.  The trail was less travelled with more spider webs with ginormous spiders, more logs crossing the path, bridges that were out, rough terrain, etc.
@@ -47,11 +48,9 @@ On the plus side, we crossed several different types of areas.  Some areas were 
 
 I had forgotten the importance of pacing ourselves and so we didn't have any breaks until we found we needed them.  One was up at the Pole Creek Campsite.  I'm glad we didn't plan to camp there because there wasn't even a stagnate lake to get water from.
 
-[![The ferns were reminiscent of Jurassic Park](//4.bp.blogspot.com/-ZlJ-vdsX-so/VHqg-WW_PzI/AAAAAAAANIw/QTHxNFRUTmY/s1600/20141128%2B094.jpg)](//4.bp.blogspot.com/-ZlJ-vdsX-so/VHqg-WW_PzI/AAAAAAAANIw/QTHxNFRUTmY/s1600/20141128%2B094.jpg)
+<img src="//4.bp.blogspot.com/-ZlJ-vdsX-so/VHqg-WW_PzI/AAAAAAAANIw/QTHxNFRUTmY/s1600/20141128%2B094.jpg" title="The ferns were reminiscent of Jurassic Park" width="50%" height="50%" />
 
 ### Caney Creek Camp
-
-[![The camp marker](//1.bp.blogspot.com/-TC3SbTqoPJ4/VHqhAR8nguI/AAAAAAAANE4/dKBiqjWX4u0/s1600/20141128%2B172%2BAndrea.jpg)](//1.bp.blogspot.com/-TC3SbTqoPJ4/VHqhAR8nguI/AAAAAAAANE4/dKBiqjWX4u0/s1600/20141128%2B172%2BAndrea.jpg)
 
 Unlike the previous campsites, Caney Creek didn't have any built-up wooden trail signs marking it but instead all we had was a tiny little marker on a tree.  Everyone setup camp while I took care of our water situation.
 
@@ -63,7 +62,7 @@ The noises at this campsite were worse than Caney Creek.  We had no rustling bus
 
 ## Saturday
 
-[![Day 3: 12 Miles](//1.bp.blogspot.com/-EV3q8Eob07Q/VHqhBI0Ll3I/AAAAAAAANFI/ja_XUcpEcAE/s1600/20141129%2B00.png)](//1.bp.blogspot.com/-EV3q8Eob07Q/VHqhBI0Ll3I/AAAAAAAANFI/ja_XUcpEcAE/s1600/20141129%2B00.png)
+<img src="//1.bp.blogspot.com/-EV3q8Eob07Q/VHqhBI0Ll3I/AAAAAAAANFI/ja_XUcpEcAE/s1600/20141129%2B00.png" title="Day 3: 12 Miles" width="75%" height="75%" />
 
 We pumped, ate, packed up, and headed off.
 
@@ -75,9 +74,11 @@ I tend to end hikes with cans of fruit to refresh us but instead we ate into the
 
 We used a McDonalds in Navasota as our opportunity to use a real bathroom.  We then didn't eat until we got back home.
 
-#### Postmortem
+# Postmortem
 
-[![The long walk back](//3.bp.blogspot.com/-IhfmAmO5TMY/VHqhDBZ4k1I/AAAAAAAANFg/CuHXXdhAQyM/s1600/20141129%2B11%2BAndrea%2BKevin.jpg)](//3.bp.blogspot.com/-IhfmAmO5TMY/VHqhDBZ4k1I/AAAAAAAANFg/CuHXXdhAQyM/s1600/20141129%2B11%2BAndrea%2BKevin.jpg)Lone Star Hiking Trail: At least the first 11 miles of it make an enjoyable hike but past that it looked like it got a little rough.
+<img src="//3.bp.blogspot.com/-eE9FjBOrhxw/VHqgoUq0PHI/AAAAAAAANA0/EhS9Fk4gi6w/s1600/20141127%2B47.jpg" width="30%" height="30%"/> | <img src="//3.bp.blogspot.com/-IhfmAmO5TMY/VHqhDBZ4k1I/AAAAAAAANFg/CuHXXdhAQyM/s1600/20141129%2B11%2BAndrea%2BKevin.jpg" title="The long walk back" width="30%" height="30%" />
+
+Lone Star Hiking Trail: At least the first 11 miles of it make an enjoyable hike but past that it looked like it got a little rough.
 
 Little Lake Creek Loop Trail: The first 6 miles were smooth and it got very rough afterwards.
 

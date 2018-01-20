@@ -69,7 +69,7 @@ We gathered everything up and left camp at 7:45 am.  We made it back to the truc
 
 We got back in Salt Lake tired, with chapped lips and running noses (both of our noses never stopped) ready to relax.  I'm surprised that I recovered enough that on Saturday I did the [Herriman Stampede 4 mile race](http://hhstampede.webs.com/) (I highly recommend it for people in the area, great price for the frills).
 
-## Postmortem
+# Postmortem
 
 ### The Drive
 
