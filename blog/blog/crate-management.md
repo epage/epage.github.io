@@ -11,11 +11,13 @@ data:
 
 When I started with Rust, I was planning on blogging about my experience. As I
 learned though, I found most of the documentation I needed was in blog posts
-but they were often out of date or seemingly contradictory. I realized that
-the more valuable route for me would be in improving documentation and tooling to
-serve as living documentation. I've even taken this to try to find homes for
-some of the blog posts I bookmarked. So far my only contribution has been to
-documenting [swapping `Option<Result<_>>` to
+that, though helpful, would give different suggestions without a hint as to why
+they solved the problems differently.  This is frustrating for someone new
+because you just want to get your task done and not have to first research a
+whole other area.  I realized that the more valuable route for me would be in
+improving documentation and tooling to serve as living documentation. I've even
+taken this to try to find homes for some of the blog posts I bookmarked. So far
+my only contribution has been to documenting [swapping `Option<Result<_>>` to
 `Result<Option<_>>`](https://rustbyexample.com/error/multiple_error_types/option_result.html)
 (which might get replaced with
 [`transpose`](https://github.com/rust-lang/rust/issues/47338)) and documenting
@@ -66,7 +68,9 @@ An easy way to handle this is for this to be a part of the [epochs
 plan](https://github.com/rust-lang/rfcs/blob/master/text/2052-epochs.md).
 Warning groups (including `warning`) could remain unchanged during epoch.  New
 warnings could be added to `*-unstable` groups that will be stabilized at the
-next epoch.
+next epoch. This might seem to be an abuse of epochs because warnings are not
+part of the language definition but I feel the benefit out weighs the possible
+misuse.
 
 This should also apply to clippy.
 
@@ -119,11 +123,12 @@ template](https://github.com/japaric/trust) but its hard to separate out the
 complexity you don't need and your edits are mixed in with the template making
 it hard to update.
 
-My vision for this is a central repo that contains a crate CI mdBook and
-commonly accepted CI tooling.  This CI tooling includes trying to find ways to
-separate out trust's mechanisms out from the user's policy so they can easily
-be modified independent of each other and let the user more easily pick and
-choose what parts they need.
+My vision for this is a central repo that contains a crate CI mdBook, a
+dedicated gitter channel for more targetted support, and commonly accepted CI
+tooling.  This CI tooling includes trying to find ways to separate out trust's
+mechanisms out from the user's policy so they can easily be modified
+independent of each other and let the user more easily pick and choose what
+parts they need.
 
 I was concerned about centralization and the challenges with it but I was
 encouraged at seeing killercup's [endorsement of the idea in
@@ -148,7 +153,7 @@ Specifically regarding CI tools, it'd be great to have best practices and be
 able to more easily collaborate to bring them up to those best practices
 (pre-build binaries for faster CIs, etc).
 
-Some examples of tools I could see hosting in this repo include
+Some examples of tools I could see hosting in this repo include (if the authors agree):
 - [`cargo-when`](https://github.com/starkat99/cargo-when) for conditional steps.
 - [`cargo-kcov`](https://github.com/roblabla/cargo-travis) for coverage
   reporting (currently `cargo-coverage`; rename is suggested to distinguish
@@ -157,7 +162,9 @@ Some examples of tools I could see hosting in this repo include
 - Wrappers for generating compressed binaries for upload to github.
 - Wrappers for generating commonly packages for major operating systems and distributions.
 
-It might even be good to host tools not directly related to CI like [`cargo-release`](https://github.com/sunng87/cargo-release).
+It might even be good to host tools not directly related to CI like
+[`cargo-release`](https://github.com/sunng87/cargo-release) in an effort to
+support users through the entire release process.
 
 ### Honorable Mention: rustfmt and clippy
 
