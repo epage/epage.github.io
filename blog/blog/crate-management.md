@@ -1,9 +1,10 @@
 title: "Crate Management for #rust2018"
-is_draft: true
+published_date: "2018-01-26 04:20:00 +0000"
+is_draft: false
 data:
-  tags: ["programming"]
+  tags:
+    - programming
 ---
-
 *Context: [Call for Community Posts](https://blog.rust-lang.org/2018/01/03/new-years-rust-a-call-for-community-blogposts.html) and [other posts](http://readrust.net/rust2018/)*
 
 ## Obligatory 2017 Reflection
