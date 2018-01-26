@@ -1,24 +1,28 @@
 <footer>
-   <nav class="navbar navbar-default">
-      <div class="container-fluid">
-         <div class="navbar-left">
-             <a href="{{ site.base_url }}/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
-         </div>
-         <div class="navbar-left">
-            <ul class="list-unstyled">
-               <li><a href="{{ site.base_url }}/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
-               <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
-               <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
-            </ul>
-         </div>
-
-         <div class="navbar-right">
-            <ul class="list-unstyled">
-               <li><i class="fa fa-copyright"></i> 2017</li>
-               <li><a href="{{ site.base_url }}/license">CC BY-SA 4.0 / MIT</a></li>
-               <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
-            </ul>
-         </div>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="{{ site.base_url }}/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
       </div>
-   </nav>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="{{ site.base_url }}/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+{% if page contains "published_date" %}
+          <li><i class="fa fa-copyright"></i> {{ page.published_date | date: "%Y"}}</li>
+{% else %}
+          <li><i class="fa fa-copyright"></i> {{ page.data.copyright }}</li>
+{% endif %}
+          <li><a href="{{ site.base_url }}/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 </footer>

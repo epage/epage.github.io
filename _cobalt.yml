@@ -7,6 +7,8 @@ pages:
   default:
     layout: default.liquid
     permalink: /{{parent}}/{{name}}/
+    data:
+      copyright: 2018
 posts:
   rss: rss.xml
   dir: blog
