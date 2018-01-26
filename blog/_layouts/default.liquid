@@ -4,6 +4,15 @@
    {% include "head.liquid" %}
 </head>
 <body>
+      <header>
+         <nav class="navbar navbar-default">
+            <div class="container-fluid">
+               <div class="navbar-left">
+                  <h2>{{ page.title }}</h2>
+               </div>
+            </div>
+         </nav>
+      </header>
    <main class="container">
       {{ page.content }}
    </main>
