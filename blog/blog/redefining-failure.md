@@ -29,7 +29,7 @@ it.
 I know it is less than ideal to receive feedback like this "late" in the
 process.  I didn't get have the time to play with it early on and was limited
 in providing feedback from a more theoretical angle. The ability to create a
-thorough analysis from just readin the docs / code is limited and the weight of
+thorough analysis from just reading the docs / code is limited and the weight of
 such feedback is reasonably lower.
 
 ## My History of Failure
@@ -78,7 +78,7 @@ struct Context {
 
 struct InternalError {
     kind: ErrorKind,
-    context: Box<Context>,
+    context: Option<Box<Context>>,
 }
 ```
 
