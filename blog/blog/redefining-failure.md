@@ -330,7 +330,7 @@ deviate in ways that make sense for their different feature sets.
 
 A quick summary of their behavior:
 
-             | `Fail`           | `Error`
+&nbsp;       | `Fail`           | `Error`
 -------------|------------------|--------
 `cause`      | child item       | inner
 `causes`     | starts with self | starts with inner
