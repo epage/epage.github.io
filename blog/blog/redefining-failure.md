@@ -39,11 +39,12 @@ future"][failure10]. Below I'll go into more specific areas I think `failure`
 can be improved.
 
 I know it is less than ideal to receive this type of feedback "late" in the
-process. I was strapped for time and only recently had solid use cases to push
-`failure`s limits.  I at least tried to provide theoretical feedback early on
-based on reading the code and docs out of an eagerness for `failure` to
-succeed.  The ability to create a thorough analysis from just reading the docs
-/ code is limited and the weight of such feedback is reasonably lower.
+process ([1.0 is expected to release next week][failure10]). I was strapped for
+time and only recently had solid use cases to push `failure`s limits.  I at
+least tried to provide theoretical feedback early on based on reading the code
+and docs out of an eagerness for `failure` to succeed.  The ability to create a
+thorough analysis from just reading the docs / code is limited and the weight
+of such feedback is reasonably lower.
 
 ## My Recent Failures
 
@@ -193,11 +194,16 @@ Context -> Context -> AssertionError -> io::Error
 - How does a user of my library identify my documented error type for making
   programmatically handling the error?
 - If an application only wants to show the leaf error and not the causes, how does it identify what is a leaf error?
+- How should adding `Context` in `no_std` work?  With the current approach, the `Context` is passed back and the original error is dropped.
 
 Suggestions:
 - Separate the roles by providing an alternative "easy error".
+- Separate the roles so a clearer `no_std` policy can exist.
 - Remove `Context` from the error chain by moving the `Context` from an error
   decorator to an error member, like `backtrace` and `cause`.
+- Experiment with ways to give `no_std` users more control over the `Context`
+  policy like moving the `Context` from an error decorator to an error member,
+  like `backtrace` and `cause`.
 
 ### Errors are `Display`ed in Inverted Order
 
@@ -253,7 +259,7 @@ Suggestion:
   `Context` from an error decorator to an error member, like `backtrace` and
   `cause`.
 
-### Support a `KeyedContext`
+### Support a `ContextPair`
 
 When converting `assert_cli` to `failure`, I found `failure::Context` works
 great when you want to dump strings but has limitations for my more common
@@ -275,7 +281,7 @@ return Err(AssertionError::new(AssertionKind::OutputMismatch))
 So I added this:
 ```rust
 #[derive(Debug)]
-pub struct KeyedContext
+pub struct ContextPair
 {
     key: &'static str,
     context: impl Display,
@@ -285,12 +291,12 @@ which can be used like:
 ```rust
 return Err(AssertionError::new(AssertionKind::OutputMismatch))
     .context("expected to contain")
-    .keyed_context("needle", needle.to_owned())
-    .keyed_context("haystack", haystack.to_owned());
+    .context(ContextPair("needle", needle.to_owned()))
+    .context(ContextPair("haystack", haystack.to_owned()));
 ```
 
 Suggestion:
-- Provide something *like* `KeyedContext` so `failure` can help developers fall
+- Provide something *like* `ContextPair` so `failure` can help developers fall
   into the [pit of
   success](https://blog.codinghorror.com/falling-into-the-pit-of-success/) for
   giving helpful errors to users.
@@ -385,7 +391,7 @@ enum ContextKind {
 }
 
 struct Context {
-    value: Vec<(ContextKind, impl Display)>,
+    value: Vec<(ContextKind, Box<Display>)>,
     backtrace: failure::Backtrace,
 }
 
