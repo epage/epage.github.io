@@ -196,7 +196,7 @@ Context -> Context -> AssertionError -> io::Error
 
 Suggestions:
 - Separate the roles by providing an alternative "easy error".
-- Remove `Context` from the error chain by moving the `Context from an error
+- Remove `Context` from the error chain by moving the `Context` from an error
   decorator to an error member, like `backtrace` and `cause`.
 
 ### Errors are `Display`ed in Inverted Order
@@ -223,7 +223,7 @@ cause: {% if "blue skies" == var %}{% endraw %}
 ```
 
 Suggestion:
-- Associate contexts with an error by, again, moving the `Context from an error
+- Associate contexts with an error by, again, moving the `Context` from an error
   decorator to an error member, like `backtrace` and `cause`.
 
 ### Better support type contracts
@@ -250,7 +250,7 @@ The only alternative is to reimplement the `Context` machinery that is built-in 
 
 Suggestion:
 - Allow using context without `failure::Error` by, yet again, moving the
-  `Context from an error decorator to an error member, like `backtrace` and
+  `Context` from an error decorator to an error member, like `backtrace` and
   `cause`.
 
 ### Support a `KeyedContext`
