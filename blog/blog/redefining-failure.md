@@ -3,119 +3,74 @@ layout: default.liquid
 is_draft: true
 ---
 
-[`failure`](https://github.com/withoutboats/failure) is a young Rust crate to
-make error management easy that is on a path to [1.0 in about a
-week](https://boats.gitlab.io/blog/post/2018-02-22-failure-1.0/).
+I recently got the chance to redo the error handling in two different crates I
+help maintain. For [`liquid`][liquid], I decided to write the error types by
+hand rather than use something like [`error-chain`][error-chain]. In the case
+of [`assert_cli`][assert_cli], I decided to finally give [`failure`][failure] a
+try.
 
-`failure` pulls together a lot of great concepts that makes error management
-easy.  It is a use boon to new users and rapid prototyping:
-- Trivial to pass any kind of error through entire program, replacing `panic`, `Box<Error>`, etc.
-- More transparent error API compared to [`error-chain`](https://github.com/rust-lang-nursery/error-chain).
-- Fewer custom errors because of `Context`.
+From `failure`'s [announcement][announcement]:
 
-With that said, I feel `failure` has some weak points.  If `failure` was just a
-handy helper like `error-chain` this wouldn't be so bad.  You can instead just
-select another crate to help you make errors and move on. `failure` isn't just
-a series of helpers but comes across as the next-generation of the [`Error`
-trait](https://doc.rust-lang.org/std/error/trait.Error.html).  While I see
-value in making such a eosystem disruptive change, I feel caution should be
-exercised when saying this is "ready" (1.0) so we avoid having to go through
-this again.
+> Failure is a Rust library intended to make it easier to manage your error
+> types. This library has been heavily influenced by learnings we gained from
+> previous iterations in our error management story, especially the [`Error`
+> trait][error-trait] and the [`error-chain`][error-chain] crate.
 
-I'll go as far as saying that I feel there are some fundamental limitations in
-`failure` that should be resolved before crate authors consider migrating to
-it.
+I think `failure` does a great job iterating on Rust's error management story,
+fixing a lot of fundamental problems in the `Error` trait and making it easier
+for new developers and prototypers to be successful.
 
-I know it is less than ideal to receive feedback like this "late" in the
-process.  I didn't get have the time to play with it early on and was limited
-in providing feedback from a more theoretical angle. The ability to create a
-thorough analysis from just reading the docs / code is limited and the weight of
-such feedback is reasonably lower.
+On the other hand, I do feel that there are parts of `failure` that are a bit
+immature, particularly [`Context`][context]. The reason this is concerning is
+the implementation policies related to `Context` are coupled to the general
+`Fail` trait mechanism (see [Separation of mechanism and policy][mechanism]).
+We cannot experiment and iterate on `Context` without breaking compatibility
+with `Fail` and there is a reasonable [hesitance in breaking
+compatibility][failure10].
+
+I'd recommend `failure` for anyone writing an application. I'd recommend
+library authors exercise caution, particularly if you have richer requirements
+for your errors. For the crate author, I'd suggest it is either not ready yet
+for "1.0" or to be more open to breaking changes than ["the distant
+future"][failure10]. Below I'll go into more specific areas I think `failure`
+can be improved.
+
+I know it is less than ideal to receive this type of feedback "late" in the
+process. I was strapped for time and only recently had solid use cases to push
+`failure`s limits.  I at least tried to provide theoretical feedback early on
+based on reading the code and docs out of an eagerness for `failure` to
+succeed.  The ability to create a thorough analysis from just reading the docs
+/ code is limited and the weight of such feedback is reasonably lower.
 
 ## My History of Failure
 
-For the last year, I've been involved in:
-- [Cobalt](https://cobalt-org.github.io/) (static site generator)
-- [rust implementation](https://github.com/cobalt-org/liquid-rust) of Shopify's [liquid template language](http://liquidmarkup.org/).
-- [`assert_cli`](https://github.com/assert-rs/assert_cli)
-
-In my proprietary day job, I spent the last 10 years maintaining a multi-million
-LoC product that is 80% user-facing library and 20% user-facing application.
-
-### Day Job
-
-Putting a flexible product into the hands of non-programmers means you need to
-provide a lot of guidance to help people get out of situations you couldn't
-predict. We consider good errors essential for our users.
-
-The user-form of our errors look like (translated to Rust pseudo-code):
-```rust
-#[derive(Fail, Debug, Copy, Clone, ...)]
-#[repr(C)]
-pub enum ErrorKind {
-    ...
-}
-
-#[derive(Fail, Debug)]
-pub struct PublicError {
-    kind: ErrorKind,
-    context: String,
-}
-```
-
-and the internal-form of our errors look like (translated to Rust pseudo-code):
-```rust
-#[derive(Fail, Debug, Copy, Clone, ...)]
-#[repr(C)]
-enum ContextKind {
-    ...
-}
-
-struct Context {
-    value: Vec<(ContextKind, impl Display)>,
-    backtrace: failure::Backtrace,
-}
-
-struct InternalError {
-    kind: ErrorKind,
-    context: Option<Box<Context>>,
-}
-```
-
-Things of note:
-- `InternalError` has a way of localizing and formatting `Context` into the `PublicError::context`.
-- `PublicError` / `InternalError` have a way of localizing `ErrorKind`.
-  - `ErrorKind` always includes "what", "why", and "how to fix it".
-- OS and library errors are manually converted to `InternalError`.  Sometimes
-  the root cause is captured in `ContextKind`s that we hide in release builds.
-- Layers higher in the stack may add to `Context`. They can even conditionally
-  add to `context.value` to avoid duplication.
-- Performance is controlled by only heap allocating or capturing a back trace if context is added.
-
-### Cobalt
-
-This is an end-user application that is a perfect fit for `failure`.
+So let's step through my recent experiences with error management
 
 ### `liquid`
 
-Recently I did a [major revamp of `liquid`s errors](https://github.com/cobalt-org/liquid-rust/pull/164).  My goals were:
-- Low friction for detailed error reports.
-- Provide context to users with liquid backtraces.
+[`liquid` is a rust implementation][liquid] of Shopify's [liquid template language](http://liquidmarkup.org/).
 
-Backtrace example:
+As mentioned above, I recently did a [major revamp of `liquid`s
+errors](https://github.com/cobalt-org/liquid-rust/pull/164). I ended up
+skipping `failure`. It was easier for me to write my error types from scratch
+than to take the time to figure out how to map my needs to `failure`. I was
+also concerned about making an unstable crate such a fundamental part of my
+API.
+
+My goals were:
+- Low friction for detailed error reports.
+- Give the user context to the errors with liquid back traces.
+
+An example of a liquid backtrace:
 ```
 {% raw %}Error: liquid: Expected whole number, found `fractional number`
   with:
     end=10.5
 from: {% for i in (1..max) reversed %}
-from: {% if blue skies == var %}{% endraw %}
+from: {% if "blue skies" == var %}{% endraw %}
   with:
     var=10
 ```
-
-When planning this, I considered giving `failure` but with the cost of API
-breakages and the time to figure out how to map my goals onto `failure` I
-figured it was quicker just to roll it by hand.
 
 Here is a rough sketch of `liquid`s errors:
 ```rust
@@ -151,16 +106,22 @@ let mut range = self.range
     .trace_with(|| self.trace().into())?;
 ```
 
+While the context API needs some work, the overall approach worked great and
+provides very help error messages to the user.
+
 ### `assert_cli`
 
-This week, I started on a refactoring of `assert_cli` in an effort to move it
-to "1.0" for the CLI working group.  I needed some new errors and rather than
-continuing to extend the existing brittle system, I thought I'd give `failure`
-a try.  I figured this was fine because 99% of `assert_cli` users are just
-unwrapping the error in their tests rather than passing it along, making
-breaking error changes of little impact.
+[`assert_cli`][assert_cli] provides assertions for program behavior to help
+with testing.
 
-I structued `assert_cli` `error-chain` errors to leverage chaining.  The chaining hierarchy is something like:
+This week, I started on a refactoring of `assert_cli` in an effort to move it
+to "1.0" for the CLI working group. I needed some new errors and rather than
+continuing to extend the existing brittle system based on `error-chain`, I
+thought I'd give `failure` a try. I figured this was fine because 99% of
+`assert_cli` users are just unwrapping the error in their tests rather than
+passing it along, making breaking error changes of little impact.
+
+I structured `assert_cli`'s `error-chain` errors to leverage chaining. The chaining hierarchy is something like:
 - Spawn Failed
 - Assertion Failed
   - Status (success / failure) Failed
@@ -176,11 +137,9 @@ I structued `assert_cli` `error-chain` errors to leverage chaining.  The chainin
     - Byte subset matched when should
     - Predicate failed
 
-Most of these errors really just exist for the sake of adding context and simplifies greatly with `failure`.
-
-Leveraging the [`ErrorKind`
-idiom](https://boats.gitlab.io/failure/error-errorkind.html) with
-`failure::Context`, I was able to simplify this down a lot.
+Most of these errors really just exist for the sake of adding context and
+simplifies greatly with `failure` by also leveraging the [`ErrorKind`
+idiom](https://boats.gitlab.io/failure/error-errorkind.html).
 
 This is what it looks like, in Rust pseudo-code:
 ```rust
@@ -198,6 +157,8 @@ pub struct AssertionError {
 }
 ```
 
+Most of the rest of this post goes into my initial experience in converting over to this.
+
 ## Feedback on `failure::Context`
 
 `error-chain` and friends have been around for a while and given us different
@@ -211,7 +172,7 @@ roughly the same approach from when it was first announced.
 
 ### Decouple Roles
 
-Coupling these roles is initially convenient.  A user can quickly create an
+Coupling these roles is initially convenient. A user can quickly create an
 error of from any piece of data they have and a `struct` that looks and acts
 similarly to `Context` doesn't have to be created.
 
@@ -226,14 +187,14 @@ Which `Fail`s `Termination` trait should be respected for [`?` in
 (when that becomes a thing)?
 
 How can the user find the error for my library in case they need to
-make a decision off of `AssertionKind`?  All of them are reported as a
-`cause()` in `Fail`.  `io::Error` will be reported as the `root_cause`. The
+make a decision off of `AssertionKind`? All of them are reported as a
+`cause()` in `Fail`. `io::Error` will be reported as the `root_cause`. The
 user would have to iterate, looking for an `AssertionError` to do anything with
 it.
 
 A specific example of this is when rendering the error for the user.
 Some developers might want to show the leaf error with context while others
-might want to show the entire error chain.  How do you know what is a leaf error?
+might want to show the entire error chain. How do you know what is a leaf error?
 
 ### Inverted Order
 
@@ -245,7 +206,7 @@ If I were to naively switch `liquid` to `failure` my errors would change from
   with:
     end=10.5
 from: {% for i in (1..max) reversed %}
-from: {% if blue skies == var %}{% endraw %}
+from: {% if "blue skies" == var %}{% endraw %}
   with:
     var=10
 ```
@@ -255,7 +216,7 @@ end=10.5
 cause: {% raw %}Error: liquid: Expected whole number, found `fractional number`
 cause: {% for i in (1..max) reversed %}
 cause: var=10
-cause: {% if blue skies == var %}{% endraw %}
+cause: {% if "blue skies" == var %}{% endraw %}
 ```
 
 ### Better support type contracts
@@ -263,18 +224,18 @@ cause: {% if blue skies == var %}{% endraw %}
 `failure::Error` is a fancy boxed version of `failure::Fail`. This is a great
 solution for prototyping and applications like Cobalt.
 
-Libraries are a different beast.  In cases like `aasert_cli` and `liquid`, I want to ensure:
+Libraries are a different beast. In cases like `aasert_cli` and `liquid`, I want to ensure:
 - User has a defined finite set of errors to programmatically deal with.
 - The errors are useful.
 
-Having a type-erased `failure::Fail` makes this impossible.  Any `?` could be
+Having a type-erased `failure::Fail` makes this impossible. Any `?` could be
 turning an error from a dependency into a `failure::Fail` and passing it right
 back up to my user. The only way for me to know is to exercise every error path
 and inspect the output.
 
 Instead I prefer to return `Result<T, AssertionError>` instead of `Result<T, failure::Error>`.
 
-That's fine, `failure::Error` is just a convenience that `failure` provides, like how `Box<Error>`.  Except.
+That's fine, `failure::Error` is just a convenience that `failure` provides, like how `Box<Error>`. Except.
 - Except if I want to add `Context` to my errors, the only reasonable ergonomic way to do so is to return `Result<T, failure::Error>`.
 - Except [`Context` only supports wrapping a `failure::Error`](https://github.com/rust-lang-nursery/failure/issues/60), making it so any error can escape through a `Context`.
 
@@ -284,7 +245,7 @@ The only alternative is to reimplement the `Context` machinery that is built-in 
 
 ### Support a `KeyedContext`
 
-When converting `assert_cli` to `failure`, I found  `failure::Context` works
+When converting `assert_cli` to `failure`, I found `failure::Context` works
 great when you want to dump strings but has limitations for my more common
 cases:
 ```rust
@@ -325,7 +286,7 @@ giving helper errors to users.
 
 ## Feedback on `failure::Error`
 
-`failure::Error` is a fancy boxed version of `Fail`.  Their APIs generally
+`failure::Error` is a fancy boxed version of `Fail`. Their APIs generally
 deviate in ways that make sense for their different feature sets.
 
 A quick summary of their behavior:
@@ -339,7 +300,7 @@ A quick summary of their behavior:
 
 ### `failure::Error` is not a `Fail`
 
-While `failure::Error` acts as a boxed `Failed`, it isn't a `Fail`.  This
+While `failure::Error` acts as a boxed `Failed`, it isn't a `Fail`. This
 requires specialization because `From<Fail> for Error` would conflict with
 `From<T> for T`.
 
@@ -347,7 +308,7 @@ requires specialization because `From<Fail> for Error` would conflict with
 
 As note above, `Error` and `Fail` have similar APIs and `failure::Error` mostly
 behaves as a proxy for the inner `Fail` with [`cause` being the
-exception](https://github.com/rust-lang-nursery/failure/issues/85).  Despite
+exception](https://github.com/rust-lang-nursery/failure/issues/85). Despite
 the `cause`s having different signatures (`Fail` returns an `Option<&Fail>`
 while cause returns `&Fail`>), I think this is going to trip up a lot of
 people.
@@ -360,9 +321,84 @@ Instead, I feel that `Error::cause` should behave exactly like
 ### `causes` and `root_cause` are foot-guns
 
 If `cause` is the child error, then `causes` would start with that and iterate
-beneath it, right?  Unfortunately, no.  The current `Fail` is the first cause.
+beneath it, right? Unfortunately, no. The current `Fail` is the first cause.
 
 Similarly, if your `Fail` has no `cause`, then it will be the `root_cause`.
 
 I can understand the need for functions that behave like these but not with
 names that imply they won't include your current `Fail`.
+
+# Addendum
+
+## Additional error management case studies
+
+### Cobalt
+
+[Cobalt][cobalt] is a static site generator that I maintain. As an end-user application,
+it is a perfect fit for `failure`. I haven't converted it over due to lack of a
+pressing need compared to the desired features.
+
+### Day Job
+
+This is from a 15+ year old, multi-million LoC product that is 80% user-facing
+library and 20% user-facing application targeted at non-programmers.
+
+Putting a flexible product into the hands of non-programmers means you need to
+provide a lot of guidance to help people get out of situations you couldn't
+predict. We consider good errors essential for our users.
+
+The user-form of our errors look like (translated to Rust pseudo-code):
+```rust
+#[derive(Fail, Debug, Copy, Clone, ...)]
+#[repr(C)]
+pub enum ErrorKind {
+    ...
+}
+
+#[derive(Fail, Debug)]
+pub struct PublicError {
+    kind: ErrorKind,
+    context: String,
+}
+```
+and the internal-form of our errors look like (translated to Rust pseudo-code):
+```rust
+#[derive(Fail, Debug, Copy, Clone, ...)]
+#[repr(C)]
+enum ContextKind {
+    ...
+}
+
+struct Context {
+    value: Vec<(ContextKind, impl Display)>,
+    backtrace: failure::Backtrace,
+}
+
+struct InternalError {
+    kind: ErrorKind,
+    context: Option<Box<Context>>,
+}
+```
+
+Things of note:
+- `InternalError` has a way of localizing and formatting `Context` into the `PublicError::context`.
+- `PublicError` / `InternalError` have a way of localizing `ErrorKind`.
+  - `ErrorKind` always includes "what", "why", and "how to fix it".
+- OS and library errors are manually converted to `InternalError`. Sometimes
+  the root cause is captured in `ContextKind`s that we hide in release builds.
+- Layers higher in the stack may add to `Context`. They can even conditionally
+  add to `context.value` to avoid duplication.
+- Performance is controlled by only heap allocating or capturing a back trace if context is added.
+
+
+
+[assert_cli]: https://github.com/assert-rs/assert_cli
+[liquid]: https://github.com/cobalt-org/liquid-rust
+[cobalt]: https://cobalt-org.github.io/
+[error-chain]: https://crates.io/crates/error-chain
+[failure]: https://github.com/withoutboats/failure
+[announcement]: https://boats.gitlab.io/blog/post/2017-11-16-announcing-failure/
+[error-trait]: https://doc.rust-lang.org/std/error/trait.Error.html
+[context]: https://docs.rs/failure/0.1.1/failure/struct.Context.html
+[failure10]: https://boats.gitlab.io/blog/post/2018-02-22-failure-1.0/
+[mechanism]: https://en.wikipedia.org/wiki/Separation_of_mechanism_and_policy
