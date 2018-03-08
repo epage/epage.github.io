@@ -18,7 +18,10 @@ From `failure`'s [announcement][announcement]:
 
 I think `failure` does a great job iterating on Rust's error management story,
 fixing a lot of fundamental problems in the `Error` trait and making it easier
-for new developers and prototypers to be successful.
+for new developers and prototypers to be successful. While a replacement for
+the `Error` trait is a disruptive change to the ecosystem, I feel the reasons
+are well justified and the crate looks like it does a great job bridging the
+gap.
 
 On the other hand, I do feel that there are parts of `failure` that are a bit
 immature, particularly [`Context`][context]. The reason this is concerning is
@@ -42,9 +45,9 @@ based on reading the code and docs out of an eagerness for `failure` to
 succeed.  The ability to create a thorough analysis from just reading the docs
 / code is limited and the weight of such feedback is reasonably lower.
 
-## My History of Failure
+## My Recent Failures
 
-So let's step through my recent experiences with error management
+So let's step through my recent case studies in error management
 
 ### `liquid`
 
@@ -59,9 +62,9 @@ API.
 
 My goals were:
 - Low friction for detailed error reports.
-- Give the user context to the errors with liquid back traces.
+- Give the user context to the errors with template back traces.
 
-An example of a liquid backtrace:
+An example of a template backtrace:
 ```
 {% raw %}Error: liquid: Expected whole number, found `fractional number`
   with:
@@ -117,9 +120,9 @@ with testing.
 This week, I started on a refactoring of `assert_cli` in an effort to move it
 to "1.0" for the CLI working group. I needed some new errors and rather than
 continuing to extend the existing brittle system based on `error-chain`, I
-thought I'd give `failure` a try. I figured this was fine because 99% of
-`assert_cli` users are just unwrapping the error in their tests rather than
-passing it along, making breaking error changes of little impact.
+thought I'd give `failure` a try. I figured breaking changes in `failure` would
+have minimal impact on my users because 99% of `assert_cli` users are just
+unwrapping the error in their tests rather than passing it along.
 
 I structured `assert_cli`'s `error-chain` errors to leverage chaining. The chaining hierarchy is something like:
 - Spawn Failed
@@ -137,8 +140,8 @@ I structured `assert_cli`'s `error-chain` errors to leverage chaining. The chain
     - Byte subset matched when should
     - Predicate failed
 
-Most of these errors really just exist for the sake of adding context and
-simplifies greatly with `failure` by also leveraging the [`ErrorKind`
+Most of these errors really just exist for the sake of adding context.  This is
+greatly simplified by leveraging `failure::Context` and [`ErrorKind`
 idiom](https://boats.gitlab.io/failure/error-errorkind.html).
 
 This is what it looks like, in Rust pseudo-code:
@@ -173,32 +176,32 @@ roughly the same approach from when it was first announced.
 ### Decouple Roles
 
 Coupling these roles is initially convenient. A user can quickly create an
-error of from any piece of data they have and a `struct` that looks and acts
-similarly to `Context` doesn't have to be created.
+error of from any piece of data they have and there isn't need for another
+`struct` that looks and acts similarly to `Context`.
 
 The problem is in the details.
 
-Say my errors are wrapped like this: `Context -> Context -> AssertionError -> io::Error`
+Say my errors are wrapped like this:
+```rust
+Context -> Context -> AssertionError -> io::Error
+```
+(remember: `Context` is a `Fail`)
 
-Those `Context`s might be just context they might be a quick and dirty error.
-
-Which `Fail`s `Termination` trait should be respected for [`?` in
+- Which `Fail`s' `Termination` trait should be respected for [`?` in
 `main`](https://github.com/rust-lang/rfcs/blob/master/text/1937-ques-in-main.md)
 (when that becomes a thing)?
+- How does a user of my library identify my documented error type for making
+  programmatically handling the error?
+- If an application only wants to show the leaf error and not the causes, how does it identify what is a leaf error?
 
-How can the user find the error for my library in case they need to
-make a decision off of `AssertionKind`? All of them are reported as a
-`cause()` in `Fail`. `io::Error` will be reported as the `root_cause`. The
-user would have to iterate, looking for an `AssertionError` to do anything with
-it.
+Suggestions:
+- Separate the roles by providing an alternative "easy error".
+- Remove `Context` from the error chain by moving the `Context from an error
+  decorator to an error member, like `backtrace` and `cause`.
 
-A specific example of this is when rendering the error for the user.
-Some developers might want to show the leaf error with context while others
-might want to show the entire error chain. How do you know what is a leaf error?
+### Errors are `Display`ed in Inverted Order
 
-### Inverted Order
-
-Because `Context` generically wraps a` `failure::Error`, the ordering is inverted.
+Because `Context` generically wraps a` `failure::Error`, the ordering is inverted when rendering an error for a user.
 
 If I were to naively switch `liquid` to `failure` my errors would change from
 ```
@@ -219,13 +222,17 @@ cause: var=10
 cause: {% if "blue skies" == var %}{% endraw %}
 ```
 
+Suggestion:
+- Associate contexts with an error by, again, moving the `Context from an error
+  decorator to an error member, like `backtrace` and `cause`.
+
 ### Better support type contracts
 
 `failure::Error` is a fancy boxed version of `failure::Fail`. This is a great
 solution for prototyping and applications like Cobalt.
 
-Libraries are a different beast. In cases like `aasert_cli` and `liquid`, I want to ensure:
-- User has a defined finite set of errors to programmatically deal with.
+Libraries can be a different beast. In cases like `aasert_cli` and `liquid`, I want to ensure:
+- User has a backwards compatible, defined, finite set of errors to programmatically deal with.
 - The errors are useful.
 
 Having a type-erased `failure::Fail` makes this impossible. Any `?` could be
@@ -235,13 +242,16 @@ and inspect the output.
 
 Instead I prefer to return `Result<T, AssertionError>` instead of `Result<T, failure::Error>`.
 
-That's fine, `failure::Error` is just a convenience that `failure` provides, like how `Box<Error>`. Except.
-- Except if I want to add `Context` to my errors, the only reasonable ergonomic way to do so is to return `Result<T, failure::Error>`.
-- Except [`Context` only supports wrapping a `failure::Error`](https://github.com/rust-lang-nursery/failure/issues/60), making it so any error can escape through a `Context`.
+That's fine, `failure::Error` is just a convenience that `failure` provides, like with `Box<Error>`, except:
+- If I want to add `Context` to my errors, the only reasonable ergonomic way to do so is to return `Result<T, failure::Error>`.
+- [`Context` only supports wrapping a `failure::Error`](https://github.com/rust-lang-nursery/failure/issues/60), making it so any error can escape through a `Context`.
 
 The only alternative is to reimplement the `Context` machinery that is built-in to the `failure::Fail` and `failure::ResultExt` traits.
 
-(remember, traits are most useful when `use failure::ResultExt;` removing any namespacing, so this effective *is* the `ResultExt` trait.)
+Suggestion:
+- Allow using context without `failure::Error` by, yet again, moving the
+  `Context from an error decorator to an error member, like `backtrace` and
+  `cause`.
 
 ### Support a `KeyedContext`
 
@@ -279,10 +289,11 @@ return Err(AssertionError::new(AssertionKind::OutputMismatch))
     .keyed_context("haystack", haystack.to_owned());
 ```
 
-I think providing something like `KeyedContext` is important for `failure` to
-help developers fall into the [pit of
-success](https://blog.codinghorror.com/falling-into-the-pit-of-success/) for
-giving helper errors to users.
+Suggestion:
+- Provide something *like* `KeyedContext` so `failure` can help developers fall
+  into the [pit of
+  success](https://blog.codinghorror.com/falling-into-the-pit-of-success/) for
+  giving helpful errors to users.
 
 ## Feedback on `failure::Error`
 
@@ -301,7 +312,7 @@ A quick summary of their behavior:
 ### `failure::Error` is not a `Fail`
 
 While `failure::Error` acts as a boxed `Failed`, it isn't a `Fail`. This
-requires specialization because `From<Fail> for Error` would conflict with
+isn't possible without specialization because `From<Fail> for Error` would conflict with
 `From<T> for T`.
 
 ### `failure::Error::cause` is a foot-gun
@@ -313,8 +324,8 @@ the `cause`s having different signatures (`Fail` returns an `Option<&Fail>`
 while cause returns `&Fail`>), I think this is going to trip up a lot of
 people.
 
-Instead, I feel that `Error::cause` should behave exactly like
-`Fail::cause`.
+Suggestion:
+- `Error::cause` should behave exactly like `Fail::cause` to avoid surprising developers.
 
 ## Feedback on `failure::Fail`
 
@@ -326,7 +337,11 @@ beneath it, right? Unfortunately, no. The current `Fail` is the first cause.
 Similarly, if your `Fail` has no `cause`, then it will be the `root_cause`.
 
 I can understand the need for functions that behave like these but not with
-names that imply they won't include your current `Fail`.
+names that imply they won't include your current `Fail`.  Granted, I personally
+would find `causes` not returning the top `Fail` more convinient.
+
+Suggestion:
+- Either find new names or change the behavior of the functions to avoid surprising developers.
 
 # Addendum
 
