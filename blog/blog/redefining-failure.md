@@ -1,6 +1,5 @@
 title: Redefining Failure
 published_date: "2018-03-09 03:08:23 +0000"
-layout: default.liquid
 is_draft: false
 data:
   tags:
