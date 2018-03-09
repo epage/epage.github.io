@@ -209,7 +209,7 @@ Suggestions:
 
 ### Errors are `Display`ed in Inverted Order
 
-Because `Context` generically wraps a` `failure::Error`, the ordering is inverted when rendering an error for a user.
+Because `Context` generically wraps a `failure::Error`, the ordering is inverted when rendering an error for a user.
 
 If I were to naively switch `liquid` to `failure` my errors would change from
 ```
