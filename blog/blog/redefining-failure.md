@@ -1,8 +1,8 @@
 title: Redefining Failure
+published_date: "2018-03-09 03:08:23 +0000"
 layout: default.liquid
-is_draft: true
+is_draft: false
 ---
-
 I recently got the chance to redo the error handling in two different crates I
 help maintain. For [`liquid`][liquid], I decided to write the error types by
 hand rather than use something like [`error-chain`][error-chain]. In the case
