@@ -171,8 +171,8 @@ experimentation with adding context to errors. In `failure`s case, it is using
 roughly the same approach from when it was first announced.
 
 `Context` serves two purposes in `failure`.
-- Wrap a `failure::Error`, adding a single `impl Display` of context.
-- Quick and dirty way to create a new error.
+- Wrap a `failure::Error`, adding a single `impl Display` of context (see [documentation](https://docs.rs/failure/0.1.1/failure/trait.Fail.html#method.context)).
+- Quick and dirty way to create or chain an error (see [documentation](https://docs.rs/failure/0.1.1/failure/struct.Context.html)).
 
 ### Decouple Roles
 
