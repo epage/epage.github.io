@@ -1,3 +1,4 @@
+---
 title: Serde and Complex Configuration
 layout: default.liquid
 is_draft: true

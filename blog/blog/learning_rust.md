@@ -1,3 +1,4 @@
+---
 is_draft: true
 ---
 anstall rust up

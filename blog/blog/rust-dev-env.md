@@ -1,3 +1,4 @@
+---
 title: A Rust Development Environment
 is_draft: true
 data:

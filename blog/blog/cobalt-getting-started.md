@@ -1,3 +1,4 @@
+---
 title: Using Cobalt for Blogging
 is_draft: true
 data:

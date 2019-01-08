@@ -1,3 +1,4 @@
+---
 title: Blog Transition
 published_date: "2018-01-17 09:00:30 -0500"
 ---

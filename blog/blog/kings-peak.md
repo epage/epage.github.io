@@ -1,3 +1,4 @@
+---
 title: "On Top of Utah - Hiking to Kings Peak"
 description: "Trip/equipment report for Kings Peak in Utah\n"
 published_date: "2013-08-17 14:46:30 -0500"
