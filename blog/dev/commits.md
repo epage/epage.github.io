@@ -170,7 +170,8 @@ git rebase master
 ```
 
 See also [How to manage your Git history: Tips for keeping your commits
-tidy][How to manage your Git history: Tips for keeping your commits tidy]
+tidy][How to manage your Git history: Tips for keeping your commits tidy] and
+[A tidy, linear Git history][A tidy, linear Git history]
 
 ### Fixing: Changing the most recent commit
 
@@ -282,3 +283,4 @@ to switch to VS Code, type `git config --global core.editor "code --wait"`.
 [A Visual Git Reference]: https://marklodato.github.io/visual-git-guide/index-en.html?no-svg
 [How to undo (almost) anything with Git]: https://github.blog/2015-06-08-how-to-undo-almost-anything-with-git/
 [Git series 2/3: rebase and the golden rule explained.]: https://www.freecodecamp.org/news/git-rebase-and-the-golden-rule-explained-70715eccc372/
+[A tidy, linear Git history]: http://www.bitsnbites.eu/a-tidy-linear-git-history/
