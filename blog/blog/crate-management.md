@@ -5,6 +5,7 @@ is_draft: false
 data:
   tags:
     - programming
+    - rust
 ---
 *Context: [Call for Community Posts](https://blog.rust-lang.org/2018/01/03/new-years-rust-a-call-for-community-blogposts.html) and [other posts](http://readrust.net/rust2018/)*
 

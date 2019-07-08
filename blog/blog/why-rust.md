@@ -2,7 +2,7 @@
 title: "Why Rust?"
 is_draft: true
 data:
-    tags: ["programming"]
+    tags: ["programming", "rust"]
 ---
 I’ve fallen into the pattern of using two kinds of languages: a rapid development language (Python) and a catch-all language (C++). I’ve long watched for something that would unseat C++ and I feel I finally found that in Rust.
 

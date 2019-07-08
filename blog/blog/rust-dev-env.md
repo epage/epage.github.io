@@ -2,7 +2,7 @@
 title: A Rust Development Environment
 is_draft: true
 data:
-    tags: ["programming"]
+    tags: ["programming", "rust"]
 ---
 Sadly, I’ve recently switched to Windows at home for some expediency reasons. I’ll call out the Windows-specific parts
 

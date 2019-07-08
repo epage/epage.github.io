@@ -5,6 +5,7 @@ is_draft: false
 data:
   tags:
     - programming
+    - rust
 ---
 I recently got the chance to redo the error handling in two different crates I
 help maintain. For [`liquid`][liquid], I decided to write the error types by
