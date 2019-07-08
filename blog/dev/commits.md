@@ -89,6 +89,8 @@ git commit
 **Tip:** Make staging files your habit rather than `git commit --all` to save
 yourself from having to fix things up later.
 
+See also [Understanding Git - Index][Understanding Git - Index].
+
 ### Upfront: Partway through a change, realize you want to make a conflicting change
 
 [Stashing][Git Tools - Stashing] is the go-to for quickly saving off your work to make another change
