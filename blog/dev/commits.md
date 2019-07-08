@@ -2,8 +2,6 @@
 title: Curating Commit History
 ---
 
-# Curating Commit History
-
 Programming is often an exploratory exercise where, for example, one might not
 know what a refactor should look like until the driving feature is done. This
 leads to a messy commit history.
