@@ -10,7 +10,7 @@ Over the years, I keep having to repeat myself on how best to reuse code, so I f
 
 Guidelines for code reuse, in priority order:
 
-- When reducing duplication, focus on reducing abstraction duplication and not implementation duplication.
+- When reducing duplication, focus on reducing intentional duplication and not incidental duplication.
   - The requirements that drove a shared implementation can evolve over time, causing the implementations to diverge.  When you share these kind of implementations, you either then need to undo your work or add "just one more" toggle to control things, leading to an unholy mess of spaghetti code
   - When focusing on the abstraction / requirements, you are identifying areas of shared code that is used together, or not. It is less likely to diverge.
   - My guidance on this is to wait until you have at least three implementations of something before trying to refactor for reuse because at that point you might be starting to understand the requirements (commonly called [The Rule of Three][I Dry-Ed Up My Code and Now It's Hard to Work With. What Happened].
@@ -23,4 +23,12 @@ Guidelines for code reuse, in priority order:
     - If a minor section of code gets pulled away into a remote component, it will make it harder for people to read and reason about the code.
     - The better the abstraction, the less this is a problem.
 
+To Integrate:
+- [Inheritance is a hammer. Eliminating code duplication is not a nail.][Inheritance is a hammer. Eliminating code duplication is not a nail.]
+- [Implementation Inheritance Is Evil][Implementation Inheritance Is Evil]
+- [When to avoid the DRY principle][When to avoid the DRY principle]
+
 [I Dry-Ed Up My Code and Now It's Hard to Work With. What Happened]: https://www.justinweiss.com/articles/i-dry-ed-up-my-code-and-now-its-hard-to-work-with-what-happened/
+[Inheritance is a hammer. Eliminating code duplication is not a nail.]: https://uselessdevblog.wordpress.com/2018/02/18/inheritance-is-a-hammer-eliminating-code-duplication-is-not-a-nail/
+[Implementation Inheritance Is Evil]: http://whats-in-a-game.com/implementation-inheritance-is-evil/
+[When to avoid the DRY principle]: https://www.madetech.com/blog/when-to-avoid-the-dry-principle
