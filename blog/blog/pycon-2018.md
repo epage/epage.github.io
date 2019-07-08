@@ -1,6 +1,10 @@
 ---
 title: PyCon 2018 Trip Report
 published_date: "2018-05-18 09:00:30 -0500"
+data:
+  tags:
+    - programming
+    - python
 ---
 I went to with a coworker to [PyCon](https://us.pycon.org/2018/) this year ([videos](https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos)).
 
