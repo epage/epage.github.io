@@ -13,7 +13,7 @@
           <div class="navbar-right">
             <ul class="list-unstyled">
               <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ page.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time></li>
-              {% if page.data.tags %}<li><i class="fa fa-tags"></i> {{ page.data.tags }}</li>{% endif %}
+              {% if page.data.tags %}<li><i class="fa fa-tags"></i> {{ page.data.tags | join: ", "}}</li>{% endif %}
             </ul>
           </div>
         </div>
