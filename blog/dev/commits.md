@@ -110,10 +110,10 @@ git add <file>
 git commit <file>
 ```
 
-**Tip:** The stash is a bit opaque of a stack which makes it harder to work
-with over periods of time or when multiple changes are getting stashed.  It
-also can't be pushed for sharing / backup.  In these cases, it might be better to
-use branches.
+**Tip:** The stash is a stack of changes which can feel opaque to work with
+which makes it harder to work with over periods of time or when multiple
+changes are getting stashed.  It also can't be pushed for sharing / backup.  In
+these cases, it might be better to use branches.
 
 ### Fixing: ctrl-z! ctrl-z! ctrl-z!
 
