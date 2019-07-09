@@ -202,7 +202,7 @@ git log
 git commit --fixup <hash>
 
 # Somtime later when you are ready to cleanup your history, this will
-automatically move your commit just after <hash> and squash it into <hash>
+# automatically move your commit just after <hash> and squash it into <hash>
 git rebase --autosquash master
 ```
 
