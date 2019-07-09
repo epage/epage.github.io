@@ -224,7 +224,7 @@ git rebase -i master
 ```
 And your commit history and instructions on editing it will pop up
 ```bash
-pick 6e73d55c6 chore(nest: Baseline version of nipg.pl
+pick 6e73d55c6 chore(nest): Baseline version of nipg.pl
 pick 6aed59e08 chore(nest): Strip nipg down to essentials
 
 # Rebase 1d9e1a08d..6aed59e08 onto 1d9e1a08d (2 commands)
