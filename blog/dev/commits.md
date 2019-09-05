@@ -273,6 +273,7 @@ to switch to VS Code, type `git config --global core.editor "code --wait"`.
 - [Auto-squashing Git Commits][Auto-squashing Git Commits]
 - [A Visual Git Reference][A Visual Git Reference]
 - [Git series 2/3: rebase and the golden rule explained.][Git series 2/3: rebase and the golden rule explained.]
+- [Linus' rules for clean history](https://www.mail-archive.com/dri-devel@lists.sourceforge.net/msg39091.html)
 
 [How to Write a Git Commit Message]: https://chris.beams.io/posts/git-commit/
 [How to manage your Git history: Tips for keeping your commits tidy]: https://ubuntu.com/blog/tricks-for-keeping-a-tidy-git-commit-history
