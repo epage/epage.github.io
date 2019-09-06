@@ -17,3 +17,9 @@ https://medium.com/@bellmar/all-the-best-engineering-advice-i-stole-from-non-tec
 > Paradoxes of Software Architecture #1: Flexibility Breeds Complexity
 
 http://www.informit.com/articles/article.aspx?p=1963779
+
+
+Developer Efficiency
+- [Activation energy](https://www.nature.com/scitable/content/ne0000/ne0000/ne0000/ne0000/14747799/U1CP3-3_EnzymeActivation_revised.jpg)
+- Analogy of my experience staying hydrated at work: drinking fountain vs water bottle vs sippy cup
+- http://www.gigamonkeys.com/flowers/
