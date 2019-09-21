@@ -5,7 +5,7 @@ title: "epage's blog"
   <div>
     {% for post in collections.posts.pages %}
     <div>
-      <h2><a href="{{ post.permalink }}">{{ post.title }}</a></h2>
+      <h2><a href="/{{ post.permalink }}">{{ post.title }}</a></h2>
       {% if post.description != "" %}<p>{{ post.description }}</p>{% elsif post.excerpt %}<p>{{ post.excerpt }}</p>{% else %}<br />{% endif %}
       {% if post.data.tags %}<h4><i class="fa fa-tags"></i> {{ post.data.tags | join: ", " }}</h4>{% endif %}
       <i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ post.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time>
