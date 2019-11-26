@@ -21,6 +21,10 @@ radical alternative (from the Rust ecosystem perspective) for addressing these
 problems. If you aren't interested in all the middle stuff, feel free to skip
 to the end!
 
+Update: I messed up my reading of docs and test cases and claimed that `Box<dyn
+Error>` implemented `Error`. This is not the case and my post has been updated
+to reflect that.
+
 ## Why are errors such a hot topic in Rust compared to other languages?
 
 When I look at other languages, for the most part what error is returned is an
@@ -33,13 +37,11 @@ achieved with `Box<dyn Error>` but with trade-offs
   changing how the compiler returns values (using the stack instead of
   registers).
 - Backtraces are not automatically included with `Box<dyn Error>`.
-- While `Box<dyn Error>` is a good citizen ([`impl From<E: Error>` for `?`
+- Not even  `Box<dyn Error>` is a good citizen ([`impl From<E: Error>` for `?`
   usage and `impl Error` for
-  interop](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=2e0501d51c22a6d5078f97aa188d4348))
-  the average user [can't reproduce that
-  behavior](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=268fdba6fb89f3ecc99f1c3d8e9f01d4)
-  until specialization is stablized, preventing people from solving the above
-  with a newtype.
+  interop](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=ff8d532f1e6cdb1cd635e32d6c0432d0)).
+  Another spin on this is [doing something similar ourselves](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=268fdba6fb89f3ecc99f1c3d8e9f01d4).
+  This can't work until specialization is stablized.
 
 Other challenges that are unique to Rust:
 
@@ -97,14 +99,11 @@ and I feel this is the way to go. I feel we should have something that looks lik
 struct BoxError(Box<Box<dync Error + Send + Sync + 'static>>);
 ```
 
-This should support both `impl Error` and `From<E: Error>` like `Box`. This
-means it can only be implemented in the stdlib and not a crate without using
-nightly features..
-
 This does not solve cloning, serialization, localization, or a host of other
 issues, however.
 
 For me, the main open questions before putting this in the **stdlib** are:
+- Like `Box`, we are blocked on specialization to support both `impl Error` and `From<E: Error>`.
 - Name bikeshedding.
 - Whether the "thin pointer" (`Box<Box<dyn _>>`) should be generalized.
 - Whether backtraces should be included (personally, I think that should be
