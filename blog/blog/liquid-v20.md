@@ -181,7 +181,7 @@ Regarding the [jekyll library][jekyll-liquid]
   - [`shift`][liquid#220]
   - [`array_to_sentence_string`][liquid#220]
 
-## Error Improvements
+#### Error Improvements
 
 We've been iterating on the usability of template errors.  I blogged in the
 past on [error handling in
@@ -194,7 +194,7 @@ Specifically, some things we've done:
 - Include context, like variable values, in backtrace [(1)][liquid#164] [(2)][liquid#233]
 - Fix up the tone and use more clear terms [(1)][liquid#231] [(2)][liquid#233]
 
-## Performance
+#### Performance
 
 To help guide performance improvements, We [ported handlebar's and tera's
 benchmarks][liquid#234] to Liquid:
