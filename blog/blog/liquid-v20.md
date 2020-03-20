@@ -9,7 +9,7 @@ data:
 
 `liquid` v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.
 
-*[`liquid-rust`][liquid-rust] is a re-implementation of the [liquid][liquid] template engine in Rust made popular by the [jekyll][jekyll] static site generator.*
+*[`liquid-rust`][liquid-rust] is a rust re-implementation of the [liquid][liquid] template engine made popular by the [jekyll][jekyll] static site generator.*
 
 ### Highlights
 
