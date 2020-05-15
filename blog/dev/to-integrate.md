@@ -23,3 +23,6 @@ Developer Efficiency
 - [Activation energy](https://www.nature.com/scitable/content/ne0000/ne0000/ne0000/ne0000/14747799/U1CP3-3_EnzymeActivation_revised.jpg)
 - Analogy of my experience staying hydrated at work: drinking fountain vs water bottle vs sippy cup
 - http://www.gigamonkeys.com/flowers/
+
+OOP
+- https://news.ycombinator.com/item?id=23192264
