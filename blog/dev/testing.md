@@ -23,6 +23,7 @@ Testing is a trade off.  Test coverage helps deliver a higher quality product an
   - Tests more tightly coupled to code’s implementation (in contrast to requirements) means it is more likely you’ll break the tests as code evolves and need to update them.
   - Doesn’t just make changes more expensive but has a psychological impact, making people less likely to change code when they see a problem.
 - There is momentum to submitted tests.  It takes quite a bit of pain before one person feels comfortable removing the test, partially for justifying it to themself, partially because they feel the need to justify it to reviewers, and partially because they feel responsible for replacing it with the right tests.  We’ve seen a recent example of this with revision-comment-hook’s itests.
+- There is opportunity cost: what else could we have done then write the tests?
 
 The trade off between these is not universal.  NASA has different needs than a script I write for a one-time refactor of code.
 
