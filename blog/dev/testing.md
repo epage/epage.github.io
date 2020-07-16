@@ -163,13 +163,11 @@ create a `ValidatedType` is to go through the `validate` constructor which
 focuses your auditing on just that one point of failure and you trust in the
 type system to enforce the policy everywhere else.
 
-## Static analysis
+## Linters
 
-While static typing is a form of static analysis, I'm classifying it separately
-because static typing tends to be very precise and most people associate static
-analysis with linters that can only point out code-smells but not say whether something
-is actually wrong.  Technically, this is true of typing but to a dramatically
-different degree.
+Generally linters try to infer higher level intent from your code by analyzing
+the source.  A lot of bugs will still get missed and a lot of valid code will
+be flagged.
 
 Strategies for adopting static analysis in an existing code base:
 - Have a stricter IDE-detected configuration than the CI enforces. This pushes
@@ -178,7 +176,7 @@ Strategies for adopting static analysis in an existing code base:
   from being introduced.
 
 For false-positives, your options are:
-- Play whack-a-mole by adding `ignores directives` in the code
+- Play whack-a-mole by adding "ignores directives" in the code
 - Warn (in IDE) but don't error (in CI).
 
 ## Proof systems
