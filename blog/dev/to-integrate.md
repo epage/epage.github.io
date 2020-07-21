@@ -18,6 +18,13 @@ https://medium.com/@bellmar/all-the-best-engineering-advice-i-stole-from-non-tec
 
 http://www.informit.com/articles/article.aspx?p=1963779
 
+> Performance changes how users use software 
+>
+> It’s probably fairly intuitive that users prefer faster software, and will have a better experience performing a given task  if the tools are faster rather than slower.
+> 
+> What is perhaps less apparent is that having faster tools changes how users use a tool or perform a task. Users almost always have multiple strategies available to pursue a goal — including deciding to work on something else entirely — and they will choose to use faster tools more and more frequently. Fast tools don’t just allow users to accomplish tasks faster; they allow users to accomplish entirely new types of tasks, in entirely new ways.
+
+https://blog.nelhage.com/post/reflections-on-performance/
 
 Developer Efficiency
 - [Activation energy](https://www.nature.com/scitable/content/ne0000/ne0000/ne0000/ne0000/14747799/U1CP3-3_EnzymeActivation_revised.jpg)
