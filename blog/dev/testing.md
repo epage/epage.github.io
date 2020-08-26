@@ -11,6 +11,14 @@ Consider the [purpose of the test][Why Am I Writing This Test]:
 
 ## Specifying Requirements
 
+> In most businesses, the only tests that have business value are those that are derived from business requirements. Most unit tests are derived from programmers' fantasies about how the function should work: their hopes, stereotypes, or sometimes wishes about how things should go. Those have no provable value. There were methodologies in the 1970s and 1980s based on traceability that tried to reduce system requirements all the way down to the unit level. In general, that's an NP-hard problem (unless you are doing pure procedural decomposition) so I'm very skeptical of anyone who says they can do that. So one question to ask about every test is: If this test fails, what business requirement is compromised? Most of the time, the answer is, "I don't know." If you don't know the value of the test, then the test theoretically could have zero business value. The test does have a cost: maintenance, computing time, administration, and so forth. That means the test could have net negative value
+
+- James O Coplien, ["Why Most Unit Testing is Waste"](https://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf)
+
+> Consider whether the bulk of your unit tests should be those that test key algorithms for which there is a “third-party” oracle for success, rather than one created by the same team that writes the code. “Success” here should reflect a business mandate rather than, say, the opinion of a team member called “tester” whose opinion is valued only because it is independent. Of course, an independent evaluation perspective is also important. 
+
+- James O Coplien, ["Why Most Unit Testing is Waste"](https://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf)
+
 A limitation with meeting this purpose is knowing your requirements.
 
 In parsing a specified format, you know the quantitative requirements up front and you know what tests need to be written.
@@ -48,6 +56,12 @@ specific section being developed. One-off scripts have a different confidence
 bar than products like the one I worked on that one time shipped with CDs
 warning that a known bug cause death or dismemberment.
 
+## Regressions
+
+> Note that there are some units and some tests for which there is a clear answer to the business value question. One such set of tests is regression tests; however, those rarely are written at the unit level but rather at the system level. We know what bug will come back if a regression test fails — by construction. Also, some systems have key algorithms — like network routing algorithms — that are testable against a single API. There is a formal oracle for deriving the tests for such APIs, as I said above. So those unit tests have value.
+
+- James O Coplien, ["Why Most Unit Testing is Waste"](https://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf)
+
 # Trade-offs in Testing
 
 Testing is a trade off.  Test coverage helps deliver a higher quality product
@@ -67,8 +81,25 @@ cost though.
   tests.
 - There is opportunity cost: what else could we have done rather than write the tests?
 
+> The point is that code is part of your system architecture. Tests are modules. That one doesn’t deliver the tests doesn’t relieve one of the design and maintenance liabilities that come with more modules. 
+> ...
+> To make things worse, you’ve introduced coupling — coordinated change — between each module and the tests that go along with it. You need to thing of tests as system modules as well. That you remove them before you ship doesn’t change their maintenance behavior. 
+
+- James O Coplien, ["Why Most Unit Testing is Waste"](https://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf)
+
+>  The tests are code. Developers write code. When developers write code they insert about three system-affecting bugs per thousand lines of code. If we randomly seed my client’s code base — which includes the tests — with such bugs, we find that the tests will hold the code to an incorrect result more often than a genuine bug will cause the code to fail!
+
+- James O Coplien, ["Why Most Unit Testing is Waste"](https://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf)
+
+
 The trade off between these is not universal.  NASA has different needs than a
 script I write for a one-time refactor of code.
+
+A lot of this comes down to risk.
+
+> If you cannot tell how a unit test failure contributes to product risk, you should evaluate whether to throw the test away. There are better techniques to attack quality lapses in the absence of formal correctness criteria, such as exploratory testing and Monte Carlo techniques. (Those are great and I view them as being in a category separate from what I am addressing here.) Don’t use unit tests for such validation.
+
+- James O Coplien, ["Why Most Unit Testing is Waste"](https://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf)
 
 For general development, I recommend reasonable coverage that instills
 confidence but doesn't get in the way.  Testing beyond this is YAGNI and should
