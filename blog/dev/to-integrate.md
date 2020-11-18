@@ -27,7 +27,7 @@ http://www.informit.com/articles/article.aspx?p=1963779
 https://blog.nelhage.com/post/reflections-on-performance/
 
 Developer Efficiency
-- [Activation energy](https://www.nature.com/scitable/content/ne0000/ne0000/ne0000/ne0000/14747799/U1CP3-3_EnzymeActivation_revised.jpg)
+- [Activation energy](https://www.nature.com/scitable/content/ne0000/ne0000/ne0000/ne0000/14747799/U1CP3-3_EnzymeActivation_revised.jpg).  Seems someone has already spoken on it: https://phab.duosec.org/D63607
 - Analogy of my experience staying hydrated at work: drinking fountain vs water bottle vs sippy cup
 - http://www.gigamonkeys.com/flowers/
 
