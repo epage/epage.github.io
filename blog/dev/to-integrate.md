@@ -33,3 +33,14 @@ Developer Efficiency
 
 OOP
 - https://news.ycombinator.com/item?id=23192264
+- https://news.ycombinator.com/item?id=24008557
+  - https://medium.com/young-coder/the-case-against-oop-is-wildly-overstated-572eae5ab495
+  - http://www.smashcompany.com/technology/object-oriented-programming-is-an-expensive-disaster-which-must-end
+  - http://www.smashcompany.com/technology/object-oriented-programming-is-an-expensive-disaster-which-must-end
+
+
+> I used to tolerate and expect complexity. Working on Go the past 10 years has changed my perspective, though. I now value simplicity above almost all else and tolerate complexity only when it's well isolated, well documented, well tested, and necessary to make things simpler overall at other layers for most people.
+https://bradfitz.com/2020/01/30/joining-tailscale
+- Interesting to disect this since I disagree about Go (and he'd probably disagree about Rust)
+
+[Five worlds](https://bradfitz.com/2020/01/30/joining-tailscale) and [discussion](https://www.reddit.com/r/programming/comments/i1445a/five_worlds_joel_on_software/fzv67f9/)
