@@ -27,6 +27,7 @@ To Integrate:
 - [Inheritance is a hammer. Eliminating code duplication is not a nail.][Inheritance is a hammer. Eliminating code duplication is not a nail.]
 - [Implementation Inheritance Is Evil][Implementation Inheritance Is Evil]
 - [When to avoid the DRY principle][When to avoid the DRY principle]
+- [Limits in concept reduction via the toilet, drinking fountain, shower metaphor](https://web.archive.org/web/20120427101911/http://jacksonfish.com/blog/2012/03/12/the-day-bill-gates-called-me-rude-and-other-lessons-in-user-experience/)
 
 [I Dry-Ed Up My Code and Now It's Hard to Work With. What Happened]: https://www.justinweiss.com/articles/i-dry-ed-up-my-code-and-now-its-hard-to-work-with-what-happened/
 [Inheritance is a hammer. Eliminating code duplication is not a nail.]: https://uselessdevblog.wordpress.com/2018/02/18/inheritance-is-a-hammer-eliminating-code-duplication-is-not-a-nail/
