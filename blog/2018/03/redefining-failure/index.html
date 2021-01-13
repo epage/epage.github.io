@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redefining Failure</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Redefining Failure</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;09&nbsp;Mar&nbsp;'18</time></li>
+              <li><i class="fa fa-tags"></i> programming, rust</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <p>I recently got the chance to redo the error handling in two different crates I
+help maintain. For <a href="https://github.com/cobalt-org/liquid-rust"><code>liquid</code></a>, I decided to write the error types by
+hand rather than use something like <a href="https://crates.io/crates/error-chain"><code>error-chain</code></a>. In the case
+of <a href="https://github.com/assert-rs/assert_cli"><code>assert_cli</code></a>, I decided to finally give <a href="https://github.com/withoutboats/failure"><code>failure</code></a> a
+try.</p>
+<p>From <code>failure</code>'s <a href="https://boats.gitlab.io/blog/post/2017-11-16-announcing-failure/">announcement</a>:</p>
+<blockquote>
+<p>Failure is a Rust library intended to make it easier to manage your error
+types. This library has been heavily influenced by learnings we gained from
+previous iterations in our error management story, especially the <a href="https://doc.rust-lang.org/std/error/trait.Error.html"><code>Error</code>
+trait</a> and the <a href="https://crates.io/crates/error-chain"><code>error-chain</code></a> crate.</p>
+</blockquote>
+<p>I think <code>failure</code> does a great job iterating on Rust's error management story,
+fixing a lot of fundamental problems in the <code>Error</code> trait and making it easier
+for new developers and prototypers to be successful. While a replacement for
+the <code>Error</code> trait is a disruptive change to the ecosystem, I feel the reasons
+are well justified and the crate looks like it does a great job bridging the
+gap.</p>
+<p>On the other hand, I do feel that there are parts of <code>failure</code> that are a bit
+immature, particularly <a href="https://docs.rs/failure/0.1.1/failure/struct.Context.html"><code>Context</code></a>. The reason this is concerning is
+the implementation policies related to <code>Context</code> are coupled to the general
+<code>Fail</code> trait mechanism (see <a href="https://en.wikipedia.org/wiki/Separation_of_mechanism_and_policy">Separation of mechanism and policy</a>).
+We cannot experiment and iterate on <code>Context</code> without breaking compatibility
+with <code>Fail</code> and there is a reasonable <a href="https://boats.gitlab.io/blog/post/2018-02-22-failure-1.0/">hesitance in breaking
+compatibility</a>.</p>
+<p>I'd recommend <code>failure</code> for anyone writing an application. I'd recommend
+library authors exercise caution, particularly if you have richer requirements
+for your errors. For the crate author, I'd suggest it is either not ready yet
+for &quot;1.0&quot; or to be more open to breaking changes than <a href="https://boats.gitlab.io/blog/post/2018-02-22-failure-1.0/">&quot;the distant
+future&quot;</a>. Below I'll go into more specific areas I think <code>failure</code>
+can be improved.</p>
+<p>I know it is less than ideal to receive this type of feedback &quot;late&quot; in the
+process (<a href="https://boats.gitlab.io/blog/post/2018-02-22-failure-1.0/">1.0 is expected to release next week</a>). I was strapped for
+time and only recently had solid use cases to push <code>failure</code>s limits.  I at
+least tried to provide theoretical feedback early on based on reading the code
+and docs out of an eagerness for <code>failure</code> to succeed.  The ability to create a
+thorough analysis from just reading the docs / code is limited and the weight
+of such feedback is reasonably lower.</p>
+<h2>My Recent Failures</h2>
+<p>So let's step through my recent case studies in error management</p>
+<h3><code>liquid</code></h3>
+<p><a href="https://github.com/cobalt-org/liquid-rust"><code>liquid</code> is a rust implementation</a> of Shopify's <a href="http://liquidmarkup.org/">liquid template language</a>.</p>
+<p>As mentioned above, I recently did a <a href="https://github.com/cobalt-org/liquid-rust/pull/164">major revamp of <code>liquid</code>s
+errors</a>. I ended up
+skipping <code>failure</code>. It was easier for me to write my error types from scratch
+than to take the time to figure out how to map my needs to <code>failure</code>. I was
+also concerned about making an unstable crate such a fundamental part of my
+API.</p>
+<p>My goals were:</p>
+<ul>
+<li>Low friction for detailed error reports.</li>
+<li>Give the user context to the errors with template back traces.</li>
+</ul>
+<p>An example of a template backtrace:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">Error: liquid: Expected whole number, found `fractional number`
+  with:
+    end=10.5
+from: {% for i in (1..max) reversed %}
+from: {% if &quot;blue skies&quot; == var %}
+  with:
+    var=10
+</span></pre>
+<p>Here is a rough sketch of <code>liquid</code>s errors:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Fail, Debug)]
+</span><span style="background-color:#2b303b;color:#b48ead;">pub struct </span><span style="background-color:#2b303b;color:#c0c5ce;">Error {
+    </span><span style="background-color:#2b303b;color:#bf616a;">inner</span><span style="background-color:#2b303b;color:#c0c5ce;">: Box&lt;InnerError&gt;,
+}
+
+#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Fail, Debug)]
+</span><span style="background-color:#2b303b;color:#b48ead;">struct </span><span style="background-color:#2b303b;color:#c0c5ce;">InnerError {
+    </span><span style="background-color:#2b303b;color:#bf616a;">msg</span><span style="background-color:#2b303b;color:#c0c5ce;">: borrow::Cow&lt;</span><span style="background-color:#2b303b;color:#b48ead;">&#39;static</span><span style="background-color:#2b303b;color:#c0c5ce;">, </span><span style="background-color:#2b303b;color:#b48ead;">str</span><span style="background-color:#2b303b;color:#c0c5ce;">&gt;,
+    </span><span style="background-color:#2b303b;color:#bf616a;">user_backtrace</span><span style="background-color:#2b303b;color:#c0c5ce;">: Vec&lt;Trace&gt;,
+    #[cause] </span><span style="background-color:#2b303b;color:#bf616a;">cause</span><span style="background-color:#2b303b;color:#c0c5ce;">: Option&lt;ErrorCause&gt;,
+}
+
+#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Clone, PartialEq, Eq, Debug, Default)]
+</span><span style="background-color:#2b303b;color:#b48ead;">pub struct </span><span style="background-color:#2b303b;color:#c0c5ce;">Trace {
+    </span><span style="background-color:#2b303b;color:#bf616a;">trace</span><span style="background-color:#2b303b;color:#c0c5ce;">: Option&lt;String&gt;,
+    </span><span style="background-color:#2b303b;color:#bf616a;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">: Vec&lt;(borrow::Cow&lt;</span><span style="background-color:#2b303b;color:#b48ead;">&#39;static</span><span style="background-color:#2b303b;color:#c0c5ce;">, </span><span style="background-color:#2b303b;color:#b48ead;">str</span><span style="background-color:#2b303b;color:#c0c5ce;">&gt;, String)&gt;,
+}
+</span></pre>
+<p>I've created various &quot;ResultExt&quot; traits to make it some-what ergonomic to create:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> value = value
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">as_scalar</span><span style="background-color:#2b303b;color:#c0c5ce;">()
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">and_then</span><span style="background-color:#2b303b;color:#c0c5ce;">(Scalar::to_integer)
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">ok_or_else</span><span style="background-color:#2b303b;color:#c0c5ce;">(|| Error::with_msg(format!(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Expected whole number, found `</span><span style="background-color:#2b303b;color:#d08770;">{}</span><span style="background-color:#2b303b;color:#a3be8c;">`</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, expected, value.</span><span style="background-color:#2b303b;color:#96b5b4;">type_name</span><span style="background-color:#2b303b;color:#c0c5ce;">()))
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context_with</span><span style="background-color:#2b303b;color:#c0c5ce;">(|| (arg_name.</span><span style="background-color:#2b303b;color:#96b5b4;">to_string</span><span style="background-color:#2b303b;color:#c0c5ce;">().</span><span style="background-color:#2b303b;color:#96b5b4;">into</span><span style="background-color:#2b303b;color:#c0c5ce;">(), value.</span><span style="background-color:#2b303b;color:#96b5b4;">to_string</span><span style="background-color:#2b303b;color:#c0c5ce;">()))?;
+...
+</span><span style="background-color:#2b303b;color:#b48ead;">let mut</span><span style="background-color:#2b303b;color:#c0c5ce;"> range = </span><span style="background-color:#2b303b;color:#bf616a;">self</span><span style="background-color:#2b303b;color:#c0c5ce;">.range
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">evaluate</span><span style="background-color:#2b303b;color:#c0c5ce;">(context)
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">trace_with</span><span style="background-color:#2b303b;color:#c0c5ce;">(|| </span><span style="background-color:#2b303b;color:#bf616a;">self</span><span style="background-color:#2b303b;color:#c0c5ce;">.</span><span style="background-color:#2b303b;color:#96b5b4;">trace</span><span style="background-color:#2b303b;color:#c0c5ce;">().</span><span style="background-color:#2b303b;color:#96b5b4;">into</span><span style="background-color:#2b303b;color:#c0c5ce;">())?;
+</span></pre>
+<p>While the context API needs some work, the overall approach worked great and
+provides very help error messages to the user.</p>
+<h3><code>assert_cli</code></h3>
+<p><a href="https://github.com/assert-rs/assert_cli"><code>assert_cli</code></a> provides assertions for program behavior to help
+with testing.</p>
+<p>This week, I started on a refactoring of <code>assert_cli</code> in an effort to move it
+to &quot;1.0&quot; for the CLI working group. I needed some new errors and rather than
+continuing to extend the existing brittle system based on <code>error-chain</code>, I
+thought I'd give <code>failure</code> a try. I figured breaking changes in <code>failure</code> would
+have minimal impact on my users because 99% of <code>assert_cli</code> users are just
+unwrapping the error in their tests rather than passing it along.</p>
+<p>I structured <code>assert_cli</code>'s <code>error-chain</code> errors to leverage chaining. The chaining hierarchy is something like:</p>
+<ul>
+<li>Spawn Failed</li>
+<li>Assertion Failed
+<ul>
+<li>Status (success / failure) Failed</li>
+<li>Exit Code Failed</li>
+<li>Output
+<ul>
+<li>Strings matched when shouldn't</li>
+<li>Strings matched when should</li>
+<li>Bytes matched when shouldn't</li>
+<li>Bytes matched when should</li>
+<li>Sub-strings matched when shouldn't</li>
+<li>Sub-strings matched when should</li>
+<li>Byte subset matched when shouldn't</li>
+<li>Byte subset matched when should</li>
+<li>Predicate failed</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Most of these errors really just exist for the sake of adding context.  This is
+greatly simplified by leveraging <code>failure::Context</code> and <a href="https://boats.gitlab.io/failure/error-errorkind.html"><code>ErrorKind</code>
+idiom</a>.</p>
+<p>This is what it looks like, in Rust pseudo-code:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Copy, Clone, Eq, PartialEq, Debug, Fail)]
+</span><span style="background-color:#2b303b;color:#b48ead;">pub enum </span><span style="background-color:#2b303b;color:#c0c5ce;">AssertionKind {
+    #[</span><span style="background-color:#2b303b;color:#bf616a;">fail</span><span style="background-color:#2b303b;color:#c0c5ce;">(display = &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Spawn failed.</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)] Spawn,
+    #[</span><span style="background-color:#2b303b;color:#bf616a;">fail</span><span style="background-color:#2b303b;color:#c0c5ce;">(display = &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Status mismatch.</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)] StatusMismatch,
+    #[</span><span style="background-color:#2b303b;color:#bf616a;">fail</span><span style="background-color:#2b303b;color:#c0c5ce;">(display = &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Exit code mismatch.</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)] ExitCodeMismatch,
+    #[</span><span style="background-color:#2b303b;color:#bf616a;">fail</span><span style="background-color:#2b303b;color:#c0c5ce;">(display = &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Output mismatch.</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)] OutputMismatch,
+}
+
+#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Debug)]
+</span><span style="background-color:#2b303b;color:#b48ead;">pub struct </span><span style="background-color:#2b303b;color:#c0c5ce;">AssertionError {
+    </span><span style="background-color:#2b303b;color:#bf616a;">inner</span><span style="background-color:#2b303b;color:#c0c5ce;">: failure::Context&lt;AssertionKind&gt;,
+}
+</span></pre>
+<p>Most of the rest of this post goes into my initial experience in converting over to this.</p>
+<h2>Feedback on <code>failure::Context</code></h2>
+<p><code>error-chain</code> and friends have been around for a while and given us different
+takes on how to write and chain errors but there hasn't been too much
+experimentation with adding context to errors. In <code>failure</code>s case, it is using
+roughly the same approach from when it was first announced.</p>
+<p><code>Context</code> serves two purposes in <code>failure</code>.</p>
+<ul>
+<li>Wrap a <code>failure::Error</code>, adding a single <code>impl Display</code> of context (see <a href="https://docs.rs/failure/0.1.1/failure/trait.Fail.html#method.context">documentation</a>).</li>
+<li>Quick and dirty way to create or chain an error (see <a href="https://docs.rs/failure/0.1.1/failure/struct.Context.html">documentation</a>).</li>
+</ul>
+<h3>Decouple Roles</h3>
+<p>Coupling these roles is initially convenient. A user can quickly create an
+error of from any piece of data they have and there isn't need for another
+<code>struct</code> that looks and acts similarly to <code>Context</code>.</p>
+<p>The problem is in the details.</p>
+<p>Say my errors are wrapped like this:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">Context -&gt; Context -&gt; AssertionError -&gt; io::Error
+</span></pre>
+<p>(remember: <code>Context</code> is a <code>Fail</code>)</p>
+<ul>
+<li>Which <code>Fail</code>s' <code>Termination</code> trait should be respected for <a href="https://github.com/rust-lang/rfcs/blob/master/text/1937-ques-in-main.md"><code>?</code> in
+<code>main</code></a>
+(when that becomes a thing)?</li>
+<li>How does a user of my library identify my documented error type for making
+programmatically handling the error?</li>
+<li>If an application only wants to show the leaf error and not the causes, how does it identify what is a leaf error?</li>
+<li>How should adding <code>Context</code> in <code>no_std</code> work?  With the current approach, the <code>Context</code> is passed back and the original error is dropped.</li>
+</ul>
+<p>Suggestions:</p>
+<ul>
+<li>Separate the roles by providing an alternative &quot;easy error&quot;.</li>
+<li>Separate the roles so a clearer <code>no_std</code> policy can exist.</li>
+<li>Remove <code>Context</code> from the error chain by moving the <code>Context</code> from an error
+decorator to an error member, like <code>backtrace</code> and <code>cause</code>.</li>
+<li>Experiment with ways to give <code>no_std</code> users more control over the <code>Context</code>
+policy like moving the <code>Context</code> from an error decorator to an error member,
+like <code>backtrace</code> and <code>cause</code>.</li>
+</ul>
+<h3>Errors are <code>Display</code>ed in Inverted Order</h3>
+<p>Because <code>Context</code> generically wraps a <code>failure::Error</code>, the ordering is inverted when rendering an error for a user.</p>
+<p>If I were to naively switch <code>liquid</code> to <code>failure</code> my errors would change from</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">Error: liquid: Expected whole number, found `fractional number`
+  with:
+    end=10.5
+from: {% for i in (1..max) reversed %}
+from: {% if &quot;blue skies&quot; == var %}
+  with:
+    var=10
+</span></pre>
+<p>to</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">end=10.5
+cause: Error: liquid: Expected whole number, found `fractional number`
+cause: {% for i in (1..max) reversed %}
+cause: var=10
+cause: {% if &quot;blue skies&quot; == var %}
+</span></pre>
+<p>Suggestion:</p>
+<ul>
+<li>Associate contexts with an error by, again, moving the <code>Context</code> from an error
+decorator to an error member, like <code>backtrace</code> and <code>cause</code>.</li>
+</ul>
+<h3>Better support type contracts</h3>
+<p><code>failure::Error</code> is a fancy boxed version of <code>failure::Fail</code>. This is a great
+solution for prototyping and applications like Cobalt.</p>
+<p>Libraries can be a different beast. In cases like <code>aasert_cli</code> and <code>liquid</code>, I want to ensure:</p>
+<ul>
+<li>User has a backwards compatible, defined, finite set of errors to programmatically deal with.</li>
+<li>The errors are useful.</li>
+</ul>
+<p>Having a type-erased <code>failure::Fail</code> makes this impossible. Any <code>?</code> could be
+turning an error from a dependency into a <code>failure::Fail</code> and passing it right
+back up to my user. The only way for me to know is to exercise every error path
+and inspect the output.</p>
+<p>Instead I prefer to return <code>Result&lt;T, AssertionError&gt;</code> instead of <code>Result&lt;T, failure::Error&gt;</code>.</p>
+<p>That's fine, <code>failure::Error</code> is just a convenience that <code>failure</code> provides, like with <code>Box&lt;Error&gt;</code>, except:</p>
+<ul>
+<li>If I want to add <code>Context</code> to my errors, the only reasonable ergonomic way to do so is to return <code>Result&lt;T, failure::Error&gt;</code>.</li>
+<li><a href="https://github.com/rust-lang-nursery/failure/issues/60"><code>Context</code> only supports wrapping a <code>failure::Error</code></a>, making it so any error can escape through a <code>Context</code>.</li>
+</ul>
+<p>The only alternative is to reimplement the <code>Context</code> machinery that is built-in to the <code>failure::Fail</code> and <code>failure::ResultExt</code> traits.</p>
+<p>Suggestion:</p>
+<ul>
+<li>Allow using context without <code>failure::Error</code> by, yet again, moving the
+<code>Context</code> from an error decorator to an error member, like <code>backtrace</code> and
+<code>cause</code>.</li>
+</ul>
+<h3>Support a <code>ContextPair</code></h3>
+<p>When converting <code>assert_cli</code> to <code>failure</code>, I found <code>failure::Context</code> works
+great when you want to dump strings but has limitations for my more common
+cases:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#65737e;">// Good: failure::Context works well in this case
+</span><span style="background-color:#2b303b;color:#b48ead;">return </span><span style="background-color:#2b303b;color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">expected to contain</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)
+</span><span style="background-color:#2b303b;color:#65737e;">// Bad: failure::Context loses the context in this case
+</span><span style="background-color:#2b303b;color:#b48ead;">return </span><span style="background-color:#2b303b;color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">(needle)
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">(haystack)
+</span><span style="background-color:#2b303b;color:#65737e;">// Alternative: Works but is a bit verbose, especially considering this is going to be 90% of my Contexts
+</span><span style="background-color:#2b303b;color:#b48ead;">return </span><span style="background-color:#2b303b;color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context_with</span><span style="background-color:#2b303b;color:#c0c5ce;">(|| format!(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">needle: </span><span style="background-color:#2b303b;color:#d08770;">{}</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, needle))
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context_with</span><span style="background-color:#2b303b;color:#c0c5ce;">(|| format!(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">haystack: </span><span style="background-color:#2b303b;color:#d08770;">{}</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, haystack))
+</span></pre>
+<p>So I added this:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Debug)]
+</span><span style="background-color:#2b303b;color:#b48ead;">pub struct </span><span style="background-color:#2b303b;color:#c0c5ce;">ContextPair
+{
+    </span><span style="background-color:#2b303b;color:#bf616a;">key</span><span style="background-color:#2b303b;color:#c0c5ce;">: &amp;</span><span style="background-color:#2b303b;color:#b48ead;">&#39;static str</span><span style="background-color:#2b303b;color:#c0c5ce;">,
+    </span><span style="background-color:#2b303b;color:#bf616a;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">: impl Display,
+}
+</span></pre>
+<p>which can be used like:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#b48ead;">return </span><span style="background-color:#2b303b;color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">expected to contain</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">(ContextPair(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">needle</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, needle.</span><span style="background-color:#2b303b;color:#96b5b4;">to_owned</span><span style="background-color:#2b303b;color:#c0c5ce;">()))
+    .</span><span style="background-color:#2b303b;color:#96b5b4;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">(ContextPair(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">haystack</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, haystack.</span><span style="background-color:#2b303b;color:#96b5b4;">to_owned</span><span style="background-color:#2b303b;color:#c0c5ce;">()));
+</span></pre>
+<p>Suggestion:</p>
+<ul>
+<li>Provide something <em>like</em> <code>ContextPair</code> so <code>failure</code> can help developers fall
+into the <a href="https://blog.codinghorror.com/falling-into-the-pit-of-success/">pit of
+success</a> for
+giving helpful errors to users.</li>
+</ul>
+<h2>Feedback on <code>failure::Error</code></h2>
+<p><code>failure::Error</code> is a fancy boxed version of <code>Fail</code>. Their APIs generally
+deviate in ways that make sense for their different feature sets.</p>
+<p>A quick summary of their behavior:</p>
+<table><thead><tr><th> </th><th><code>Fail</code></th><th><code>Error</code></th></tr></thead><tbody>
+<tr><td><code>cause</code></td><td>child item</td><td>inner</td></tr>
+<tr><td><code>causes</code></td><td>starts with self</td><td>starts with inner</td></tr>
+<tr><td><code>root_cause</code></td><td>includes self</td><td>includes self</td></tr>
+<tr><td><code>downcast</code></td><td>acts on self</td><td>acts on inner</td></tr>
+</tbody></table>
+<h3><code>failure::Error</code> is not a <code>Fail</code></h3>
+<p>While <code>failure::Error</code> acts as a boxed <code>Failed</code>, it isn't a <code>Fail</code>. This
+isn't possible without specialization because <code>From&lt;Fail&gt; for Error</code> would conflict with
+<code>From&lt;T&gt; for T</code>.</p>
+<h3><code>failure::Error::cause</code> is a foot-gun</h3>
+<p>As note above, <code>Error</code> and <code>Fail</code> have similar APIs and <code>failure::Error</code> mostly
+behaves as a proxy for the inner <code>Fail</code> with <a href="https://github.com/rust-lang-nursery/failure/issues/85"><code>cause</code> being the
+exception</a>. Despite
+the <code>cause</code>s having different signatures (<code>Fail</code> returns an <code>Option&lt;&amp;Fail&gt;</code>
+while cause returns <code>&amp;Fail</code>&gt;), I think this is going to trip up a lot of
+people.</p>
+<p>Suggestion:</p>
+<ul>
+<li><code>Error::cause</code> should behave exactly like <code>Fail::cause</code> to avoid surprising developers.</li>
+</ul>
+<h2>Feedback on <code>failure::Fail</code></h2>
+<h3><code>causes</code> and <code>root_cause</code> are foot-guns</h3>
+<p>If <code>cause</code> is the child error, then <code>causes</code> would start with that and iterate
+beneath it, right? Unfortunately, no. The current <code>Fail</code> is the first cause.</p>
+<p>Similarly, if your <code>Fail</code> has no <code>cause</code>, then it will be the <code>root_cause</code>.</p>
+<p>I can understand the need for functions that behave like these but not with
+names that imply they won't include your current <code>Fail</code>.  Granted, I personally
+would find <code>causes</code> not returning the top <code>Fail</code> more convinient.</p>
+<p>Suggestion:</p>
+<ul>
+<li>Either find new names or change the behavior of the functions to avoid surprising developers.</li>
+</ul>
+<h1>Addendum</h1>
+<h2>Additional error management case studies</h2>
+<h3>Cobalt</h3>
+<p><a href="https://cobalt-org.github.io/">Cobalt</a> is a static site generator that I maintain. As an end-user application,
+it is a perfect fit for <code>failure</code>. I haven't converted it over due to lack of a
+pressing need compared to the desired features.</p>
+<h3>Day Job</h3>
+<p>This is from a 15+ year old, multi-million LoC product that is 80% user-facing
+library and 20% user-facing application targeted at non-programmers.</p>
+<p>Putting a flexible product into the hands of non-programmers means you need to
+provide a lot of guidance to help people get out of situations you couldn't
+predict. We consider good errors essential for our users.</p>
+<p>The user-form of our errors look like (translated to Rust pseudo-code):</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Fail, Debug, Copy, Clone, ...)]
+#[</span><span style="background-color:#2b303b;color:#bf616a;">repr</span><span style="background-color:#2b303b;color:#c0c5ce;">(C)]
+</span><span style="background-color:#2b303b;color:#b48ead;">pub enum </span><span style="background-color:#2b303b;color:#c0c5ce;">ErrorKind {
+    ...
+}
+
+#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Fail, Debug)]
+</span><span style="background-color:#2b303b;color:#b48ead;">pub struct </span><span style="background-color:#2b303b;color:#c0c5ce;">PublicError {
+    </span><span style="background-color:#2b303b;color:#bf616a;">kind</span><span style="background-color:#2b303b;color:#c0c5ce;">: ErrorKind,
+    </span><span style="background-color:#2b303b;color:#bf616a;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">: String,
+}
+</span></pre>
+<p>and the internal-form of our errors look like (translated to Rust pseudo-code):</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Fail, Debug, Copy, Clone, ...)]
+#[</span><span style="background-color:#2b303b;color:#bf616a;">repr</span><span style="background-color:#2b303b;color:#c0c5ce;">(C)]
+</span><span style="background-color:#2b303b;color:#b48ead;">enum </span><span style="background-color:#2b303b;color:#c0c5ce;">ContextKind {
+    ...
+}
+
+</span><span style="background-color:#2b303b;color:#b48ead;">struct </span><span style="background-color:#2b303b;color:#c0c5ce;">Context {
+    </span><span style="background-color:#2b303b;color:#bf616a;">value</span><span style="background-color:#2b303b;color:#c0c5ce;">: Vec&lt;(ContextKind, Box&lt;Display&gt;)&gt;,
+    </span><span style="background-color:#2b303b;color:#bf616a;">backtrace</span><span style="background-color:#2b303b;color:#c0c5ce;">: failure::Backtrace,
+}
+
+</span><span style="background-color:#2b303b;color:#b48ead;">struct </span><span style="background-color:#2b303b;color:#c0c5ce;">InternalError {
+    </span><span style="background-color:#2b303b;color:#bf616a;">kind</span><span style="background-color:#2b303b;color:#c0c5ce;">: ErrorKind,
+    </span><span style="background-color:#2b303b;color:#bf616a;">context</span><span style="background-color:#2b303b;color:#c0c5ce;">: Option&lt;Box&lt;Context&gt;&gt;,
+}
+</span></pre>
+<p>Things of note:</p>
+<ul>
+<li><code>InternalError</code> has a way of localizing and formatting <code>Context</code> into the <code>PublicError::context</code>.</li>
+<li><code>PublicError</code> / <code>InternalError</code> have a way of localizing <code>ErrorKind</code>.
+<ul>
+<li><code>ErrorKind</code> always includes &quot;what&quot;, &quot;why&quot;, and &quot;how to fix it&quot;.</li>
+</ul>
+</li>
+<li>OS and library errors are manually converted to <code>InternalError</code>. Sometimes
+the root cause is captured in <code>ContextKind</code>s that we hide in release builds.</li>
+<li>Layers higher in the stack may add to <code>Context</code>. They can even conditionally
+add to <code>context.value</code> to avoid duplication.</li>
+<li>Performance is controlled by only heap allocating or capturing a back trace if context is added.</li>
+</ul>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquid v0.20</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Liquid v0.20</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;16&nbsp;Mar&nbsp;'20</time></li>
+              <li><i class="fa fa-tags"></i> programming, oss</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
+<p><em><a href="https://docs.rs/liquid"><code>liquid-rust</code></a> is a rust re-implementation of the <a href="https://shopify.github.io/liquid/">liquid</a> template engine made popular by the <a href="https://jekyllrb.com">jekyll</a> static site generator.</em></p>
+<h3>Highlights</h3>
+<h4>Conformance improvements</h4>
+<p>We're striving to match the liquid-ruby's behavior and this release gets us closer:</p>
+<ul>
+<li><code>where</code> filter implemented by or17191</li>
+<li>Improvements to <code>sort</code>, <code>sort_natural</code>, <code>compact</code>, and other filters by or17191</li>
+<li>Support for <code>{{ var.size }}</code></li>
+<li>Improved equality of values</li>
+<li>Split <code>{% include %}</code> from accepting both a bare word (<code>foo.txt</code>) and quoted words (<code>&quot;foo.txt&quot;</code>) into the Liquid version (<code>&quot;foo.txt&quot;</code>) and Jekyll version (<code>foo,.txt</code>).  For the Liquid version, it now also accepts variables.</li>
+</ul>
+<p>In addition, we've made it more clear what filters, tags, and blocks are a part of core liquid, Jekyll's extensions, Shopify's extensions, or our own extensions.</p>
+<h4>Improved API stability for <code>liquid</code></h4>
+<p>The <code>liquid</code> crate has been stripped down to what is needed for parsing and rendering a template.</p>
+<ul>
+<li><code>liquid_core</code> was created as a convenience for plugin authors.  <code>error</code>, <code>value</code>, <code>compiler</code>, and <code>interpreter</code> were merged in.</li>
+<li><code>liquid_lib</code> was split out of <code>liquid</code> so we can evolve the non-stdlib plugins without breaking changes to <code>liquid</code>.</li>
+</ul>
+<h4><code>render</code> can accept Rust-native types</h4>
+<p>Previously, you had to construct a <code>liquid::value::Object</code> (a newtype for a <code>HashMap</code>) to pass to <code>render</code>.  Now, you can create a <code>struct</code> that implements <code>ObjectView</code> and <code>ValueView</code> instead and pass it in:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(liquid::ObjectView, liquid::ValueView, serde::Serialize, serde::Deserialize, Debug)]
+</span><span style="background-color:#2b303b;color:#b48ead;">struct </span><span style="background-color:#2b303b;color:#c0c5ce;">Data {
+    </span><span style="background-color:#2b303b;color:#bf616a;">foo</span><span style="background-color:#2b303b;color:#c0c5ce;">: </span><span style="background-color:#2b303b;color:#b48ead;">i32</span><span style="background-color:#2b303b;color:#c0c5ce;">,
+    </span><span style="background-color:#2b303b;color:#bf616a;">bar</span><span style="background-color:#2b303b;color:#c0c5ce;">: String,
+}
+
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> data = Data::default();
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> template = todo!();
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;data)?;
+</span></pre>
+<p>In addition to the ergonomic improvements, this can help squeeze out the most performance:</p>
+<ul>
+<li>Can reuse borrowed data rather than having to switch everything to an owned type.</li>
+<li>Avoid allocating for the <code>HashMap</code> entries.</li>
+</ul>
+<p>These improvements will be in the caller of <code>liquid</code> and don't show up in our benchmarks.</p>
+<h4>Other <code>render</code> ergonomic improvements</h4>
+<p>There multiple convenient ways to construct your <code>data</code>, depending on your application:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> template = todo!();
+
+</span><span style="background-color:#2b303b;color:#65737e;">// `Object` is a newtype for `HashMap` and has a similar interface.
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> object = liquid::Object::new();
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;object)?;
+
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> object = liquid::object!({
+    &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">foo</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot; =&gt; </span><span style="background-color:#2b303b;color:#d08770;">0</span><span style="background-color:#2b303b;color:#c0c5ce;">,
+    &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">bar</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot; =&gt; &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Hello World</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;,
+});
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;object)?;
+
+</span><span style="background-color:#2b303b;color:#65737e;">// Requires your struct implements `serde::Serialize`
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> data = todo!();
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> object = liquid::to_object(&amp;data)?;
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;object)?;
+
+</span><span style="background-color:#2b303b;color:#65737e;">// Using the aforementioned derive.
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> data = Data::default();
+</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;data)?;
+</span></pre>
+<h4>String Optimizations</h4>
+<p>A core data type in liquid is an <code>Object</code>, a mapping of strings to <code>Value</code>s. Strings used as keys within a template engine are:</p>
+<ul>
+<li>Immutable, not needing separate <code>size</code> and <code>capacity</code> fields of a <code>String</code>. <code>Box&lt;str&gt;</code> is more appropriate.</li>
+<li>Generally short, gaining a lot from small-string optimizations</li>
+<li>Depending on the application, <code>'static</code>.  Something like a <code>Cow&lt;'static, str&gt;</code>. Even better if it can preserve <code>'static</code> getting a reference and going back to an owned value.</li>
+</ul>
+<p>Combining these together gives us the new <code>kstring</code> crate.  Some quick benchmarking suggests</p>
+<ul>
+<li>Equality is faster than <code>String</code> (as a gauge of access time).</li>
+<li>Cloning takes 1/5 the time when using <code>'static</code> or small string optimization.</li>
+</ul>
+<h3>Future work</h3>
+<p>There is still a lot of room for improvement and <a href="https://github.com/cobalt-org/liquid-rust/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">contributors are most welcome</a>:</p>
+<ul>
+<li><a href="https://github.com/cobalt-org/liquid-rust/issues?q=is%3Aissue+is%3Aopen+label%3Astd-compatibility">Liquid compatibility</a>, especially <a href="https://github.com/cobalt-org/liquid-rust/pull/396">more extensive compatibility tests</a></li>
+<li><a href="https://github.com/cobalt-org/liquid-rust/labels/api-break">API Stability</a>, including:
+<ul>
+<li>The parser.  While the new parser (see below) is a major improvement, we are exposing a thin wrapper around the implementation details of our parser.  This makes the code messier and still cannot easily be evolved especially without breaking changes.  Ideally, we'd find a way to take the parser out of <code>liquid</code>s public API.</li>
+<li>Get <code>kstring</code> to 1.0</li>
+</ul>
+</li>
+<li>Performance: The biggest bottleneck atm is <code>clone</code>-ing data for for-loops, see <a href="https://github.com/cobalt-org/liquid-rust/pull/337">#337</a></li>
+<li><a href="https://github.com/cobalt-org/liquid-rust/pull/399">Javascript API wrapping a wasm build</a></li>
+</ul>
+<p>I'm probalby going to slow down my rate of contributions as I shift my focus to
+other projects that this work helped unblock.</p>
+<h3>Highlights from past releases</h3>
+<p>Back in 2018 we had some major improvements that deserve to be called out, most especially work by <a href="https://github.com/Goncalerta">Goncalerta</a>, but I never finished my post.</p>
+<h4>New Parser</h4>
+<p>The parser in liquid-rust has been a hurdle for improvements.  It included a
+regex-based lexer and a random assortment of functions to parse the tokens.
+These functions were particularly a hurdle because logic was duplicated when it
+shouldn't, shared when it shouldn't, etc making it difficult to grok, extend,
+or refactor.</p>
+<p>There are two big challenges with parsing in liquid:</p>
+<ul>
+<li>There is no official grammar or compliance tests</li>
+<li>Language plugins exist and are heavily used.</li>
+</ul>
+<p>Liquid has the concept of filters, plugins to modify a value:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">{{ data | uniq | first }}
+</span></pre>
+<p>These are relatively simple.</p>
+<p>In contrast, tags and blocks declare their own grammar, for both parameters and a block's content.</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">Standard include: {% include variable %}
+</span></pre>
+<p>In contrast, a Jekyll-style include would pass the variable as <code>{{ variable }}</code>.</p>
+<p><a href="https://github.com/Goncalerta">Goncalerta</a> took on the monumental task of replacing all of this
+with a <a href="https://pest.rs/">pest</a>-based parser written from the ground up.</p>
+<p>No matter the parser library, language plugins are a chalenge.  In Pest's case,
+it has a grammar file that gets turned into Rust code.  For now, we've taken
+the approach of expressing all the parts of the native grammar and where
+plugins are involved, we expose more of a higher-level token stream than
+before. This does present a challenge that our parser has to support every
+feature of every plugin.</p>
+<h4>Conformance Improvements</h4>
+<p>What we did:</p>
+<ul>
+<li>Values
+  - We improved <a href="https://github.com/cobalt-org/liquid-rust/pull/158">value coercion</a>, including coercing <a href="https://github.com/cobalt-org/liquid-rust/pull/182"><code>now</code> and <code>today</code> to a date</a>.
+  - We added <a href="https://github.com/cobalt-org/liquid-rust/pull/158">whole number support to values</a>.
+  - Added <a href="https://github.com/cobalt-org/liquid-rust/pull/218"><code>.first</code> and <code>.last</code> to arrays</a>.
+  - Add support for indexing into a variable with a variable (e.g. <code>foo[bar]</code>) <a href="https://github.com/cobalt-org/liquid-rust/pull/214">(1)</a> <a href="https://github.com/cobalt-org/liquid-rust/pull/231">(2)</a>.</li>
+<li>Fixed ranges (e.g. <code>1..4</code>) to be <a href="https://github.com/cobalt-org/liquid-rust/pull/212">inclusive</a>.</li>
+<li>Indexing into variables
+  - Support <a href="https://github.com/cobalt-org/liquid-rust/pull/208">this for filters</a></li>
+<li>Filters
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/158"><code>compact</code></a>
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/210"><code>at_least</code> and <code>at_most</code></a></li>
+<li>Blocks
+  - Extend <code>if</code> blocks with <a href="https://github.com/cobalt-org/liquid-rust/pull/217"><code>and</code> and <code>or</code></a>
+  - Extend <code>for</code>-loops to support <a href="https://github.com/cobalt-org/liquid-rust/pull/203">iterating over <code>Object</code>s for
+    <code>for</code>-loop</a> and accept <a href="https://github.com/cobalt-org/liquid-rust/pull/213">variables for <code>offset</code>,
+    <code>limit</code></a>
+  - Support for <a href="https://github.com/cobalt-org/liquid-rust/pull/211"><code>ifchanged</code></a>
+  - Support <code>tablerow</code><a href="https://github.com/cobalt-org/liquid-rust/pull/211">(1)</a> <a href="https://github.com/cobalt-org/liquid-rust/pull/213">(2)</a> <a href="https://github.com/cobalt-org/liquid-rust/pull/215">(3)</a></li>
+<li>Tags
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/211"><code>increment</code> and <code>decrement</code></a></li>
+</ul>
+<p>Regarding the <a href="https://jekyllrb.com/docs/liquid/">jekyll library</a></p>
+<ul>
+<li>Filters
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/220"><code>push</code></a>
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/220"><code>pop</code></a>
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/220"><code>unshift</code></a>
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/220"><code>shift</code></a>
+  - <a href="https://github.com/cobalt-org/liquid-rust/pull/220"><code>array_to_sentence_string</code></a></li>
+</ul>
+<h4>Error Improvements</h4>
+<p>We've been iterating on the usability of template errors.  I blogged in the
+past on <a href="https://epage.github.io/blog/2018/03/redefining-failure/">error handling in
+Rust</a> and am finding
+the approach being taken here is offering a balance of good usability with
+relatively low overhead.</p>
+<p>Specifically, some things we've done:</p>
+<ul>
+<li><a href="https://github.com/cobalt-org/liquid-rust/pull/164">Include a liquid backtrace</a></li>
+<li>Include context, like variable values, in backtrace <a href="https://github.com/cobalt-org/liquid-rust/pull/164">(1)</a> <a href="https://github.com/cobalt-org/liquid-rust/pull/233">(2)</a></li>
+<li>Fix up the tone and use more clear terms <a href="https://github.com/cobalt-org/liquid-rust/pull/231">(1)</a> <a href="https://github.com/cobalt-org/liquid-rust/pull/233">(2)</a></li>
+</ul>
+<h4>Performance</h4>
+<p>To help guide performance improvements, We <a href="https://github.com/cobalt-org/liquid-rust/pull/234">ported handlebar's and tera's
+benchmarks</a> to Liquid:</p>
+<ul>
+<li>Save us from thinking about representative use cases</li>
+<li>Of all the arbitrary baselines, this seemed like one of the better ones.</li>
+</ul>
+<p>We've made quite a good number of performance improvements</p>
+<ul>
+<li>Offer <code>Renderable</code> trait to <a href="https://github.com/cobalt-org/liquid-rust/pull/192">render to a <code>Write</code></a>, giving users
+  the opportunity to control the backend and allocations. This might cause us
+  problems with Liquid's <a href="https://github.com/cobalt-org/liquid-rust/pull/244">string trimming</a> but we have ideas on how
+  to handle this.</li>
+<li><a href="https://github.com/cobalt-org/liquid-rust/pull/200">Reduce allocations within <code>impl Display</code></a>.</li>
+<li>Have parallel code paths for <code>Option</code> and <code>Return</code>, optimizing for the
+  failure case by avoiding expensive error reporting. <a href="https://github.com/cobalt-org/liquid-rust/pull/233">(1)</a></li>
+<li>Play <a href="https://en.wikipedia.org/wiki/Whac-A-Mole">whac-a-mole</a> with <code>clone()</code>s, finding ways to use
+  references instead. <a href="https://github.com/cobalt-org/liquid-rust/pull/233">(1)</a></li>
+</ul>
+<p>These numbers were gathered on my laptop running under WSL.  To help show the
+variability of my computer, we included the baseline from both the old and new
+liquid runs.</p>
+<ul>
+<li>Liquid 0.13.7</li>
+<li>Liquid 0.18.0</li>
+<li>Handlebars 1.1.0</li>
+<li>Tera 0.11.20</li>
+</ul>
+<p>Parsing Benchmarks</p>
+<table><thead><tr><th>Library                        </th><th>Liquid's <code>parse_text</code></th><th> Handlebar's <code>parse_template</code>  </th><th>Tera's <code>parsing_basic_template</code></th></tr></thead><tbody>
+<tr><td>Baseline Run                    </td><td>             </td><td>   20,730 ns/iter (+/- 4,811)          </td><td>24,612 ns/iter (+/- 8,620)</td></tr>
+<tr><td>Liquid v0.13.7</td><td>    2,670 ns/iter (+/- 992)    </td><td>   26,518 ns/iter (+/- 14,115)        </td><td>24,720 ns/iter (+/- 12,812)</td></tr>
+<tr><td>Liquid v0.18.0</td><td>    1,612 ns/iter (+/- 1,123)  </td><td>   24,812 ns/iter (+/- 13,214)        </td><td>19,690 ns/iter (+/- 9,187)</td></tr>
+</tbody></table>
+<p>Rendering Benchmarks</p>
+<table><thead><tr><th>Library        </th><th>Liquid's <code>render_text</code></th><th> Handlebar's <code>render_template</code>  </th><th>Tera's <code>rendering_basic_template</code></th><th>Tera's <code>rendering_only_variable</code></th></tr></thead><tbody>
+<tr><td>Baseline Run</td><td>                      </td><td>35,703 ns/iter (+/- 4,859)</td><td>6,687 ns/iter (+/- 1,886)</td><td>2,345 ns/iter (+/- 1,678)</td></tr>
+<tr><td>Liquid v0.13.7</td><td>2,379 ns/iter (+/- 610)</td><td>16,500 ns/iter (+/- 6,603)</td><td>5,677 ns/iter (+/- 2,408)</td><td>3,285 ns/iter (+/- 1,401)</td></tr>
+<tr><td>Liquid v0.18.0</td><td>280 ns/iter (+/- 60)</td><td>11,112 ns/iter (+/- 1,527)</td><td>2,845 ns/iter (+/- 1,216)</td><td>525 ns/iter (+/- 186)  </td></tr>
+</tbody></table>
+<p>Variable Access Benchmarks</p>
+<table><thead><tr><th>Library        </th><th>Tera's <code>access_deep_object</code></th><th>Tera's <code>access_deep_object_with_literal</code></th></tr></thead><tbody>
+<tr><td>Tera Run 1    </td><td>8,626 ns/iter (+/- 5,309)</td><td>10,212 ns/iter (+/- 4,452)</td></tr>
+<tr><td>Tera Run 2    </td><td>8,201 ns/iter (+/- 4,476)</td><td>9,490 ns/iter (+/- 6,118)</td></tr>
+<tr><td>Liquid v0.13.7</td><td>13,100 ns/iter (+/- 1,489)</td><td><strong>Unsupported</strong></td></tr>
+<tr><td>Liquid v0.18.0</td><td>6,863 ns/iter (+/- 1,252)</td><td>8,225 ns/iter (+/- 3,567)</td></tr>
+</tbody></table>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2020</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>
