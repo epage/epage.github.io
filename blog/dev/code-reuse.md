@@ -1,10 +1,18 @@
 ---
 title: Code Reuse
+data:
+    tags: ["warstory"]
 ---
 
 <center>[<img src="https://assets.amuniversal.com/5d2d9c209fd5012f2fe600163e41dd5b" width=900m/>](https://dilbert.com/strip/1996-01-31)</center>
 
-Several years ago, I was working with an engineer fresh out of college.  He was rightfully excited to start using all of the best practices he had learned in college, including Don't Repeat Yourself (DRY).  The problem is college is rarely a time where you see when best practices work and when they don't.  When does a college student ever get to reuse their code?  I tried to explain the dangers of DRY but I think instead I came across as the old curmudgeon who didn't want anything to do with these new fangled ways of making code better.
+Several years ago, I was working with an engineer fresh out of college.  He was
+rightfully excited to start using all of the best practices he had learned in
+college, including Don't Repeat Yourself (DRY).  The problem is college is
+rarely a time where you see when best practices work and when they don't.  When
+does a college student ever get to reuse their code?  I tried to explain the
+dangers of DRY but I think instead I came across as the old curmudgeon who
+didn't want anything to do with these new fangled ways of making code better.
 
 Over the years, I keep having to repeat myself on how best to reuse code, so I figured it was time practice DRY with my advice.
 
