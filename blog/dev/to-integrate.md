@@ -44,3 +44,6 @@ https://bradfitz.com/2020/01/30/joining-tailscale
 - Interesting to disect this since I disagree about Go (and he'd probably disagree about Rust)
 
 [Five worlds](https://bradfitz.com/2020/01/30/joining-tailscale) and [discussion](https://www.reddit.com/r/programming/comments/i1445a/five_worlds_joel_on_software/fzv67f9/)
+
+
+https://sans-io.readthedocs.io/how-to-sans-io.html
