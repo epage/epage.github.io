@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reflecting on Errors in 2019</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Reflecting on Errors in 2019</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p>With people reflecting on Rust in 2019 and what they want to see in 2020, error handling has come up again:</p>
+<ul>
+<li><a href="https://www.ncameron.org/blog/rust-in-2020-one-more-thing/">Rust in 2020, one more thing</a></li>
+<li><a href="https://lukaskalbertodt.github.io/2019/11/14/thoughts-on-error-handling-in-rust.html">Thoughts on Error Handling in Rust</a></li>
+<li><a href="https://blog.yoshuawuyts.com/error-handling-survey/">Error Handling Survey</a></li>
+</ul>
+<p>It felt like there was interest in moving <code>anyhow</code> into the stdlib.  While I
+feel that a lot of it is ready or near-ready (see below), I feel we
+have gotten stuck in a rut with the <code>context</code> pattern.  I've been told that
+<a href="https://github.com/withoutboats/fehler/issues/16">the pattern is derived from
+cargo</a> and it feels like
+we've mostly been iterating on that same pattern rather than exploring
+alternatives. After framing my concerns with error handling and where we are at
+with existing solutions, I'll introduce <a href="https://docs.rs/status/"><code>Status</code></a> as a
+radical alternative (from the Rust ecosystem perspective) for addressing these
+problems. If you aren't interested in all the middle stuff, feel free to skip
+to the end!</p>
+<p>Update: I messed up my reading of docs and test cases and claimed that <code>Box&lt;dyn Error&gt;</code> implemented <code>Error</code>. This is not the case and my post has been updated
+to reflect that.</p>
+<h2>Why are errors such a hot topic in Rust compared to other languages?</h2>
+<p>When I look at other languages, for the most part what error is returned is an
+implementation detail unless stated otherwise in documentation. This can be
+achieved with <code>Box&lt;dyn Error&gt;</code> but with trade-offs</p>
+<ul>
+<li>In Rust, errors types are statically constrained with traits, preventing a
+<code>Box&lt;dyn Error&gt;</code> from being clonable, serialiable, etc.</li>
+<li>For the performance sensitive, <code>Box&lt;dyn Error&gt;</code> is 2 pointers-wide and risks
+changing how the compiler returns values (using the stack instead of
+registers).</li>
+<li>Backtraces are not automatically included with <code>Box&lt;dyn Error&gt;</code>.</li>
+<li>Not even  <code>Box&lt;dyn Error&gt;</code> is a good citizen (<a href="https://play.rust-lang.org/?version=stable&amp;mode=debug&amp;edition=2018&amp;gist=ff8d532f1e6cdb1cd635e32d6c0432d0"><code>impl From&lt;E: Error&gt;</code> for <code>?</code>
+usage and <code>impl Error</code> for
+interop</a>).
+Another spin on this is <a href="https://play.rust-lang.org/?version=stable&amp;mode=debug&amp;edition=2018&amp;gist=268fdba6fb89f3ecc99f1c3d8e9f01d4">doing something similar ourselves</a>.
+This can't work until specialization is stablized.</li>
+</ul>
+<p>Other challenges that are unique to Rust:</p>
+<ul>
+<li>In Rust, functions opt-in to being failable while in other languages, at
+best, you opt-out, requiring boilerplate to switch back and forth.</li>
+<li>Rust does not provide a &quot;low-effort&quot; error type and syntax for prototyping
+(<code>std::io::Error</code> seems the closest).</li>
+<li>When adding <code>impl From&lt;dep::Error&gt; for crate::Error</code> for use with <code>?</code>, you
+are exposing <code>dep</code> in your public API, making it a breaking change to remove
+it or upgrade major versions.</li>
+<li><code>fn main() -&gt; Result&lt;(), Error&gt;</code> will use <code>Debug</code> rather than <code>Display</code>.</li>
+<li>When wrapping errors, it is unclear which error in the chain is the &quot;real
+error&quot;, an implementation detail, or just augmented information</li>
+<li>Supporting <code>no_std</code>.</li>
+</ul>
+<p>Challenges that I feel don't just apply to Rust:</p>
+<ul>
+<li>Mapping errors to process exit codes.</li>
+<li>Providing a localizable, end-user message.</li>
+</ul>
+<h2>Status of solutions</h2>
+<p>Spoiler alert: I started this post as an introduction for
+<a href="https://docs.rs/status/"><code>Status</code></a> but it grew from there. What's worse, is I
+felt it best to order things from more concrete plans to more wild ideas. If
+you are interested in a Proof-of-Concept that tries to address (almost) all of
+the above problems, I recommend skipping to the end.</p>
+<h3>Concrete error types</h3>
+<p><a href="https://github.com/dtolnay/thiserror"><code>thiserror</code></a> is a fairly mature solution
+for reducing the boilerplate. However, I feel it should narrow its focus on just <code>trait Error</code>. We should
+instead have a generalized solution for deriving <code>Display</code> and <code>From</code>.</p>
+<ul>
+<li>Allow other types to use them</li>
+<li>For <code>Display</code>, allow alternative policies
+(<a href="https://jeltef.github.io/derive_more/derive_more/display.html">attributes</a>
+vs <a href="https://github.com/yaahc/displaydoc">doc-comments</a>)</li>
+<li>For <code>From</code>, add friction to the process to raise awareness of the trade-offs.</li>
+</ul>
+<p>With those features removed, I'd love to see this moved into the <strong>stdlib</strong>.</p>
+<h3><code>Box&lt;dyn Error&gt;</code></h3>
+<p>Some might see <a href="https://github.com/dtolnay/anyhow"><code>anyhow</code></a> filling this role
+but I feel we should decouple adhoc error handling from an abstract error
+container.</p>
+<p>There was a discussion about a <a href="https://internals.rust-lang.org/t/proposal-add-std-boxerror/10953/2"><code>BoxError</code> on
+internals</a>
+and I feel this is the way to go. I feel we should have something that looks like:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Debug. anyhow::Error, derive_more::Display, derive_more::From)]
+</span><span style="background-color:#2b303b;color:#b48ead;">struct </span><span style="background-color:#2b303b;color:#c0c5ce;">BoxError(Box&lt;Box&lt;dync Error + Send + Sync + </span><span style="background-color:#2b303b;color:#b48ead;">&#39;static</span><span style="background-color:#2b303b;color:#c0c5ce;">&gt;&gt;);
+</span></pre>
+<p>This does not solve cloning, serialization, localization, or a host of other
+issues, however.</p>
+<p>For me, the main open questions before putting this in the <strong>stdlib</strong> are:</p>
+<ul>
+<li>Like <code>Box</code>, we are blocked on specialization to support both <code>impl Error</code> and <code>From&lt;E: Error&gt;</code>.</li>
+<li>Name bikeshedding.</li>
+<li>Whether the &quot;thin pointer&quot; (<code>Box&lt;Box&lt;dyn _&gt;&gt;</code>) should be generalized.</li>
+<li>Whether backtraces should be included (personally, I think that should be
+left to concrete and ad-hoc error types).</li>
+</ul>
+<h3>Ad-hoc Error Types</h3>
+<p>I think <code>anyhow::Error</code> and <code>anyhow::anyhow!</code> are close to something we can standardize. My main concerns</p>
+<ul>
+<li>Couples the concept of <code>Box&lt;dyn Error&gt;</code> (<code>anyhow::new</code>) with ad-hoc errors (<code>anyhow::msg</code>).
+<ul>
+<li>Being distinct can reduce scope, hopefully speeding up moving into the <strong>stdlib</strong></li>
+<li>By being distinct, I feel we'll do a better job communicating the trade-offs of different patterns.</li>
+</ul>
+</li>
+<li>It favors the <code>context</code> idiom (adding metadata by wrapping errors) which I
+think is an immature space that needs further exploration.</li>
+</ul>
+<h3><code>From</code> for <code>?</code></h3>
+<p>The first problem is <code>From&lt;dep::Errpr&gt;</code> exposing implementation details.</p>
+<ul>
+<li><code>snafu</code> experiments with the ideas of macro-generated &quot;selectors&quot; which are
+private types which would keep <code>From&lt;dep::Error&gt;</code> private. I find the
+approach interesting and an area we should do more experimentation (though
+from an approachability perspective I dislike derives generating anything
+from than the <code>impl</code> for a trait).</li>
+<li>Controlling visibility on trait impls.  There was an
+<a href="https://github.com/rust-lang/rfcs/pull/2529">RFC</a> which got attention for
+other reasons.  It ended up stalling due to soundness concerns with
+specialization.</li>
+</ul>
+<p>The second problem is <code>From&lt;E: Error&gt;</code></p>
+<ul>
+<li>Ideally we get specialization to solve this.</li>
+<li>I think <code>snafu</code> selectors might also help here since they don't need to <code>impl Error</code>.</li>
+</ul>
+<h3>Streamlined Syntax</h3>
+<p>This is a more diverse space</p>
+<ul>
+<li><a href="https://github.com/dtolnay/anyhow"><code>anyhow::bail!</code></a>: Seems like a mature area though <code>fehler</code> might replace some roles of it.</li>
+<li><a href="https://github.com/dtolnay/anyhow"><code>anyhow::ensure!</code></a>: Seems handy but if we go with <code>fehler</code>, the name might need to be bike-sheded.</li>
+<li>Reduced <code>Result</code> boilerplate with <a href="https://github.com/withoutboats/fehler"><code>fehler</code></a>: I think this has a lot of
+potential with the biggest hindrance being people's initial
+impression. <code>fehler</code> originally also encompassed <code>anyhow</code> and provided a
+complete solution using exception nomenclature.  Like a lot of people, I was
+concerned about this. For me, I was concerned about how different exceptions
+and monadic errors are and how adopting exception language, while potentially
+more approachable, would lead people into making bad assumptions. Since then,
+<code>fehler</code> has <a href="https://github.com/withoutboats/fehler/issues/20">narrowed its focus on reducing <code>Result</code>
+boilerplate</a>, relying on
+crates like <code>anyhow</code> for everything else.</li>
+<li><a href="https://github.com/rust-lang/rfcs/blob/master/text/2388-try-expr.md">Try-expressions</a>:
+While this is only at the stage of having the keyword reserved, I look
+forward to this. The alternatives are <code>map</code> (high boilerplate) and closures
+(low discverability).</li>
+</ul>
+<h3>Everything else</h3>
+<p>Introducing my Proof-of-Concept, <a href="https://docs.rs/status/"><code>Status</code></a>. I refer to
+it as an error container because it provides a basic structure for the major
+parts of an error which you then populate.</p>
+<p>Unlike the error-wrapping pattern found in <code>cargo</code> and generalized in <code>anyhow</code>, the pattern
+implemented in <code>Status</code> comes from projects I've worked on which try to address the
+following requirements:</p>
+<ul>
+<li>Programmatically respond to both the <code>Kind</code> of status and the metadata, or <code>Context</code>, of
+the status.</li>
+<li>Dealing with error-sites not knowing enough to describe the error but allowing the
+<code>Context</code> to be built gradually when unwinding where there is relevant information to
+add.</li>
+<li>Localizing the rendered message.</li>
+<li>Allowing an application to make some phrasing native to its UX.</li>
+<li>Preserving all of this while passing through FFI, IPC, and RPC (TODO <a href="https://github.com/epage/status/issues/1">#1</a> <a href="https://github.com/epage/status/issues/2">#2</a>).</li>
+</ul>
+<p>These requirements are addressed by trading off the usability provided by per-site custom messages with
+messages built up from common building blocks.  The <code>Kind</code> serves as a static description of the
+error that comes from a general, fixed collection.  Describing the exact problem and tailored
+remediation is the responsibility of the <code>Context</code> which maps general, fixed keys with
+runtime-generated data.</p>
+<p><code>Status</code> grows from your prototype to a mature library.</p>
+<p>A prototype might look like:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#b48ead;">use </span><span style="background-color:#2b303b;color:#c0c5ce;">std::path::Path;
+</span><span style="background-color:#2b303b;color:#b48ead;">type </span><span style="background-color:#2b303b;color:#c0c5ce;">Status = status::Status;
+</span><span style="background-color:#2b303b;color:#b48ead;">type </span><span style="background-color:#2b303b;color:#c0c5ce;">Result&lt;T, E = Status&gt; = std::result::Result&lt;T, E&gt;;
+
+</span><span style="background-color:#2b303b;color:#b48ead;">fn </span><span style="background-color:#2b303b;color:#8fa1b3;">read_file</span><span style="background-color:#2b303b;color:#c0c5ce;">(</span><span style="background-color:#2b303b;color:#bf616a;">path</span><span style="background-color:#2b303b;color:#c0c5ce;">: &amp;Path) -&gt; Result&lt;String&gt; {
+    std::fs::read_to_string(path)
+        .</span><span style="background-color:#2b303b;color:#96b5b4;">map_err</span><span style="background-color:#2b303b;color:#c0c5ce;">(|</span><span style="background-color:#2b303b;color:#bf616a;">e</span><span style="background-color:#2b303b;color:#c0c5ce;">| {
+            Status::new(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Failed to read file</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)
+                .</span><span style="background-color:#2b303b;color:#96b5b4;">with_internal</span><span style="background-color:#2b303b;color:#c0c5ce;">(e)
+                .</span><span style="background-color:#2b303b;color:#96b5b4;">context_with</span><span style="background-color:#2b303b;color:#c0c5ce;">(|</span><span style="background-color:#2b303b;color:#bf616a;">c</span><span style="background-color:#2b303b;color:#c0c5ce;">| c.</span><span style="background-color:#2b303b;color:#96b5b4;">insert</span><span style="background-color:#2b303b;color:#c0c5ce;">(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Expected value</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, </span><span style="background-color:#2b303b;color:#d08770;">5</span><span style="background-color:#2b303b;color:#c0c5ce;">))
+        })
+}
+
+</span><span style="background-color:#2b303b;color:#b48ead;">fn </span><span style="background-color:#2b303b;color:#8fa1b3;">main</span><span style="background-color:#2b303b;color:#c0c5ce;">() -&gt; Result&lt;(), status::TerminatingStatus&gt; {
+    </span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> content = </span><span style="background-color:#2b303b;color:#96b5b4;">read_file</span><span style="background-color:#2b303b;color:#c0c5ce;">(Path::new(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Cargo.toml</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;))?;
+    println!(&quot;</span><span style="background-color:#2b303b;color:#d08770;">{}</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, content);
+    Ok(())
+}
+</span></pre>
+<p>The <code>TerminatingStatus</code> provides a <code>Debug</code> that produces user-visible data and
+will print chained error messages, so the output will looks something like:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">Failed to read file
+
+Expected value: 5
+</span></pre>
+<p>You can then customize the <code>Kind</code> and <code>Context</code> used.</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#b48ead;">use </span><span style="background-color:#2b303b;color:#c0c5ce;">std::path::Path;
+#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(Copy, Clone, Debug, derive_more::Display)]
+</span><span style="background-color:#2b303b;color:#b48ead;">enum </span><span style="background-color:#2b303b;color:#c0c5ce;">ErrorKind {
+  #[</span><span style="background-color:#2b303b;color:#bf616a;">display</span><span style="background-color:#2b303b;color:#c0c5ce;">(fmt = &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Failed to read file</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)]
+  Read,
+  #[</span><span style="background-color:#2b303b;color:#bf616a;">display</span><span style="background-color:#2b303b;color:#c0c5ce;">(fmt = &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Failed to parse</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;)]
+  Parse,
+}
+</span><span style="background-color:#2b303b;color:#b48ead;">type </span><span style="background-color:#2b303b;color:#c0c5ce;">Status = status::Status&lt;ErrorKind&gt;;
+</span><span style="background-color:#2b303b;color:#b48ead;">type </span><span style="background-color:#2b303b;color:#c0c5ce;">Result&lt;T, E = Status&gt; = std::result::Result&lt;T, E&gt;;
+
+</span><span style="background-color:#2b303b;color:#b48ead;">fn </span><span style="background-color:#2b303b;color:#8fa1b3;">read_file</span><span style="background-color:#2b303b;color:#c0c5ce;">(</span><span style="background-color:#2b303b;color:#bf616a;">path</span><span style="background-color:#2b303b;color:#c0c5ce;">: &amp;Path) -&gt; Result&lt;String, Status&gt; {
+    std::fs::read_to_string(path)
+        .</span><span style="background-color:#2b303b;color:#96b5b4;">map_err</span><span style="background-color:#2b303b;color:#c0c5ce;">(|</span><span style="background-color:#2b303b;color:#bf616a;">e</span><span style="background-color:#2b303b;color:#c0c5ce;">| {
+            Status::new(ErrorKind::Read).</span><span style="background-color:#2b303b;color:#96b5b4;">with_internal</span><span style="background-color:#2b303b;color:#c0c5ce;">(e)
+                .</span><span style="background-color:#2b303b;color:#96b5b4;">context_with</span><span style="background-color:#2b303b;color:#c0c5ce;">(|</span><span style="background-color:#2b303b;color:#bf616a;">c</span><span style="background-color:#2b303b;color:#c0c5ce;">| c.</span><span style="background-color:#2b303b;color:#96b5b4;">insert</span><span style="background-color:#2b303b;color:#c0c5ce;">(&quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Expected value</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, </span><span style="background-color:#2b303b;color:#d08770;">5</span><span style="background-color:#2b303b;color:#c0c5ce;">))
+        })
+}
+</span></pre>
+<p><em>(custom <code>Context</code> not shown)</em></p>
+<p>For more, check out <a href="https://docs.rs/status/">the docs</a> and <a href="https://github.com/epage/status/issues">the
+issues</a>. Like I said, this is a
+Proof-of-Concept.  Your help is needed, whether feedback, ideas, or code. Even
+something as simple as encouragement that this is worth persuing would be good
+feedback into where I put my time.</p>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2019</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

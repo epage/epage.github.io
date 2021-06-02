@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RustFest Parist Trip Report</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>RustFest Parist Trip Report</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;04&nbsp;Jun&nbsp;'18</time></li>
+              <li><i class="fa fa-tags"></i> programming, rust</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <p>I've been involved in the Rust community for about a year and a half now.  What
+attracted me to Rust is that is looks like the first viable replacement for
+C++.  It offers similar (actually better) protections than GCed languages and
+the full language is available in any environment, including exception-like
+error handling in the Windows kernel.</p>
+<p>1aim partially sponsored my attendance at RustFest.  At the start of the year,
+the Rust community organized working groups for targeted improvements to the
+language for <a href="https://internals.rust-lang.org/t/announcing-the-2018-domain-working-groups/6737">several use
+cases</a>.
+1aim was looking for working group members to sponsor and the WG-CLI leader
+sponsored me due to my involvement with the working group where I've been
+working to make my life easier for my maintaining my tools.</p>
+<p>Sadly, I'm writing this up so late from the main event (the talks), that I'm
+not going into as much detail as I'd like.</p>
+<h3>Talks (Saturday)</h3>
+<p>The opening Keynote was on the <a href="https://www.youtube.com/watch?v=23lRkdDXqY0&amp;index=1&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1">Feynman Method for
+learning</a>.
+Really enjoyed this.  Probably the most memorable part is dealing with jargon.
+I've heard before that Elon Musk has a ban on acronyms and proprietary jargon</p>
+<blockquote>
+<p>&quot;Don't use acronyms or nonsense words for objects, software, or processes at
+Tesla. In general, anything that requires an explanation inhibits
+communication. We don't want people to have to memorize a glossary just to
+function at Tesla.&quot;</p>
+</blockquote>
+<p>Feynman articulately calls out the real problem with jargon in this quote that
+Vaidehi Joshi shares:</p>
+<blockquote>
+<p>When we speak without jargon, it frees us from hiding behind knowledge we
+don't have.</p>
+</blockquote>
+<p>Next was a talk on a Rust implementation of TLS / SSL.  Key parts of this talk</p>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=aHMRFZkXq4Y&amp;feature=youtu.be&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1&amp;t=1250">Leveraging the type system to avoid GOTO FAIL</a>
+<ul>
+<li>While the focus is on Rust, languages with weaker type systems can
+still get some benefit from these practices.</li>
+</ul>
+</li>
+<li>Apparently, there is a OpenSSL wrapper around rustls.  OpenSSL is a big
+problem for making &quot;portable&quot; pythons for Linux for nibuild.  I wonder if
+we can leverage this.</li>
+</ul>
+<p>Later was a talk on <a href="https://www.youtube.com/watch?v=hMJEPWcSD8w&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1&amp;index=8">writing reliable systems</a>.  Highlights</p>
+<ul>
+<li>Calls out challenges we have in manually identifying corners that need testing.
+<ul>
+<li>Pesticide paradox: code becomes immune to tests</li>
+<li>Besides being good in general, provides good reason to be using property-based testing</li>
+</ul>
+</li>
+<li>Good to see more background on property-based testing</li>
+<li>Model testing seems intriguing for complex driver interactions at my work.
+<ul>
+<li>It randomly generates ops to perform on your code.  If it comes across a failure case, it will randomly drop ops to find the minimal reproducible situation.</li>
+<li>There was talk of linearizibility.  I don't remember the details on this but had a note that it could help with testing some of our concurrent code.</li>
+</ul>
+</li>
+</ul>
+<p>The <a href="https://www.youtube.com/watch?v=pTEYqpcQ6lg&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1&amp;index=11">Monotron
+talk</a>
+is a great showcase at the potential for Rust for firmware.</p>
+<p>Misc talk notes</p>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=Gfe-JKn7G0I&amp;index=3&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1" title="https://www.youtube.com/watch?v=Gfe-JKn7G0I&amp;index=3&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1">RustFest Paris 2018 - Immutable Data Structures and why You want them by Bodil Stokke - YouTube</a>  was enjoyable but not as much immediate use</li>
+<li><a href="https://www.youtube.com/watch?v=Ct7jveV7j8g&amp;index=5&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1" title="https://www.youtube.com/watch?v=Ct7jveV7j8g&amp;index=5&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1">RustFest Paris 2018 - A Rust Crate that also quacks like a modern C++ Library by Henri Sivonen - YouTube</a>  has potential value to us but I fell asleep in due to my hotel roommate coming in late the night before.</li>
+<li><a href="https://www.youtube.com/watch?v=2Ng5kpDirDI&amp;index=7&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1" title="https://www.youtube.com/watch?v=2Ng5kpDirDI&amp;index=7&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1">RustFest Paris 2018 - Vector graphics rendering on the GPU in Rust with Lyon by Nicolas Silva - YouTube</a>  shows some impressive performance work.</li>
+<li><a href="https://www.youtube.com/watch?v=8IvWPeavjiQ&amp;index=9&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1" title="https://www.youtube.com/watch?v=8IvWPeavjiQ&amp;index=9&amp;list=PL85XCvVPmGQgdqz9kz6qH3SI_hp7Zb4s1">RustFest Paris 2018 - Bringing Intel SGX to the Rust Ecosystem by Yu Ding - YouTube</a>  was interesting but unsure how much SGX will be relevant to me or my coworkers.</li>
+</ul>
+<h3>Workshops (Sunday)</h3>
+<p>I skipped the workshops.</p>
+<h3>Impl Days (Monday, Tuesday)</h3>
+<p>This was a two day hack fest.  I liked this better than the PyCon one.  I'm
+unsure if its because I'm more involved in the community or they handle it
+better with</p>
+<ul>
+<li>Clearer mentorship model</li>
+<li>Use-case driven cross-ecosystem initiatives making it easier for people to
+find problems relevant to them which makes them more invested.</li>
+</ul>
+<p>I worked on one of my WG-CLI projects, CLI testing.  The crates (packages) provide</p>
+<ul>
+<li>ability to find and launch you executable</li>
+<li>run asserts on the result of your executable</li>
+<li>filesystem fixtures</li>
+<li>filesystem assertions</li>
+</ul>
+<h3>Visiting Paris (Thursday, Wednesday)</h3>
+<p>This was my first time to Paris.</p>
+<p>Misc notes</p>
+<ul>
+<li>Went on the Arc de'Triomphe</li>
+<li>Enjoyed a walked along the Seine River</li>
+<li>Visited <a href="https://photos.app.goo.gl/SOus5YTJySi0JSSO2">Pere Lachaise cemetery</a></li>
+<li>While nothing to special about duck or escargot, the sauces they came in were great!</li>
+<li>The city is dirty</li>
+<li>Everything felt one or two turns away.  I'm unsure if this was because of where my hotel was or all the weird angles all the streets are in.</li>
+<li>Every mode of transport is used (train, subway, car, motorcycle, bicycle, scooter, electric scooter, those one wheeled segways) and the roads / sidewalks are chaos.  Anyone who could was scooting around stopped cars in traffic.</li>
+<li>Experienced the stereotype of french customer service
+<ul>
+<li>Got the ire of a bar tender for being the sober person in a group</li>
+<li>Despite my flight being empty (as I found out later), they enforced
+unusual baggage restrictions.  After waiting in line a while for
+checking my carry on, all of the Air France staff disappeared (I flew
+KLM to Paris).  Eventually they came back and I was served.  The
+gentleman got very frustrated and deposited me in another line without
+telling me why I was in the wrong line.  The gatekeeper of this new
+line kept telling me I was in the wrong line and needed to go back.
+Thankfully ignoring him was the right thing to do.</li>
+</ul>
+</li>
+<li>Should have brought a better umbrella.  It rained nearly every day and now my passport is messed up.  The Air France guy sure made his thoughts on my passport known.</li>
+</ul>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>

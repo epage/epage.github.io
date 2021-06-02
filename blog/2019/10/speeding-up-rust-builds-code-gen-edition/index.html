@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speeding Up Rust Builds: Code-Gen Edition</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Speeding Up Rust Builds: Code-Gen Edition</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p><em>tl;dr Cache your code-gen results with the <a href="https://crates.io/crates/codegenrs"><code>codegenrs</code> crate</a>.</em></p>
+<p>Lately, there has been talk talk about improving build times, with a focus on
+reducing bloat like <a href="https://www.reddit.com/r/rust/comments/cz7u0j/psa_regex_13_permits_disabling_unicodeperformance/?st=k1k1fzk7&amp;sh=69a9ab53">regex breaking out logic into features that can be
+disabled</a>,
+<a href="https://www.reddit.com/r/rust/comments/cg3p5m/cargobloat_08_debloated_5x_smaller_10x_faster/?st=k1k1cfs7&amp;sh=f42a89f0">cargo-bloat going on a
+diet</a>,
+<a href="https://internals.rust-lang.org/t/exploring-crate-graph-build-times-with-cargo-build-ztimings/10975?u=dtolnay">new cargo features to identify slow-to-build
+dependencies</a>.
+The area that has been impacting me lately is <code>build.rs</code>.  I've been
+code-generating compile-time hash tables (<a href="https://crates.io/crates/phf">phf</a>)
+which has added several dependencies to my build and takes a while.</p>
+<p>Let's use <a href="https://crates.io/crates/imperative"><code>imperative</code></a> as an example.
+<code>imperative</code> is a simple way to check a word is in the imperative-mood.  The
+logic was taken from <a href="https://github.com/pycqa/pydocstyle">pydocstyle</a> where it
+was used to ensure the subject-line for a doc-comment should start with an
+imperative-mood verb.</p>
+<p><code>imperative</code> uses:</p>
+<ul>
+<li>A set of blacklisted words (73 words).</li>
+<li>A map of word-stems to acceptable full-words (227 full-words).</li>
+</ul>
+<p>And relies on the following unique dependencies:</p>
+<ul>
+<li><code>phf_codegen</code></li>
+<li><code>multimap</code></li>
+</ul>
+<p>What if instead of code-generating in <code>build.rs</code> as part of <code>imperative</code> and
+all dependents' builds, we checked in the result? The main risks are:</p>
+<ul>
+<li>Contributors forgetting to re-run code-gen</li>
+<li>Contributors changing the code-gen output without modifying the code-generator.</li>
+</ul>
+<p>We can mitigate these risks by having the CI run a <code>--check</code> mode in the
+code-generator that ensures the output matches what should be generated.</p>
+<p>To setup <code>imperative-codegen</code>:</p>
+<ul>
+<li>Set <code>package.publish</code> to <code>false</code>.</li>
+<li>Add a dependency on <a href="https://crates.io/crates/codegenrs"><code>codegenrs</code></a>.</li>
+<li>Write the <a href="https://github.com/crate-ci/imperative/blob/master/codegen/src/main.rs">code-generator</a>.</li>
+<li>Update the <a href="https://github.com/crate-ci/imperative/blob/master/azure-pipelines.yml">CI to check the generated output</a>.</li>
+</ul>
+<p>Now let's look at some very unscientific numbers for clean builds of <code>imperative</code> (a
+<code>lib</code> crate):</p>
+<table><thead><tr><th><code>imperative</code></th><th><code>cargo check</code></th><th><code>cargo build</code></th></tr></thead><tbody>
+<tr><td><code>build.rs</code></td><td>39.94 s</td><td>35.65 s</td></tr>
+<tr><td><code>codegenrs</code></td><td>22.55 s</td><td>26.06 s</td></tr>
+</tbody></table>
+<p><em>Note that this technique might also help make crates work better with
+<a href="https://people.gnome.org/%7Efederico/blog/rust-build-scripts.html">alternative build
+systems</a>.</em></p>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2019</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

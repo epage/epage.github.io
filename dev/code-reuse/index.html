@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Reuse</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Code Reuse</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <center>[<img src="https://assets.amuniversal.com/5d2d9c209fd5012f2fe600163e41dd5b" width=900m/>](https://dilbert.com/strip/1996-01-31)</center>
+<p>Several years ago, I was working with an engineer fresh out of college.  He was
+rightfully excited to start using all of the best practices he had learned in
+college, including Don't Repeat Yourself (DRY).  The problem is college is
+rarely a time where you see when best practices work and when they don't.  When
+does a college student ever get to reuse their code?  I tried to explain the
+dangers of DRY but I think instead I came across as the old curmudgeon who
+didn't want anything to do with these new fangled ways of making code better.</p>
+<p>Over the years, I keep having to repeat myself on how best to reuse code, so I figured it was time practice DRY with my advice.</p>
+<p>Guidelines for code reuse, in priority order:</p>
+<ul>
+<li>When reducing duplication, focus on reducing intentional duplication and not incidental duplication.
+<ul>
+<li>The requirements that drove a shared implementation can evolve over time, causing the implementations to diverge.  When you share these kind of implementations, you either then need to undo your work or add &quot;just one more&quot; toggle to control things, leading to an unholy mess of spaghetti code</li>
+<li>When focusing on the abstraction / requirements, you are identifying areas of shared code that is used together, or not. It is less likely to diverge.</li>
+<li>My guidance on this is to wait until you have at least three implementations of something before trying to refactor for reuse because at that point you might be starting to understand the requirements (commonly called <a href="https://www.justinweiss.com/articles/i-dry-ed-up-my-code-and-now-its-hard-to-work-with-what-happened/">The Rule of Three</a>.</li>
+</ul>
+</li>
+<li>Composition over (implementation) inheritance
+<ul>
+<li>Inheritance is the second highest form of code coupling in C++, just behind &quot;friend&quot;
+<ul>
+<li>This makes it hard to ensure invariants are being satisfied in an objects API</li>
+<li>This makes it hard to avoid spaghetti code where an implementation of the API jumps back and forth between a base class and the classes that inherit from it</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Weigh the value of cost of reuse
+<ul>
+<li>Just like computers have locality issues (instruction locality improves execution time, memory locality improves memory access), humans have code locality when reading / analyzing code.
+<ul>
+<li>If a minor section of code gets pulled away into a remote component, it will make it harder for people to read and reason about the code.</li>
+<li>The better the abstraction, the less this is a problem.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>To Integrate:</p>
+<ul>
+<li><a href="https://uselessdevblog.wordpress.com/2018/02/18/inheritance-is-a-hammer-eliminating-code-duplication-is-not-a-nail/">Inheritance is a hammer. Eliminating code duplication is not a nail.</a></li>
+<li><a href="http://whats-in-a-game.com/implementation-inheritance-is-evil/">Implementation Inheritance Is Evil</a></li>
+<li><a href="https://www.madetech.com/blog/when-to-avoid-the-dry-principle">When to avoid the DRY principle</a></li>
+<li><a href="https://web.archive.org/web/20120427101911/http://jacksonfish.com/blog/2012/03/12/the-day-bill-gates-called-me-rude-and-other-lessons-in-user-experience/">Limits in concept reduction via the toilet, drinking fountain, shower metaphor</a></li>
+</ul>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

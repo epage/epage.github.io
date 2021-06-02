@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warstory: The HID PID Bug</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Warstory: The HID PID Bug</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p>Lessons:</p>
+<ul>
+<li>Don't let seniority get in the way of doing what's right</li>
+<li>Look to the systemic cause of a problem</li>
+<li>Design APIs for the <a href="https://philosopherdeveloper.com/posts/pit-of-success.html">Pit of Success</a></li>
+<li>Technical debt incurs risk, and not just cost.</li>
+</ul>
+<p>Looking back, I appreciate how much trust my first job out of college gave me.
+Within a year of being there, I was neck deep refactoring one of the hairiest
+pieces of (involved in a three-process concurrent handshake).  I was trying to
+reduce the scope of the state in the code so I could see how to introduce my
+first big project: support for a piece of hardware that communicates as a
+<a href="https://en.wikipedia.org/wiki/Hardware_interface_design">HID</a> device.</p>
+<p>We had an existing stack for detecting and talking to hardware but it was all
+coupled together, meaning I couldn't get it to talk to our new piece of
+hardware.  I created a new path for detecting and talking to these HID devices
+and all was right in the world.</p>
+<p>A while later, we got word that a major university was bringing up their
+student lab and our software was busted.  Somehow a legacy child device was in
+our hardware database without its parent, breaking the schema, preventing any
+further writes to the database.</p>
+<p>That new HID code path I mentioned?  It was in a place that couldn't go through
+our fancy new database abstraction which would enforce schema validation.  That
+combined with the fact that I was doing a lookup of the device by PID (Product ID), without
+the context of the VID (Vendor ID) or Bus.  Each bus (PCI, USB), defines its own standard
+for assigning out VIDs.  Each vendor is then responsible for assigning out
+PIDs, in the context of their VID.  So in this case, a HP USB Mouse had the
+same PID as our legacy child device, causing my new detection path to insert it
+into the database, without any safety checks to fail it out.</p>
+<p>We switched the code to only doing lookups by the triple Bus, VID, PID, patched
+6 versions of our software, and got on our way.</p>
+<p>Once we realize this, we remembered getting vague, non-reproducible reports
+from within the company over the last couple of months.</p>
+<p>So what system failures led up to this?</p>
+<ul>
+<li>We had an API that only took PID, assuming Bus and VID were already verified, making this non-obvious when new code paths were added.</li>
+<li>We delayed getting rid of those old database access code paths.  Even 10
+years later, and with a PR ready to go before I left that company, the code
+path is still not updated.</li>
+</ul>
+<p>Many years later, I found myself in a battle over this.  We had a new
+cross-company hardware API.  We wanted to use it to support creating mock
+devices for low cost validation.  Everyone wanted it to just accept PID because
+&quot;we'll support a third-party device in this API&quot; (we would) and &quot;but if we do,
+people can specify it then&quot; (notice this is the systemic failure that led to my
+bug).  I had to fight an uphill battle, repeatedly like it was <a href="https://en.wikipedia.org/wiki/Groundhog_Day_(film)">Groundhog's
+Day</a>, against multiple
+engineers with double my seniority until they gave up and acquiesced.  Even
+with us having seen this problem once before showing it was creating a trap for
+future developers, they still wanted something &quot;convenient&quot; for themselves.</p>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

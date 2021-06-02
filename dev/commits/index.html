@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curating Commit History</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Curating Commit History</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p>Programming is often an exploratory exercise where, for example, one might not
+know what a refactor should look like until the driving feature is done. This
+leads to a messy commit history.</p>
+<p>Git offers tools to create a clean history upfront or to fix it up later.</p>
+<h2>What does an ideal history look like</h2>
+<ul>
+<li>Every commit does exactly one thing.</li>
+<li>Every commit is buildable.</li>
+<li>Every commit message has a meaningful subject line</li>
+<li>Every commit message establishes context (what, why, and how)</li>
+<li>Commits are ordered to tell a story of how a feature was implemented.</li>
+<li>The commit graph is linear (and not <a href="https://cdn-images-1.medium.com/max/800/1*e-tlWqLwbUd1UmZyC_KbGg.png">spaghetti</a>).</li>
+</ul>
+<h2>Why keep a clean history</h2>
+<center>
+[![History decays with time](https://imgs.xkcd.com/comics/git_commit.png)](https://xkcd.com/1296/0)
+</center>
+<ul>
+<li>Make it easy for someone to scan the history, parsing it for what they need.</li>
+<li>Help future developers know the design assumptions rather than them rediscovering them in a costly way.</li>
+<li>Avoid false positives with <code>git bisect</code>.</li>
+<li>Allow <code>git bisect</code> and <code>git blame</code> to more directly point to the desired change.</li>
+</ul>
+<h2>What keeps us from the ideal history</h2>
+<blockquote>
+<p>In theory, there is no difference between theory and practice. But, in practice, there is.</p>
+</blockquote>
+<p>- Jan L. A. van de Snepscheut</p>
+<ul>
+<li><a href="https://www.freecodecamp.org/news/git-rebase-and-the-golden-rule-explained-70715eccc372/">History should not be rewritten when the branch is being modified by more
+than one person.</a></li>
+<li>On some occasions, the cost of resolving conflicts from re-ordering commits
+outweighs the benefits of a clean history.</li>
+<li>CIs might not ensure that every commit is buildable either due to design
+limitations or resource constraints.</li>
+</ul>
+<h2>How to keep a clean history</h2>
+<p>Git supports you with:</p>
+<ul>
+<li>Keeping history clean upfront
+<ul>
+<li><a href="https://hackernoon.com/understanding-git-index-4821a0765cf">The Index</a> (<code>git add &lt;path&gt;</code>, <code>git add -p &lt;path&gt;</code>)</li>
+<li><a href="https://git-scm.com/book/en/v1/Git-Tools-Stashing">Stashing</a> (<code>git stash</code>, <code>git stash pop</code>)</li>
+<li>Branches (<code>git checkout -b &lt;name&gt;</code>)</li>
+</ul>
+</li>
+<li>Fixing it up later
+<ul>
+<li>Rebasing (<code>git rebase</code>,<code>git rebase -i</code>, <code>git pull --rebase</code>)</li>
+<li>Cherry-picking (<code>git cherry-pick &lt;hash&gt;</code>)</li>
+<li>Universal undo (<code>git reflog</code>)</li>
+</ul>
+</li>
+</ul>
+<p><strong>Tips:</strong></p>
+<ul>
+<li>Again, <a href="https://www.freecodecamp.org/news/git-rebase-and-the-golden-rule-explained-70715eccc372/">history should not be rewritten when the branch is being modified by
+more than one person.</a></li>
+<li>If you rewrote history after pushing to your remote branch, you will need to
+force-override it.  Use <a href="https://git-scm.com/docs/git-push#Documentation/git-push.txt---no-force-with-lease"><code>--force-with-lease</code></a> instead of
+<code>--force</code> as a safety catch in case someone else pushed to the branch.</li>
+<li>If you already published your PR, consider rewriting history after people
+have signed off on your PR so they can more easily see how you've
+responded to their feedback. This does mean you'll have to hold off on
+marking a PR for auto-completion until after you have rewritten history.</li>
+</ul>
+<h3>Upfront: Distinct changes in distinct sections of code</h3>
+<p>When modifying one section of code, you might be reading another section and
+notice something you want to change, like a typo.</p>
+<p>When the changes are in separate files</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add &lt;file</span><span style="background-color:#2b303b;color:#d08770;">1</span><span style="background-color:#2b303b;color:#c0c5ce;">&gt;
+git commit
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add &lt;file</span><span style="background-color:#2b303b;color:#d08770;">2</span><span style="background-color:#2b303b;color:#c0c5ce;">&gt;
+git commit
+</span></pre>
+<p>When the changes are in the same file, you can select which parts to stage.</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#65737e;"># Interactive staging let&#39;s you choose which changed hunks you want to stage
+</span><span style="background-color:#2b303b;color:#8fa1b3;">#
+</span><span style="background-color:#2b303b;color:#65737e;"># Sometimes a hunk is bigger than you want and you can split it.
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add</span><span style="background-color:#2b303b;color:#bf616a;"> -p </span><span style="background-color:#2b303b;color:#c0c5ce;">&lt;file&gt;
+git commit
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add &lt;file&gt;
+git commit
+</span></pre>
+<p><strong>Tip:</strong> Make staging files your habit rather than <code>git commit --all</code> to save
+yourself from having to fix things up later.</p>
+<p>See also <a href="https://hackernoon.com/understanding-git-index-4821a0765cf">Understanding Git - Index</a>.</p>
+<h3>Upfront: Partway through a change, realize you want to make a conflicting change</h3>
+<p><a href="https://git-scm.com/book/en/v1/Git-Tools-Stashing">Stashing</a> is the go-to for quickly saving off your work to make another change</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">&lt;change file&gt;
+git stash
+
+&lt;change file&gt;
+git add &lt;file&gt;
+git commit
+
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> stash pop
+&lt;resolve file&gt;
+&lt;finish file&gt;
+git add &lt;file&gt;
+git commit &lt;file&gt;
+</span></pre>
+<p><strong>Tip:</strong> The stash is a stack of changes which can feel opaque to work with
+which makes it harder to work with over periods of time or when multiple
+changes are getting stashed.  It also can't be pushed for sharing / backup.  In
+these cases, it might be better to use branches.</p>
+<h3>Fixing: ctrl-z! ctrl-z! ctrl-z!</h3>
+<p>Before getting into how to rewrite history, its helpful to know how to recover
+when you don't like where you ended up.  This is possible because git does not
+automatically delete unreferenced commits in the commit graph (instead requires
+calling <code>git gc</code>).  <code>git reflog</code> let's you browse your <code>HEAD</code>'s history, allowing
+you to find commits from before rewriting history.</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#65737e;"># Find hash from before rewrite
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> reflog
+
+</span><span style="background-color:#2b303b;color:#65737e;"># Update the branch and index to point to &lt;hash&gt;
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># - `</span><span style="background-color:#2b303b;color:#8fa1b3;">--soft</span><span style="background-color:#2b303b;color:#c0c5ce;">` to not touch index
+</span><span style="background-color:#2b303b;color:#65737e;"># - `--hard` to also update working directory
+</span><span style="background-color:#2b303b;color:#c0c5ce;">git reset &lt;hash&gt;
+</span></pre>
+<p>Lower impact commands:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#65737e;"># See differences
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> diff &lt;hash&gt;
+# Switch to &lt;hash&gt; as a detatched head (ie anonymous branch)
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout &lt;hash&gt;
+# Update working directory, good if you want to revert your rebase via a commit.
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout &lt;hash&gt; -- .
+</span></pre>
+<p>See also <a href="https://marklodato.github.io/visual-git-guide/index-en.html?no-svg">A Visual Git Reference</a> and <a href="https://github.blog/2015-06-08-how-to-undo-almost-anything-with-git/">How to undo
+(almost) anything with Git</a></p>
+<h3>&quot;Fixing&quot;: Updating your branch to latest from <code>master</code></h3>
+<p>Coming from other SCM's, <code>git merge</code> sounds familiar and might be what you
+reach for by default.  The thing to remember is that git's commits are not
+linear but a graph and <code>git merge</code> can easily lead to <a href="https://cdn-images-1.medium.com/max/800/1*e-tlWqLwbUd1UmZyC_KbGg.png">complex commit
+graphs</a>.</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#65737e;"># - Fetch origin/master
+</span><span style="background-color:#2b303b;color:#8fa1b3;">#</span><span style="background-color:#2b303b;color:#c0c5ce;"> - Take existing commits and append them to origin/master
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> pull</span><span style="background-color:#2b303b;color:#bf616a;"> --rebase</span><span style="background-color:#2b303b;color:#c0c5ce;"> origin master
+</span></pre>
+<p>In case you want to explore the difference, like when dealing with conflicts,
+it might be helpful to do this as separate commands:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout master
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> pull
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout - </span><span style="background-color:#2b303b;color:#65737e;"># `-` means &quot;last branch&quot;
+</span><span style="background-color:#2b303b;color:#c0c5ce;">git rebase master
+</span></pre>
+<p>See also <a href="https://ubuntu.com/blog/tricks-for-keeping-a-tidy-git-commit-history">How to manage your Git history: Tips for keeping your commits
+tidy</a> and
+<a href="http://www.bitsnbites.eu/a-tidy-linear-git-history/">A tidy, linear Git history</a></p>
+<h3>Fixing: Changing the most recent commit</h3>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">&lt;change file&gt;
+git add &lt;file&gt;
+git commit</span><span style="background-color:#2b303b;color:#bf616a;"> --amend
+</span></pre>
+<p><strong>Tip</strong>: If you've already pushed your PR, consider making a fixup commit (see
+below) during the review and then cleaning them up later so reviewers can more
+easily see how you've responded to their feedback.</p>
+<p>See also <a href="https://ubuntu.com/blog/tricks-for-keeping-a-tidy-git-commit-history">How to manage your Git history: Tips for keeping your commits
+tidy</a> and
+<a href="https://about.gitlab.com/2018/06/07/keeping-git-commit-history-clean/">How (and why!) to keep your Git commit history clean</a></p>
+<h3>Fixing: I need to change a specific commit</h3>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">&lt;change file&gt;
+git add &lt;file&gt;
+
+# Find the commit hash your change fixes
+</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> log
+</span><span style="background-color:#2b303b;color:#65737e;"># Marks the commit as fixing up another commit
+</span><span style="background-color:#2b303b;color:#c0c5ce;">git commit</span><span style="background-color:#2b303b;color:#bf616a;"> --fixup </span><span style="background-color:#2b303b;color:#c0c5ce;">&lt;hash&gt;
+
+# Somtime later when you are ready to cleanup your history, this will
+</span><span style="background-color:#2b303b;color:#65737e;"># automatically move your commit just after &lt;hash&gt; and squash it into &lt;hash&gt;
+</span><span style="background-color:#2b303b;color:#c0c5ce;">git rebase</span><span style="background-color:#2b303b;color:#bf616a;"> --autosquash</span><span style="background-color:#2b303b;color:#c0c5ce;"> master
+</span></pre>
+<p>See also <a href="https://thoughtbot.com/blog/autosquashing-git-commits">Auto-squashing Git Commits</a> and <a href="https://about.gitlab.com/2018/06/07/keeping-git-commit-history-clean/">How (and
+why!) to keep your Git commit history clean</a></p>
+<p><strong>Tip:</strong> You can turn on <code>--autosquash</code> by default with <code>git config --global rebase.autosquash true</code></p>
+<h3>Fixing: I need to add/remove/combine/split/re-order commits</h3>
+<p><code>git rebase -i</code> let's you edit your commit history in your <code>$EDITOR</code> of choice</p>
+<p>Note: things get funky when merge commits are used.  Another reason not to use them.</p>
+<p>Just type:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> rebase</span><span style="background-color:#2b303b;color:#bf616a;"> -i</span><span style="background-color:#2b303b;color:#c0c5ce;"> master
+</span></pre>
+<p>And your commit history and instructions on editing it will pop up</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#8fa1b3;">pick</span><span style="background-color:#2b303b;color:#c0c5ce;"> 6e73d55c6 chore(nest)</span><span style="background-color:#2b303b;color:#96b5b4;">:</span><span style="background-color:#2b303b;color:#c0c5ce;"> Baseline version of nipg.pl
+</span><span style="background-color:#2b303b;color:#8fa1b3;">pick</span><span style="background-color:#2b303b;color:#c0c5ce;"> 6aed59e08 chore(nest)</span><span style="background-color:#2b303b;color:#96b5b4;">:</span><span style="background-color:#2b303b;color:#c0c5ce;"> Strip nipg down to essentials
+
+</span><span style="background-color:#2b303b;color:#65737e;"># Rebase 1d9e1a08d..6aed59e08 onto 1d9e1a08d (2 commands)
+</span><span style="background-color:#2b303b;color:#c0c5ce;">#
+</span><span style="background-color:#2b303b;color:#65737e;"># Commands:
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># p, pick &lt;commit&gt; = use commit
+</span><span style="background-color:#2b303b;color:#65737e;"># r, reword &lt;commit&gt; = use commit, but edit the commit message
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># e, edit &lt;commit&gt; = use commit, but stop for amending
+</span><span style="background-color:#2b303b;color:#65737e;"># s, squash &lt;commit&gt; = use commit, but meld into previous commit
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># f, fixup &lt;commit&gt; = like &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">squash</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, but discard this commit&#39;</span><span style="background-color:#2b303b;color:#a3be8c;">s log message
+# x, exec &lt;command&gt; = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with </span><span style="background-color:#2b303b;color:#c0c5ce;">&#39;git rebase --continue&#39;</span><span style="background-color:#2b303b;color:#a3be8c;">)
+# d, drop &lt;commit&gt; = remove commit
+# l, label &lt;label&gt; = label current HEAD with a name
+# t, reset &lt;label&gt; = reset HEAD to a label
+# m, merge [-C &lt;commit&gt; | -c &lt;commit&gt;] &lt;label&gt; [# &lt;oneline&gt;]
+# .       create a merge commit using the original merge commit</span><span style="background-color:#2b303b;color:#c0c5ce;">&#39;s
+</span><span style="background-color:#2b303b;color:#65737e;"># .       message (or the oneline, if no original merge commit was
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># .       specified)</span><span style="background-color:#2b303b;color:#96b5b4;">.</span><span style="background-color:#2b303b;color:#c0c5ce;"> Use -c &lt;commit&gt; to reword the commit message.
+</span><span style="background-color:#2b303b;color:#65737e;">#
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># These lines can be re-ordered; </span><span style="background-color:#2b303b;color:#8fa1b3;">they</span><span style="background-color:#2b303b;color:#c0c5ce;"> are executed from top to bottom.
+</span><span style="background-color:#2b303b;color:#65737e;">#
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># If you remove a line here THAT COMMIT WILL BE LOST.
+</span><span style="background-color:#2b303b;color:#65737e;">#
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># However, if you remove everything, the rebase will be aborted.
+</span><span style="background-color:#2b303b;color:#65737e;">#
+</span><span style="background-color:#2b303b;color:#c0c5ce;"># Note that empty commits are commented out
+</span></pre>
+<p>Once you've modified the &quot;file&quot;, save and close and your history will be rewritten.</p>
+<p>See also <a href="https://ubuntu.com/blog/tricks-for-keeping-a-tidy-git-commit-history">How to manage your Git history: Tips for keeping your commits
+tidy</a> and
+<a href="https://about.gitlab.com/2018/06/07/keeping-git-commit-history-clean/">How (and why!) to keep your Git commit history clean</a></p>
+<p><strong>Tip:</strong> By default, <code>$EDITOR</code> is VIM which works for me. For anyone else, you can change the editor, for example
+to switch to VS Code, type <code>git config --global core.editor &quot;code --wait&quot;</code>.</p>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://chris.beams.io/posts/git-commit/">How to Write a Git Commit Message</a></li>
+<li><a href="https://ubuntu.com/blog/tricks-for-keeping-a-tidy-git-commit-history">How to manage your Git history: Tips for keeping your commits tidy</a></li>
+<li><a href="https://about.gitlab.com/2018/06/07/keeping-git-commit-history-clean/">How (and why!) to keep your Git commit history clean</a></li>
+<li><a href="https://thoughtbot.com/blog/autosquashing-git-commits">Auto-squashing Git Commits</a></li>
+<li><a href="https://marklodato.github.io/visual-git-guide/index-en.html?no-svg">A Visual Git Reference</a></li>
+<li><a href="https://www.freecodecamp.org/news/git-rebase-and-the-golden-rule-explained-70715eccc372/">Git series 2/3: rebase and the golden rule explained.</a></li>
+<li><a href="https://www.mail-archive.com/dri-devel@lists.sourceforge.net/msg39091.html">Linus' rules for clean history</a></li>
+</ul>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

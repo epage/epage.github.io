@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monorepos</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Monorepos</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p>A monorepo is a SCM repo that contains multiple components.  Some famous
+monorepos hold an entire company's code in it; not all do.  Google's monorepo
+does not contain Android, Chrome, or several other major products.  A monorepo
+can be as simple as ripgrep where <a href="https://github.com/BurntSushi/ripgrep/blob/master/Cargo.toml#L33">several dependencies are developed in the
+same repo</a>.</p>
+<p>Basic assumptions about a monorepo</p>
+<ul>
+<li>Everything is versioned together</li>
+<li>Third party dependencies are vendored</li>
+<li>Single version of a third party dependency across the monorepo</li>
+<li>Build and test system is in place to provide confidence when making monorepo-wide refactors</li>
+</ul>
+<p>For more background, see <a href="https://trunkbaseddevelopment.com/">Trunk Based Development</a>.</p>
+<p>Different scopes of monorepos can include:</p>
+<ul>
+<li>An entire company, including unrelated code</li>
+<li>Coupled products</li>
+<li>Individual products</li>
+<li>Independent sections of a product, like the core vs plugins</li>
+<li>Not using one at all</li>
+</ul>
+<h2>Considerations for the right scope</h2>
+<h3>Release schedule</h3>
+<ul>
+<li>For some products, the business impact of adjusting the release date is small
+and they can align on a coordinated monorepo release train if its frequent enough
+(e.g. once a quarter)</li>
+<li>Products that have limited purchasing windows, like consumer holidays or academia
+need exceptions to the release train.</li>
+</ul>
+<h3>Release schedule with shared shipping code</h3>
+<ul>
+<li>If A depends on B and B has a breaking change, great, A gets updated
+<ul>
+<li>Ideally everything is always shippable but that isn't always the case.</li>
+<li>So what if A needs to ship but B isn't ready, then A needs to release with an old B</li>
+</ul>
+</li>
+</ul>
+<h3>Supporting older versions of dependencies</h3>
+<p>Let's say that product A interoperates with B but we don't want to force users to
+upgrade B, then A might need to build against old versions of B.  This violates
+the principle that monorepos should align in their dependencies, especially if
+its something from within the monorepo.</p>
+<h3>Protected IP</h3>
+<p>Not everyone in a company has the same access rights to all IP, whether out of
+paranoia or due to export-restrictions.</p>
+<ul>
+<li>git repo access rights are all or nothing</li>
+<li>How do you handle protected IP?</li>
+<li>How do you handle IP that becomes protected?</li>
+</ul>
+<h3>Conversion and maintenance cost</h3>
+<ul>
+<li>How trivially fast is the build and tests?</li>
+<li>Is your company built on a cloud computing platform and have the resources to
+scale up your build and tests with it (like Google and Microft)?  Including:
+<ul>
+<li>Bubble up of mono repo</li>
+<li>Ideally identify when cached versions can be reused</li>
+<li>Does it need to support native builds for platforms that major monobuild tools don't support?</li>
+<li>The cost of migrating to any new tools needed for using a monobuild.</li>
+</ul>
+</li>
+</ul>
+<h3>Dev Efficiency</h3>
+<ul>
+<li>Monorepo's impact on culture
+<ul>
+<li>Some part of culture are embedded in a monorepo's policies</li>
+<li>Culture alignment can improve efficiency</li>
+<li>Are there negative aspects of a mono-culture though? Do all practices work for all teams?</li>
+</ul>
+</li>
+<li>For software that can't always be shippable, submissions might get throttled during stablization periods but now everyone is on the same stablization schedule, causing other teams to hold your product hostage.</li>
+<li>Cost of change has an impact on culture, including autonomy and empowerment
+<ul>
+<li>e.g. With monorepo, can find and update all clients and fix them
+<ul>
+<li>But required to do it in one pass</li>
+<li>But required to do it to code you don't know</li>
+<li>But merge conflicts can become unwieldy</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Third party dependencies being kept in lock step increases cost of upgrading, lower the advantage gained by new features / capabilities
+<ul>
+<li>&quot;For third-party dependencies, the same rule applies, everyone upgrades in lock-step. Problems can ensure, of course, if there are real reasons for team B to not upgrade and team A was insistent. Broken backward compatibility is one problem.&quot;</li>
+<li>&quot;In 2007, Google tried to upgrade their JUnit from 3.8.x to 4.x and struggled as there was a subtle backward incompatibility in a small percentage of their usages of it. The change-set became very large, and struggled to keep up with the rate developers were adding tests.&quot;</li>
+<li>- <a href="https://trunkbaseddevelopment.com/monorepos/#third-party-dependencies-1">Monorepos - Trunk Based Development</a></li>
+</ul>
+</li>
+<li>Quality of validation vs turn around time
+<ul>
+<li>Ideal: full build + test suite run on every PR and commit
+<ul>
+<li>Would take too long for some code bases; we'd need to find ways to skip building parts and identify pertinent tests</li>
+<li>Might still take too long</li>
+</ul>
+</li>
+<li>Different products might have different bars on quality
+<ul>
+<li>Either due to how mission critical the software is</li>
+<li>Or due to the cost of running all tests</li>
+</ul>
+</li>
+<li>Important dev efficiency metrics:
+<ul>
+<li>Time from PR approved by human reviewers to different levels of verification</li>
+<li>Time from PR approved by human reviewers to being available for hand-testing</li>
+</ul>
+</li>
+<li>Barriers
+<ul>
+<li>Scaling test suites involving hardware requires more hardware and more maintenance</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>SCM's ability to have a performant interactive experience is important
+<ul>
+<li>Slow CLI tools can break developers out of the zone, making them more easily distracted</li>
+<li>Need to ensure commands are fast, especially ones used in the background by text editors / IDEs</li>
+<li>Network issues are a major contributing factor, especially for remote developers and remote branches.</li>
+</ul>
+</li>
+</ul>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>
