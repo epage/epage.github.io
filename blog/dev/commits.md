@@ -269,6 +269,7 @@ to switch to VS Code, type `git config --global core.editor "code --wait"`.
 
 ## Resources
 
+- [On undoing, fixing, or removing commits in git](https://sethrobertson.github.io/GitFixUm/fixup.html)
 - [How to Write a Git Commit Message][How to Write a Git Commit Message]
 - [How to manage your Git history: Tips for keeping your commits tidy][How to manage your Git history: Tips for keeping your commits tidy]
 - [How (and why!) to keep your Git commit history clean][How (and why!) to keep your Git commit history clean]
