@@ -157,7 +157,7 @@ hints).  Besides forgetting <code>try_for_each</code>, we'll also have to implem
 algorithms twice and keep them in sync.  A good test harness will help but all
 of this increases the friction for taking advantage of <code>try_for_each</code>.</p>
 <h2>Performance of <code>pushgen</code></h2>
-<p>For <code>pushgen</code>, the gains in lowering iteration overhead are not noticeable compared to everything else, like IO:</p>
+<p>For <code>pushgen</code>, the improvements from lowering iteration overhead are not noticeable compared to everything else, like IO:</p>
 <pre style="background-color:#2b303b;">
 <span style="background-color:#2b303b;color:#c0c5ce;">check_file/Typos/code   time:   [113.92 us 115.85 us 118.02 us]
                         thrpt:  [2.4566 MiB/s 2.5025 MiB/s 2.5449 MiB/s]
@@ -222,6 +222,8 @@ Found 8 outliers among 100 measurements (8.00%)
   6 (6.00%) high mild
   2 (2.00%) high severe
 </span></pre>
+<p><code>pushgen</code> won't be a magic bullet to improve performance but it might help with
+specific hot-loops.  Let profilers and benchmarks be your guide.</p>
 <h2>Porting to <code>pushgen</code></h2>
 <p><code>pushgen</code> is in its early stages, at v0.0.1.  I had to implement a lot of
 features before porting <code>typos</code> to use <code>pushgen</code>.</p>
