@@ -141,7 +141,7 @@ Lower impact commands:
 ```bash
 # See differences
 git diff <hash>
-# Switch to <hash> as a detatched head (ie anonymous branch)
+# Switch to <hash> as a detached head (ie anonymous branch)
 git checkout <hash>
 # Update working directory, good if you want to revert your rebase via a commit.
 git checkout <hash> -- .

@@ -238,5 +238,5 @@ fn read_file(path: &Path) -> Result<String, Status> {
 For more, check out [the docs](https://docs.rs/status/) and [the
 issues](https://github.com/epage/status/issues). Like I said, this is a
 Proof-of-Concept.  Your help is needed, whether feedback, ideas, or code. Even
-something as simple as encouragement that this is worth persuing would be good
+something as simple as encouragement that this is worth pursuing would be good
 feedback into where I put my time.

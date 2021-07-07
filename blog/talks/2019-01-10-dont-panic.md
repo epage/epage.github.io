@@ -573,7 +573,7 @@ Deviation: `Deref`
 let value = 5;
 let value_ref = &value;
 
-// All following are equivelant
+// All following are equivalent
 value.clone();
 (*value_ref).clone();
 *value_ref.clone(); // Auto-deref
