@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Experiments with `pushgen`</title><link>https://epage.github.io/blog/2021/07/pushgen-experiment/</link><description><![CDATA[<p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Experiments with `pushgen`</title><link>https://epage.github.io/blog/2021/07/pushgen-experiment/</link><description><![CDATA[<p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
 <code>pushgen</code></a>,
 a port of C++ <code>transrangers</code> to Rust with a <a href="https://github.com/joaquintides/transrangers/blob/master/rust.md">follow up
 post</a> from

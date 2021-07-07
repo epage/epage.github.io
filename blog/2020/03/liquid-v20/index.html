@@ -50,15 +50,15 @@
 <h4><code>render</code> can accept Rust-native types</h4>
 <p>Previously, you had to construct a <code>liquid::value::Object</code> (a newtype for a <code>HashMap</code>) to pass to <code>render</code>.  Now, you can create a <code>struct</code> that implements <code>ObjectView</code> and <code>ValueView</code> instead and pass it in:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">#[</span><span style="background-color:#2b303b;color:#bf616a;">derive</span><span style="background-color:#2b303b;color:#c0c5ce;">(liquid::ObjectView, liquid::ValueView, serde::Serialize, serde::Deserialize, Debug)]
-</span><span style="background-color:#2b303b;color:#b48ead;">struct </span><span style="background-color:#2b303b;color:#c0c5ce;">Data {
-    </span><span style="background-color:#2b303b;color:#bf616a;">foo</span><span style="background-color:#2b303b;color:#c0c5ce;">: </span><span style="background-color:#2b303b;color:#b48ead;">i32</span><span style="background-color:#2b303b;color:#c0c5ce;">,
-    </span><span style="background-color:#2b303b;color:#bf616a;">bar</span><span style="background-color:#2b303b;color:#c0c5ce;">: String,
-}
-
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> data = Data::default();
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> template = todo!();
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;data)?;
+<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(liquid::ObjectView, liquid::ValueView, serde::Serialize, serde::Deserialize, Debug)]
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Data {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">foo</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">i32</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">bar</span><span style="color:#c0c5ce;">: String,
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> data = Data::default();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> template = todo!();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> s = template.</span><span style="color:#96b5b4;">render</span><span style="color:#c0c5ce;">(&amp;data)?;
 </span></pre>
 <p>In addition to the ergonomic improvements, this can help squeeze out the most performance:</p>
 <ul>
@@ -69,26 +69,26 @@
 <h4>Other <code>render</code> ergonomic improvements</h4>
 <p>There multiple convenient ways to construct your <code>data</code>, depending on your application:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> template = todo!();
-
-</span><span style="background-color:#2b303b;color:#65737e;">// `Object` is a newtype for `HashMap` and has a similar interface.
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> object = liquid::Object::new();
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;object)?;
-
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> object = liquid::object!({
-    &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">foo</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot; =&gt; </span><span style="background-color:#2b303b;color:#d08770;">0</span><span style="background-color:#2b303b;color:#c0c5ce;">,
-    &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">bar</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot; =&gt; &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">Hello World</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;,
-});
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;object)?;
-
-</span><span style="background-color:#2b303b;color:#65737e;">// Requires your struct implements `serde::Serialize`
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> data = todo!();
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> object = liquid::to_object(&amp;data)?;
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;object)?;
-
-</span><span style="background-color:#2b303b;color:#65737e;">// Using the aforementioned derive.
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> data = Data::default();
-</span><span style="background-color:#2b303b;color:#b48ead;">let</span><span style="background-color:#2b303b;color:#c0c5ce;"> s = template.</span><span style="background-color:#2b303b;color:#96b5b4;">render</span><span style="background-color:#2b303b;color:#c0c5ce;">(&amp;data)?;
+<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> template = todo!();
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;">// `Object` is a newtype for `HashMap` and has a similar interface.
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> object = liquid::Object::new();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> s = template.</span><span style="color:#96b5b4;">render</span><span style="color:#c0c5ce;">(&amp;object)?;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> object = liquid::object!({
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">foo</span><span style="color:#c0c5ce;">&quot; =&gt; </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">bar</span><span style="color:#c0c5ce;">&quot; =&gt; &quot;</span><span style="color:#a3be8c;">Hello World</span><span style="color:#c0c5ce;">&quot;,
+</span><span style="color:#c0c5ce;">});
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> s = template.</span><span style="color:#96b5b4;">render</span><span style="color:#c0c5ce;">(&amp;object)?;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;">// Requires your struct implements `serde::Serialize`
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> data = todo!();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> object = liquid::to_object(&amp;data)?;
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> s = template.</span><span style="color:#96b5b4;">render</span><span style="color:#c0c5ce;">(&amp;object)?;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;">// Using the aforementioned derive.
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> data = Data::default();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> s = template.</span><span style="color:#96b5b4;">render</span><span style="color:#c0c5ce;">(&amp;data)?;
 </span></pre>
 <h4>String Optimizations</h4>
 <p>A core data type in liquid is an <code>Object</code>, a mapping of strings to <code>Value</code>s. Strings used as keys within a template engine are:</p>
@@ -132,12 +132,12 @@ or refactor.</p>
 </ul>
 <p>Liquid has the concept of filters, plugins to modify a value:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">{{ data | uniq | first }}
+<span style="color:#c0c5ce;">{{ data | uniq | first }}
 </span></pre>
 <p>These are relatively simple.</p>
 <p>In contrast, tags and blocks declare their own grammar, for both parameters and a block's content.</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">Standard include: {% include variable %}
+<span style="color:#c0c5ce;">Standard include: {% include variable %}
 </span></pre>
 <p>In contrast, a Jekyll-style include would pass the variable as <code>{{ variable }}</code>.</p>
 <p><a href="https://github.com/Goncalerta">Goncalerta</a> took on the monumental task of replacing all of this

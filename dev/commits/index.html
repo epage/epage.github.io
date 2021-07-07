@@ -92,20 +92,20 @@ marking a PR for auto-completion until after you have rewritten history.</li>
 notice something you want to change, like a typo.</p>
 <p>When the changes are in separate files</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add &lt;file</span><span style="background-color:#2b303b;color:#d08770;">1</span><span style="background-color:#2b303b;color:#c0c5ce;">&gt;
-git commit
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add &lt;file</span><span style="background-color:#2b303b;color:#d08770;">2</span><span style="background-color:#2b303b;color:#c0c5ce;">&gt;
-git commit
+<span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add &lt;file</span><span style="color:#d08770;">1</span><span style="color:#c0c5ce;">&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add &lt;file</span><span style="color:#d08770;">2</span><span style="color:#c0c5ce;">&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit
 </span></pre>
 <p>When the changes are in the same file, you can select which parts to stage.</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#65737e;"># Interactive staging let&#39;s you choose which changed hunks you want to stage
-</span><span style="background-color:#2b303b;color:#8fa1b3;">#
-</span><span style="background-color:#2b303b;color:#65737e;"># Sometimes a hunk is bigger than you want and you can split it.
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add</span><span style="background-color:#2b303b;color:#bf616a;"> -p </span><span style="background-color:#2b303b;color:#c0c5ce;">&lt;file&gt;
-git commit
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> add &lt;file&gt;
-git commit
+<span style="color:#65737e;"># Interactive staging let&#39;s you choose which changed hunks you want to stage
+</span><span style="color:#65737e;">#
+</span><span style="color:#65737e;"># Sometimes a hunk is bigger than you want and you can split it.
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add</span><span style="color:#bf616a;"> -p </span><span style="color:#c0c5ce;">&lt;file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add &lt;file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit
 </span></pre>
 <p><strong>Tip:</strong> Make staging files your habit rather than <code>git commit --all</code> to save
 yourself from having to fix things up later.</p>
@@ -113,18 +113,18 @@ yourself from having to fix things up later.</p>
 <h3>Upfront: Partway through a change, realize you want to make a conflicting change</h3>
 <p><a href="https://git-scm.com/book/en/v1/Git-Tools-Stashing">Stashing</a> is the go-to for quickly saving off your work to make another change</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">&lt;change file&gt;
-git stash
-
-&lt;change file&gt;
-git add &lt;file&gt;
-git commit
-
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> stash pop
-&lt;resolve file&gt;
-&lt;finish file&gt;
-git add &lt;file&gt;
-git commit &lt;file&gt;
+<span style="color:#c0c5ce;">&lt;change file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> stash
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">&lt;change file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add &lt;file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> stash pop
+</span><span style="color:#c0c5ce;">&lt;resolve file&gt;
+</span><span style="color:#c0c5ce;">&lt;finish file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add &lt;file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit &lt;file&gt;
 </span></pre>
 <p><strong>Tip:</strong> The stash is a stack of changes which can feel opaque to work with
 which makes it harder to work with over periods of time or when multiple
@@ -137,22 +137,22 @@ automatically delete unreferenced commits in the commit graph (instead requires
 calling <code>git gc</code>).  <code>git reflog</code> let's you browse your <code>HEAD</code>'s history, allowing
 you to find commits from before rewriting history.</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#65737e;"># Find hash from before rewrite
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> reflog
-
-</span><span style="background-color:#2b303b;color:#65737e;"># Update the branch and index to point to &lt;hash&gt;
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># - `</span><span style="background-color:#2b303b;color:#8fa1b3;">--soft</span><span style="background-color:#2b303b;color:#c0c5ce;">` to not touch index
-</span><span style="background-color:#2b303b;color:#65737e;"># - `--hard` to also update working directory
-</span><span style="background-color:#2b303b;color:#c0c5ce;">git reset &lt;hash&gt;
+<span style="color:#65737e;"># Find hash from before rewrite
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> reflog
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;"># Update the branch and index to point to &lt;hash&gt;
+</span><span style="color:#65737e;"># - `--soft` to not touch index
+</span><span style="color:#65737e;"># - `--hard` to also update working directory
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> reset &lt;hash&gt;
 </span></pre>
 <p>Lower impact commands:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#65737e;"># See differences
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> diff &lt;hash&gt;
-# Switch to &lt;hash&gt; as a detached head (ie anonymous branch)
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout &lt;hash&gt;
-# Update working directory, good if you want to revert your rebase via a commit.
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout &lt;hash&gt; -- .
+<span style="color:#65737e;"># See differences
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> diff &lt;hash&gt;
+</span><span style="color:#65737e;"># Switch to &lt;hash&gt; as a detached head (ie anonymous branch)
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> checkout &lt;hash&gt;
+</span><span style="color:#65737e;"># Update working directory, good if you want to revert your rebase via a commit.
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> checkout &lt;hash&gt; -- .
 </span></pre>
 <p>See also <a href="https://marklodato.github.io/visual-git-guide/index-en.html?no-svg">A Visual Git Reference</a> and <a href="https://github.blog/2015-06-08-how-to-undo-almost-anything-with-git/">How to undo
 (almost) anything with Git</a></p>
@@ -162,26 +162,26 @@ reach for by default.  The thing to remember is that git's commits are not
 linear but a graph and <code>git merge</code> can easily lead to <a href="https://cdn-images-1.medium.com/max/800/1*e-tlWqLwbUd1UmZyC_KbGg.png">complex commit
 graphs</a>.</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#65737e;"># - Fetch origin/master
-</span><span style="background-color:#2b303b;color:#8fa1b3;">#</span><span style="background-color:#2b303b;color:#c0c5ce;"> - Take existing commits and append them to origin/master
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> pull</span><span style="background-color:#2b303b;color:#bf616a;"> --rebase</span><span style="background-color:#2b303b;color:#c0c5ce;"> origin master
+<span style="color:#65737e;"># - Fetch origin/master
+</span><span style="color:#65737e;"># - Take existing commits and append them to origin/master
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> pull</span><span style="color:#bf616a;"> --rebase</span><span style="color:#c0c5ce;"> origin master
 </span></pre>
 <p>In case you want to explore the difference, like when dealing with conflicts,
 it might be helpful to do this as separate commands:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout master
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> pull
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> checkout - </span><span style="background-color:#2b303b;color:#65737e;"># `-` means &quot;last branch&quot;
-</span><span style="background-color:#2b303b;color:#c0c5ce;">git rebase master
+<span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> checkout master
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> pull
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> checkout - </span><span style="color:#65737e;"># `-` means &quot;last branch&quot;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> rebase master
 </span></pre>
 <p>See also <a href="https://ubuntu.com/blog/tricks-for-keeping-a-tidy-git-commit-history">How to manage your Git history: Tips for keeping your commits
 tidy</a> and
 <a href="http://www.bitsnbites.eu/a-tidy-linear-git-history/">A tidy, linear Git history</a></p>
 <h3>Fixing: Changing the most recent commit</h3>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">&lt;change file&gt;
-git add &lt;file&gt;
-git commit</span><span style="background-color:#2b303b;color:#bf616a;"> --amend
+<span style="color:#c0c5ce;">&lt;change file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add &lt;file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit</span><span style="color:#bf616a;"> --amend
 </span></pre>
 <p><strong>Tip</strong>: If you've already pushed your PR, consider making a fixup commit (see
 below) during the review and then cleaning them up later so reviewers can more
@@ -191,17 +191,17 @@ tidy</a> and
 <a href="https://about.gitlab.com/2018/06/07/keeping-git-commit-history-clean/">How (and why!) to keep your Git commit history clean</a></p>
 <h3>Fixing: I need to change a specific commit</h3>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">&lt;change file&gt;
-git add &lt;file&gt;
-
-# Find the commit hash your change fixes
-</span><span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> log
-</span><span style="background-color:#2b303b;color:#65737e;"># Marks the commit as fixing up another commit
-</span><span style="background-color:#2b303b;color:#c0c5ce;">git commit</span><span style="background-color:#2b303b;color:#bf616a;"> --fixup </span><span style="background-color:#2b303b;color:#c0c5ce;">&lt;hash&gt;
-
-# Somtime later when you are ready to cleanup your history, this will
-</span><span style="background-color:#2b303b;color:#65737e;"># automatically move your commit just after &lt;hash&gt; and squash it into &lt;hash&gt;
-</span><span style="background-color:#2b303b;color:#c0c5ce;">git rebase</span><span style="background-color:#2b303b;color:#bf616a;"> --autosquash</span><span style="background-color:#2b303b;color:#c0c5ce;"> master
+<span style="color:#c0c5ce;">&lt;change file&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> add &lt;file&gt;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;"># Find the commit hash your change fixes
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> log
+</span><span style="color:#65737e;"># Marks the commit as fixing up another commit
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> commit</span><span style="color:#bf616a;"> --fixup </span><span style="color:#c0c5ce;">&lt;hash&gt;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;"># Somtime later when you are ready to cleanup your history, this will
+</span><span style="color:#65737e;"># automatically move your commit just after &lt;hash&gt; and squash it into &lt;hash&gt;
+</span><span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> rebase</span><span style="color:#bf616a;"> --autosquash</span><span style="color:#c0c5ce;"> master
 </span></pre>
 <p>See also <a href="https://thoughtbot.com/blog/autosquashing-git-commits">Auto-squashing Git Commits</a> and <a href="https://about.gitlab.com/2018/06/07/keeping-git-commit-history-clean/">How (and
 why!) to keep your Git commit history clean</a></p>
@@ -211,38 +211,38 @@ why!) to keep your Git commit history clean</a></p>
 <p>Note: things get funky when merge commits are used.  Another reason not to use them.</p>
 <p>Just type:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#8fa1b3;">git</span><span style="background-color:#2b303b;color:#c0c5ce;"> rebase</span><span style="background-color:#2b303b;color:#bf616a;"> -i</span><span style="background-color:#2b303b;color:#c0c5ce;"> master
+<span style="color:#8fa1b3;">git</span><span style="color:#c0c5ce;"> rebase</span><span style="color:#bf616a;"> -i</span><span style="color:#c0c5ce;"> master
 </span></pre>
 <p>And your commit history and instructions on editing it will pop up</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#8fa1b3;">pick</span><span style="background-color:#2b303b;color:#c0c5ce;"> 6e73d55c6 chore(nest)</span><span style="background-color:#2b303b;color:#96b5b4;">:</span><span style="background-color:#2b303b;color:#c0c5ce;"> Baseline version of nipg.pl
-</span><span style="background-color:#2b303b;color:#8fa1b3;">pick</span><span style="background-color:#2b303b;color:#c0c5ce;"> 6aed59e08 chore(nest)</span><span style="background-color:#2b303b;color:#96b5b4;">:</span><span style="background-color:#2b303b;color:#c0c5ce;"> Strip nipg down to essentials
-
-</span><span style="background-color:#2b303b;color:#65737e;"># Rebase 1d9e1a08d..6aed59e08 onto 1d9e1a08d (2 commands)
-</span><span style="background-color:#2b303b;color:#c0c5ce;">#
-</span><span style="background-color:#2b303b;color:#65737e;"># Commands:
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># p, pick &lt;commit&gt; = use commit
-</span><span style="background-color:#2b303b;color:#65737e;"># r, reword &lt;commit&gt; = use commit, but edit the commit message
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># e, edit &lt;commit&gt; = use commit, but stop for amending
-</span><span style="background-color:#2b303b;color:#65737e;"># s, squash &lt;commit&gt; = use commit, but meld into previous commit
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># f, fixup &lt;commit&gt; = like &quot;</span><span style="background-color:#2b303b;color:#a3be8c;">squash</span><span style="background-color:#2b303b;color:#c0c5ce;">&quot;, but discard this commit&#39;</span><span style="background-color:#2b303b;color:#a3be8c;">s log message
-# x, exec &lt;command&gt; = run command (the rest of the line) using shell
-# b, break = stop here (continue rebase later with </span><span style="background-color:#2b303b;color:#c0c5ce;">&#39;git rebase --continue&#39;</span><span style="background-color:#2b303b;color:#a3be8c;">)
-# d, drop &lt;commit&gt; = remove commit
-# l, label &lt;label&gt; = label current HEAD with a name
-# t, reset &lt;label&gt; = reset HEAD to a label
-# m, merge [-C &lt;commit&gt; | -c &lt;commit&gt;] &lt;label&gt; [# &lt;oneline&gt;]
-# .       create a merge commit using the original merge commit</span><span style="background-color:#2b303b;color:#c0c5ce;">&#39;s
-</span><span style="background-color:#2b303b;color:#65737e;"># .       message (or the oneline, if no original merge commit was
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># .       specified)</span><span style="background-color:#2b303b;color:#96b5b4;">.</span><span style="background-color:#2b303b;color:#c0c5ce;"> Use -c &lt;commit&gt; to reword the commit message.
-</span><span style="background-color:#2b303b;color:#65737e;">#
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># These lines can be re-ordered; </span><span style="background-color:#2b303b;color:#8fa1b3;">they</span><span style="background-color:#2b303b;color:#c0c5ce;"> are executed from top to bottom.
-</span><span style="background-color:#2b303b;color:#65737e;">#
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># If you remove a line here THAT COMMIT WILL BE LOST.
-</span><span style="background-color:#2b303b;color:#65737e;">#
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># However, if you remove everything, the rebase will be aborted.
-</span><span style="background-color:#2b303b;color:#65737e;">#
-</span><span style="background-color:#2b303b;color:#c0c5ce;"># Note that empty commits are commented out
+<span style="color:#8fa1b3;">pick</span><span style="color:#c0c5ce;"> 6e73d55c6 chore(nest)</span><span style="color:#96b5b4;">:</span><span style="color:#c0c5ce;"> Baseline version of nipg.pl
+</span><span style="color:#8fa1b3;">pick</span><span style="color:#c0c5ce;"> 6aed59e08 chore(nest)</span><span style="color:#96b5b4;">:</span><span style="color:#c0c5ce;"> Strip nipg down to essentials
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;"># Rebase 1d9e1a08d..6aed59e08 onto 1d9e1a08d (2 commands)
+</span><span style="color:#65737e;">#
+</span><span style="color:#65737e;"># Commands:
+</span><span style="color:#65737e;"># p, pick &lt;commit&gt; = use commit
+</span><span style="color:#65737e;"># r, reword &lt;commit&gt; = use commit, but edit the commit message
+</span><span style="color:#65737e;"># e, edit &lt;commit&gt; = use commit, but stop for amending
+</span><span style="color:#65737e;"># s, squash &lt;commit&gt; = use commit, but meld into previous commit
+</span><span style="color:#65737e;"># f, fixup &lt;commit&gt; = like &quot;squash&quot;, but discard this commit&#39;s log message
+</span><span style="color:#65737e;"># x, exec &lt;command&gt; = run command (the rest of the line) using shell
+</span><span style="color:#65737e;"># b, break = stop here (continue rebase later with &#39;git rebase --continue&#39;)
+</span><span style="color:#65737e;"># d, drop &lt;commit&gt; = remove commit
+</span><span style="color:#65737e;"># l, label &lt;label&gt; = label current HEAD with a name
+</span><span style="color:#65737e;"># t, reset &lt;label&gt; = reset HEAD to a label
+</span><span style="color:#65737e;"># m, merge [-C &lt;commit&gt; | -c &lt;commit&gt;] &lt;label&gt; [# &lt;oneline&gt;]
+</span><span style="color:#65737e;"># .       create a merge commit using the original merge commit&#39;s
+</span><span style="color:#65737e;"># .       message (or the oneline, if no original merge commit was
+</span><span style="color:#65737e;"># .       specified). Use -c &lt;commit&gt; to reword the commit message.
+</span><span style="color:#65737e;">#
+</span><span style="color:#65737e;"># These lines can be re-ordered; they are executed from top to bottom.
+</span><span style="color:#65737e;">#
+</span><span style="color:#65737e;"># If you remove a line here THAT COMMIT WILL BE LOST.
+</span><span style="color:#65737e;">#
+</span><span style="color:#65737e;"># However, if you remove everything, the rebase will be aborted.
+</span><span style="color:#65737e;">#
+</span><span style="color:#65737e;"># Note that empty commits are commented out
 </span></pre>
 <p>Once you've modified the &quot;file&quot;, save and close and your history will be rewritten.</p>
 <p>See also <a href="https://ubuntu.com/blog/tricks-for-keeping-a-tidy-git-commit-history">How to manage your Git history: Tips for keeping your commits

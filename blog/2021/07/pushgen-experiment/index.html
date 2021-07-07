@@ -61,47 +61,47 @@ identifier into individual words (e.g. <code>PascalCase</code> -&gt; <code>Pasca
 <h2>Architecture of <code>typos</code></h2>
 <p>In pseudo-code, <code>typos</code> looks like:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#b48ead;">def </span><span style="background-color:#2b303b;color:#8fa1b3;">walk_path</span><span style="background-color:#2b303b;color:#c0c5ce;">(</span><span style="background-color:#2b303b;color:#bf616a;">repo</span><span style="background-color:#2b303b;color:#c0c5ce;">):
-    </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">path </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#c0c5ce;">repo:
-        </span><span style="background-color:#2b303b;color:#8fa1b3;">check_file</span><span style="background-color:#2b303b;color:#c0c5ce;">(path)
-
-
-</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">check_file</span><span style="background-color:#2b303b;color:#c0c5ce;">(path):
-    </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">typo </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">check_str</span><span style="background-color:#2b303b;color:#c0c5ce;">(path.name):
-        </span><span style="background-color:#2b303b;color:#8fa1b3;">report</span><span style="background-color:#2b303b;color:#c0c5ce;">(typo)
-    content = path.</span><span style="background-color:#2b303b;color:#8fa1b3;">read_text</span><span style="background-color:#2b303b;color:#c0c5ce;">()
-    </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#c0c5ce;">not </span><span style="background-color:#2b303b;color:#8fa1b3;">is_binary</span><span style="background-color:#2b303b;color:#c0c5ce;">(content):
-        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">typo </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">check_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(content):
-            </span><span style="background-color:#2b303b;color:#8fa1b3;">report</span><span style="background-color:#2b303b;color:#c0c5ce;">(typo)
-
-
-</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">check_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):  </span><span style="background-color:#2b303b;color:#65737e;"># similar for `check_str`
-    </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#c0c5ce;">parser.</span><span style="background-color:#2b303b;color:#8fa1b3;">parse_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-        </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier in dictionary:
-            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">dictionary[identifier]
-        </span><span style="background-color:#2b303b;color:#b48ead;">else</span><span style="background-color:#2b303b;color:#c0c5ce;">:
-            </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">word </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier.</span><span style="background-color:#2b303b;color:#8fa1b3;">split</span><span style="background-color:#2b303b;color:#c0c5ce;">():
-                </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier in dictionary:
-                    </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">dictionary[identifier]
-
-
-</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">parse_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-    </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#8fa1b3;">is_ascii</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">ascii_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
-    </span><span style="background-color:#2b303b;color:#b48ead;">else</span><span style="background-color:#2b303b;color:#c0c5ce;">:
-        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">text </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">utf8_chunks</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-            </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">unicode_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-                </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
-
-
-</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">parse_str</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-    </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#8fa1b3;">is_ascii</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">ascii_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
-    </span><span style="background-color:#2b303b;color:#b48ead;">else</span><span style="background-color:#2b303b;color:#c0c5ce;">:
-        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">unicode_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
-            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
+<span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">walk_path</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">repo</span><span style="color:#c0c5ce;">):
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">path </span><span style="color:#b48ead;">in </span><span style="color:#c0c5ce;">repo:
+</span><span style="color:#c0c5ce;">        </span><span style="color:#8fa1b3;">check_file</span><span style="color:#c0c5ce;">(path)
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">check_file</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">path</span><span style="color:#c0c5ce;">):
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">typo </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">check_str</span><span style="color:#c0c5ce;">(path.name):
+</span><span style="color:#c0c5ce;">        </span><span style="color:#8fa1b3;">report</span><span style="color:#c0c5ce;">(typo)
+</span><span style="color:#c0c5ce;">    content = path.</span><span style="color:#8fa1b3;">read_text</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">not </span><span style="color:#8fa1b3;">is_binary</span><span style="color:#c0c5ce;">(content):
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">typo </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">check_bytes</span><span style="color:#c0c5ce;">(content):
+</span><span style="color:#c0c5ce;">            </span><span style="color:#8fa1b3;">report</span><span style="color:#c0c5ce;">(typo)
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">check_bytes</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">buffer</span><span style="color:#c0c5ce;">):  </span><span style="color:#65737e;"># similar for `check_str`
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">identifier </span><span style="color:#b48ead;">in </span><span style="color:#c0c5ce;">parser.</span><span style="color:#8fa1b3;">parse_bytes</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">identifier in dictionary:
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">yield </span><span style="color:#c0c5ce;">dictionary[identifier]
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">else</span><span style="color:#c0c5ce;">:
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">word </span><span style="color:#b48ead;">in </span><span style="color:#c0c5ce;">identifier.</span><span style="color:#8fa1b3;">split</span><span style="color:#c0c5ce;">():
+</span><span style="color:#c0c5ce;">                </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">identifier in dictionary:
+</span><span style="color:#c0c5ce;">                    </span><span style="color:#b48ead;">yield </span><span style="color:#c0c5ce;">dictionary[identifier]
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">parse_bytes</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">buffer</span><span style="color:#c0c5ce;">):
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">if </span><span style="color:#8fa1b3;">is_ascii</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">identifier </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">ascii_parser</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">yield </span><span style="color:#c0c5ce;">identifier
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">else</span><span style="color:#c0c5ce;">:
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">text </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">utf8_chunks</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">identifier </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">unicode_parser</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">                </span><span style="color:#b48ead;">yield </span><span style="color:#c0c5ce;">identifier
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">parse_str</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">buffer</span><span style="color:#c0c5ce;">):
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">if </span><span style="color:#8fa1b3;">is_ascii</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">identifier </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">ascii_parser</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">yield </span><span style="color:#c0c5ce;">identifier
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">else</span><span style="color:#c0c5ce;">:
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">identifier </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">unicode_parser</span><span style="color:#c0c5ce;">(buffer):
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">yield </span><span style="color:#c0c5ce;">identifier
 </span></pre>
 <p>Key takeaways:</p>
 <ul>
@@ -121,25 +121,25 @@ running in WSL on a laptop that is plugged in with most applications closed.  I
 didn't spend much time making the environment less jittery.</p>
 <p>With that said, <code>try_for_each</code> seems to have slowed down <code>check_file</code> more than that jitter:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">check_file/Typos/code   time:   [147.52 us 150.23 us 153.51 us]
-                        thrpt:  [1.8886 MiB/s 1.9298 MiB/s 1.9653 MiB/s]
-                 change:
-                        time:   [+26.226% +29.951% +34.477%] (p = 0.00 &lt; 0.05)
-                        thrpt:  [-25.638% -23.048% -20.777%]
-                        Performance has regressed.
-Found 8 outliers among 100 measurements (8.00%)
-  5 (5.00%) high mild
-  3 (3.00%) high severe
-
-check_file/Typos/corpus time:   [50.001 ms 50.776 ms 51.638 ms]
-                        thrpt:  [11.257 MiB/s 11.448 MiB/s 11.626 MiB/s]
-                 change:
-                        time:   [+21.952% +24.403% +26.950%] (p = 0.00 &lt; 0.05)
-                        thrpt:  [-21.229% -19.616% -18.001%]
-                        Performance has regressed.
-Found 10 outliers among 100 measurements (10.00%)
-  6 (6.00%) high mild
-  4 (4.00%) high severe
+<span style="color:#c0c5ce;">check_file/Typos/code   time:   [147.52 us 150.23 us 153.51 us]
+</span><span style="color:#c0c5ce;">                        thrpt:  [1.8886 MiB/s 1.9298 MiB/s 1.9653 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [+26.226% +29.951% +34.477%] (p = 0.00 &lt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [-25.638% -23.048% -20.777%]
+</span><span style="color:#c0c5ce;">                        Performance has regressed.
+</span><span style="color:#c0c5ce;">Found 8 outliers among 100 measurements (8.00%)
+</span><span style="color:#c0c5ce;">  5 (5.00%) high mild
+</span><span style="color:#c0c5ce;">  3 (3.00%) high severe
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">check_file/Typos/corpus time:   [50.001 ms 50.776 ms 51.638 ms]
+</span><span style="color:#c0c5ce;">                        thrpt:  [11.257 MiB/s 11.448 MiB/s 11.626 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [+21.952% +24.403% +26.950%] (p = 0.00 &lt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [-21.229% -19.616% -18.001%]
+</span><span style="color:#c0c5ce;">                        Performance has regressed.
+</span><span style="color:#c0c5ce;">Found 10 outliers among 100 measurements (10.00%)
+</span><span style="color:#c0c5ce;">  6 (6.00%) high mild
+</span><span style="color:#c0c5ce;">  4 (4.00%) high severe
 </span></pre>
 <p>Remember: <code>check_file</code> is doing a lot more than running iterators, like IO.</p>
 <p>One thing hurting <code>try_for_each</code> is that iterator authors can't provide
@@ -159,68 +159,68 @@ of this increases the friction for taking advantage of <code>try_for_each</code>
 <h2>Performance of <code>pushgen</code></h2>
 <p>For <code>pushgen</code>, the improvements from lowering iteration overhead are not noticeable compared to everything else, like IO:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">check_file/Typos/code   time:   [113.92 us 115.85 us 118.02 us]
-                        thrpt:  [2.4566 MiB/s 2.5025 MiB/s 2.5449 MiB/s]
-                 change:
-                        time:   [-1.1247% +1.7826% +4.7350%] (p = 0.21 &gt; 0.05)
-                        thrpt:  [-4.5209% -1.7513% +1.1375%]
-                        No change in performance detected.
-Found 4 outliers among 100 measurements (4.00%)
-  2 (2.00%) high mild
-  2 (2.00%) high severe
-
-check_file/Typos/corpus time:   [38.571 ms 39.072 ms 39.617 ms]
-                        thrpt:  [14.673 MiB/s 14.877 MiB/s 15.071 MiB/s]
-                 change:
-                        time:   [-6.0200% -4.2708% -2.4899%] (p = 0.00 &lt; 0.05)
-                        thrpt:  [+2.5535% +4.4613% +6.4057%]
-                        Performance has improved.
-Found 9 outliers among 100 measurements (9.00%)
-  5 (5.00%) high mild
-  4 (4.00%) high severe
+<span style="color:#c0c5ce;">check_file/Typos/code   time:   [113.92 us 115.85 us 118.02 us]
+</span><span style="color:#c0c5ce;">                        thrpt:  [2.4566 MiB/s 2.5025 MiB/s 2.5449 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [-1.1247% +1.7826% +4.7350%] (p = 0.21 &gt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [-4.5209% -1.7513% +1.1375%]
+</span><span style="color:#c0c5ce;">                        No change in performance detected.
+</span><span style="color:#c0c5ce;">Found 4 outliers among 100 measurements (4.00%)
+</span><span style="color:#c0c5ce;">  2 (2.00%) high mild
+</span><span style="color:#c0c5ce;">  2 (2.00%) high severe
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">check_file/Typos/corpus time:   [38.571 ms 39.072 ms 39.617 ms]
+</span><span style="color:#c0c5ce;">                        thrpt:  [14.673 MiB/s 14.877 MiB/s 15.071 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [-6.0200% -4.2708% -2.4899%] (p = 0.00 &lt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [+2.5535% +4.4613% +6.4057%]
+</span><span style="color:#c0c5ce;">                        Performance has improved.
+</span><span style="color:#c0c5ce;">Found 9 outliers among 100 measurements (9.00%)
+</span><span style="color:#c0c5ce;">  5 (5.00%) high mild
+</span><span style="color:#c0c5ce;">  4 (4.00%) high severe
 </span></pre>
 <p>When breaking out just parsing, we do see decent improvements, for example:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">parse_str/unicode/code  time:   [13.505 us 13.705 us 13.909 us]
-                        thrpt:  [20.844 MiB/s 21.153 MiB/s 21.468 MiB/s]
-                 change:
-                        time:   [-19.030% -16.653% -14.273%] (p = 0.00 &lt; 0.05)
-                        thrpt:  [+16.650% +19.980% +23.503%]
-                        Performance has improved.
-Found 3 outliers among 100 measurements (3.00%)
-  2 (2.00%) high mild
-  1 (1.00%) high severe
-
-parse_str/ascii/code    time:   [13.742 us 13.959 us 14.208 us]
-                        thrpt:  [20.405 MiB/s 20.769 MiB/s 21.096 MiB/s]
-                 change:
-                        time:   [-12.491% -10.529% -8.5378%] (p = 0.00 &lt; 0.05)
-                        thrpt:  [+9.3348% +11.768% +14.274%]
-                        Performance has improved.
-Found 5 outliers among 100 measurements (5.00%)
-  4 (4.00%) high mild
-  1 (1.00%) high severe
+<span style="color:#c0c5ce;">parse_str/unicode/code  time:   [13.505 us 13.705 us 13.909 us]
+</span><span style="color:#c0c5ce;">                        thrpt:  [20.844 MiB/s 21.153 MiB/s 21.468 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [-19.030% -16.653% -14.273%] (p = 0.00 &lt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [+16.650% +19.980% +23.503%]
+</span><span style="color:#c0c5ce;">                        Performance has improved.
+</span><span style="color:#c0c5ce;">Found 3 outliers among 100 measurements (3.00%)
+</span><span style="color:#c0c5ce;">  2 (2.00%) high mild
+</span><span style="color:#c0c5ce;">  1 (1.00%) high severe
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">parse_str/ascii/code    time:   [13.742 us 13.959 us 14.208 us]
+</span><span style="color:#c0c5ce;">                        thrpt:  [20.405 MiB/s 20.769 MiB/s 21.096 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [-12.491% -10.529% -8.5378%] (p = 0.00 &lt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [+9.3348% +11.768% +14.274%]
+</span><span style="color:#c0c5ce;">                        Performance has improved.
+</span><span style="color:#c0c5ce;">Found 5 outliers among 100 measurements (5.00%)
+</span><span style="color:#c0c5ce;">  4 (4.00%) high mild
+</span><span style="color:#c0c5ce;">  1 (1.00%) high severe
 </span></pre>
 <p>And the overhead for adapting word-splitting into a <code>pushgen::Generator</code> was minimal:</p>
 <pre style="background-color:#2b303b;">
-<span style="background-color:#2b303b;color:#c0c5ce;">split/words/code        time:   [1.4384 us 1.4654 us 1.4973 us]
-                        thrpt:  [193.63 MiB/s 197.84 MiB/s 201.56 MiB/s]
-                 change:
-                        time:   [-1.9718% +2.1027% +5.9130%] (p = 0.29 &gt; 0.05)
-                        thrpt:  [-5.5829% -2.0594% +2.0114%]
-                        No change in performance detected.
-Found 3 outliers among 100 measurements (3.00%)
-  3 (3.00%) high mild
-
-split/words/corpus      time:   [2.7414 ms 2.7730 ms 2.8080 ms]
-                        thrpt:  [207.02 MiB/s 209.63 MiB/s 212.05 MiB/s]
-                 change:
-                        time:   [+2.0584% +3.7444% +5.7863%] (p = 0.00 &lt; 0.05)
-                        thrpt:  [-5.4698% -3.6092% -2.0169%]
-                        Performance has regressed.
-Found 8 outliers among 100 measurements (8.00%)
-  6 (6.00%) high mild
-  2 (2.00%) high severe
+<span style="color:#c0c5ce;">split/words/code        time:   [1.4384 us 1.4654 us 1.4973 us]
+</span><span style="color:#c0c5ce;">                        thrpt:  [193.63 MiB/s 197.84 MiB/s 201.56 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [-1.9718% +2.1027% +5.9130%] (p = 0.29 &gt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [-5.5829% -2.0594% +2.0114%]
+</span><span style="color:#c0c5ce;">                        No change in performance detected.
+</span><span style="color:#c0c5ce;">Found 3 outliers among 100 measurements (3.00%)
+</span><span style="color:#c0c5ce;">  3 (3.00%) high mild
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">split/words/corpus      time:   [2.7414 ms 2.7730 ms 2.8080 ms]
+</span><span style="color:#c0c5ce;">                        thrpt:  [207.02 MiB/s 209.63 MiB/s 212.05 MiB/s]
+</span><span style="color:#c0c5ce;">                 change:
+</span><span style="color:#c0c5ce;">                        time:   [+2.0584% +3.7444% +5.7863%] (p = 0.00 &lt; 0.05)
+</span><span style="color:#c0c5ce;">                        thrpt:  [-5.4698% -3.6092% -2.0169%]
+</span><span style="color:#c0c5ce;">                        Performance has regressed.
+</span><span style="color:#c0c5ce;">Found 8 outliers among 100 measurements (8.00%)
+</span><span style="color:#c0c5ce;">  6 (6.00%) high mild
+</span><span style="color:#c0c5ce;">  2 (2.00%) high severe
 </span></pre>
 <p><code>pushgen</code> won't be a magic bullet to improve performance but it might help with
 specific hot-loops.  Let profilers and benchmarks be your guide.</p>
