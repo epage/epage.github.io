@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Review</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Code Review</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p>A lot of this is lessons hard learned from being a reviewer that
+unintentionally made people feel dejected.  Regardless of my intentions, I had
+to own my impact.  For some, my reviews were insightful learning experiences
+but for others, they were a never ending gauntlet that burned them out.  My
+tone defaults to analytical which comes off as short and critical.  I'd also be
+focused on &quot;my main task&quot; and only mentally &quot;check-in&quot; when replying to an
+update (particularly when assisting other teams as a subject-matter-expert),
+losing track of how long the review has been running, how discouraging it is
+for the person, and how inefficient it is for them.</p>
+<h1>Goals</h1>
+<ul>
+<li>Reduce bus factor by keeping other people abreast of changes</li>
+<li>Share culture and best practices</li>
+<li>Limit the effect of blindspots with more eyes</li>
+<li>Maintaining, or raising, the quality bar</li>
+</ul>
+<p>Non-goals</p>
+<ul>
+<li>Exhaustively catch bugs</li>
+</ul>
+<h1>Code Author</h1>
+<p>The primary concern is &quot;how do I make this easier on the reviewer, especially so they focus on the important details?&quot;</p>
+<ul>
+<li>Consider how controversial the change will be and make sure it is discussed
+before posting a review.  Is this a change of practice or not align with the existing abstractions?</li>
+<li>Keep reviewed changes small</li>
+<li>Annotate the review with a guided tour, especially giving the &quot;why&quot; behind
+the decisions you made.</li>
+<li>Communicate why you think the change is valid (ideally with tests)</li>
+<li>Make it clear what you changed in response to feedback</li>
+<li>Negotiate: you likely have more background on the constraints and timelines.
+Speak up and negotiate whether feedback needs addressing (e.g. not for
+short-lived code), or if it needs to be addressed now.
+<ul>
+<li>A big part of negotiating is trust: if you ask to defer changes, be sure to
+follow up and let the person know you did so.  Right or wrong, reviewers
+are likely to hold their ground more if they feel its &quot;now or never&quot;.</li>
+</ul>
+</li>
+</ul>
+<h1>Code Reviewer</h1>
+<p>As a reviewer, you have to balance meeting the needs of the organization (e.g.
+quality) with the code author (e.g. feeling dejected and checking out).</p>
+<ul>
+<li>Automate the minutia.  Besides saving you time, this makes code authors
+happier.  People feel better when there are emotionally detached, immediate,
+objective measures they are held against.  This isn't just linting but also
+includes other analysis like making it easy to browse covered lines to
+determine what is ok vs too risky.</li>
+<li>Be prompt: long cycle times are discouraging for the code author.</li>
+<li>Avoid associating code and ideas with people.  Discuss &quot;this change&quot;, &quot;this
+PR&quot;, and not &quot;your PR&quot;.  This keeps the discussion objective and gives code
+authors more space to detach from their code.</li>
+<li>Periodically, check-in on your tone.  Text feedback loses context and can be
+interpreted in multiple ways.  When giving feedback, it usually is received
+in the most negative way.</li>
+<li>Be sure to call out the good as well!  Just make sure you aren't patronizing.</li>
+<li>If there is a lot of feedback for a PR, that suggests there is a disconnect
+in expectations.  These are best resolved by discussing directly, privately,
+and real-time with the person.</li>
+<li>If there is back and forth on an item of feedback, it is inefficient
+resolving by asynchronous back and forths and there might be a disconnect in
+understanding.  Again, switch to direct, private, and real-time
+communication.</li>
+<li>Pick your battles and make them clear by communicating severity.  Is the
+feedback about a minor stylistic improvement?  A major deviation from team
+standards or custom-facing bug?  Does it need to fixed before merging or can
+it be postponed to another PR?  How do you ensure there is a follow-up?
+<ul>
+<li>Is it worth yet another review cycle and the inefficiencies each cycle introduces?</li>
+<li>Is it worth the risk being introduced since updates to a PR are probably
+not manually tested as exhaustively?</li>
+</ul>
+</li>
+<li>Be humble by focusing on questions rather than feedback.  This gives the code
+author room to re-evaluate on their own, reducing the effect of ego and helps
+them grow.  It also helps remind you that the code author is the
+boots-on-the-ground and might have reasons for going a different route than
+you might theorize.</li>
+</ul>
+<h1>Improving</h1>
+<p>Learn from other areas with review cultures, like the game
+<a href="https://us.pycon.org/2018/schedule/presentation/149/">Go</a>,
+<a href="https://us.pycon.org/2018/schedule/presentation/149/">art</a>, etc.</p>
+<p>For example, in the game Go, when discussing the game:</p>
+<blockquote>
+<p>Use &quot;Black&quot; and &quot;White&quot; instead of naming the players or using pronouns. This creates an objective discussion which allows both players to learn without their ego getting in the way.</p>
+</blockquote>
+<p>From <a href="https://senseis.xmp.net/?AnalyseTheGame">Sensei's Library: Analyze the Game</a></p>
+<h1>Resources</h1>
+<ul>
+<li><a href="https://stackoverflow.blog/2019/09/30/how-to-make-good-code-reviews-better/">How to Make Good Code Reviews Better</a></li>
+</ul>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

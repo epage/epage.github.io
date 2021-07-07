@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planning</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Planning</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <h1>Burn-out</h1>
+<p>Software development is a marathon.  You can't repeatedly sprint to the finish
+line or you burn out.  This is one thing I really liked about the place where
+we did 6 month waterfalls was that the project planning phase was low pressure
+and gave you time to recharge from the last cycle before pressure mounted for
+the current one.</p>
+<p>With sprints, the pressure was always on.  Sprints were filled to capacity and
+you were accountable to what was accepted.  Now slowing down for recharge
+projects, helping others, or resolving tech debt need to be negotiated against
+the features in the backlog and require an ROI conversation to get in the
+schedule.  There is no mental breathing room and instead is turning into
+micro-management.</p>
+<h1>Estimating</h1>
+<blockquote>
+<p>It always takes longer than you expect, even when you take into account Hofstadter’s Law.</p>
+</blockquote>
+<p>- <a href="https://en.wikipedia.org/wiki/Hofstadter%27s_law">Hofstadter's Law</a></p>
+<p>I've found estimates useful for:</p>
+<ul>
+<li>Quickly identifying when there are different expectations for a project (people with wildly different estimates).</li>
+<li>Identifying expensive solutions so you can evaluate alternative solutions or
+alternative implementation plans to get benefits incrementally rather than going &quot;dark&quot;.</li>
+<li>Help with planning schedules.</li>
+</ul>
+<p>In general, you don't need a high level of precision for purposes.  Some use
+fibonacci numbers to discourage false precision.  The trap someone can fall
+into is the idea &quot;if large tasks have low precision, breaking it down into
+small tasks will increase the precision!&quot;.  One problem with this is you start
+adding up error
+(see <a href="https://en.wikipedia.org/wiki/Significant_figures">significant figures</a>).
+The other is that you are unlikely to account for all of the unknowns.</p>
+<p>I find that variability of precision is more relevant for time horizon (now vs
+future) more than task size but estimating for the day or week has limited
+value.</p>
+<p>When estimating, precision is relative to whether the problem is</p>
+<ul>
+<li>Simple: Easy and repeatable</li>
+<li>Complicated: Hard but repeatable</li>
+<li>Complex: Hard and not repeatable</li>
+</ul>
+<p>(paraphrased from &quot;The Checklist Manifesto&quot; by Atul Gawande)</p>
+<h1>Schedules</h1>
+<p>I've found schedules good for:</p>
+<ul>
+<li>Provide check-in points to gauge the health of a project and re-evaluate, if needed.</li>
+<li>Only in rare circumstances, ensure you are driving to a specific deadline, external or internal.
+Where possible, find a way to deliver that minimizes the scope tied to deadlines.  See <a href="https://www.youtube.com/watch?v=vOt4BbWLWQw">Spotify's thoughts on
+Innovation vs Predictability</a>.</li>
+</ul>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

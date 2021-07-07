@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Submit Queue</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Submit Queue</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p>Time keeps marching on while developing a branch for merging and history
+diverges.  <code>git</code> merge history but fails when similar lines are changed,
+conflicting with each other.  Most Code Review tools will report there would be
+one of these line conflicts.  What they can't do is report when there would be
+semantic conflicts (e.g. adding new code that calls a function that was renamed).
+Only running CI will detect these types of conflicts.</p>
+<p>Strategies for reducing the impact of semantic conflicts include:</p>
+<ul>
+<li>CI runs against the developer's branch:
+<ul>
+<li>Merge race window: Between last manual rebase and merge-time.</li>
+<li>Cost: none</li>
+<li>User notification: post-merge</li>
+</ul>
+</li>
+<li>CI runs against the developer's branch, merged with <code>master</code>:
+<ul>
+<li>Merge race window: Between last push and merge-time.</li>
+<li>Cost: none</li>
+<li>User notification: post-push</li>
+</ul>
+</li>
+<li>Code Review policy rejects PRs that are X days old or Y commits behind:
+<ul>
+<li>Merge race window: bounded by configuration</li>
+<li>Cost: compute time and/or accept latency due to &quot;satisfy the tool&quot; pushes</li>
+<li>User notification: after X time</li>
+</ul>
+</li>
+<li>Merges into <code>master</code> are serialized and only made available when CI passes:
+<ul>
+<li>Merge race window: none</li>
+<li>Cost: compute time and/or merge latency from extra pipeline run</li>
+<li>User notification: pre-merge</li>
+</ul>
+</li>
+</ul>
+<p>Other benefits to Submit Queues:</p>
+<ul>
+<li>To speed up PR feedback, its common to rely heavily on test avoidance but
+there are gaps where we don't have precise enough information and we err on
+the side of faster CI runs rather than more complete CI runs.  Sometimes, this is worked around by markers the user can leave to get extra validation.
+A Submit Queue gives us the best of all worlds: fast PR feedback and green-master.</li>
+<li>There is a gap between when a PR lands and CI pushing out artifacts.  Submit Queue artifacts could be staged and made available if the pipeline succeeds, making them available immediately on merge.</li>
+</ul>
+<p>Considerations</p>
+<ul>
+<li>Emergency fixes</li>
+<li>Uncaught failures in the Submit Queue CI run, potentially failing unrelated changes in the future</li>
+<li>CI Flakiness rejecting changes unnecessarily and disrupting any speculative CI runs</li>
+<li>Latency before changes become available</li>
+<li>Controlling for side effects in Submit Queue CI runs since they might not land (e.g. deployments)</li>
+<li>Improve throughput through predicting failure
+<ul>
+<li>ML like Uber</li>
+<li>PRs too old, like Shopify</li>
+</ul>
+</li>
+<li>Resource utilization
+<ul>
+<li>Required processing &quot;bandwidth&quot;</li>
+<li>Cost</li>
+</ul>
+</li>
+</ul>
+<p>Existing Submit Queues</p>
+<ul>
+<li><a href="https://bors.tech/">bors</a>
+<ul>
+<li>Used by Rust and other projects</li>
+<li>Integrates with GitHub</li>
+<li><a href="https://bors.tech/documentation/">Communicate through @-mentions in PR comments</a></li>
+<li>Can request a full test suite run without a merge</li>
+<li>Uses a priority queue</li>
+<li><a href="https://github.com/bors-ng/bors-ng#how-it-works">Batches changes</a>
+<ul>
+<li>Batch per priority level</li>
+<li>Only one batch is active at a time
+<ul>
+<li>Max on success latency is O(2 * ci_time)</li>
+<li>Max system load is O(pipeline)</li>
+<li>Cost is O(pipeline * ci_time)</li>
+</ul>
+</li>
+<li>Bisects batches on failure
+<ul>
+<li>Latency is O(num_errors * log queue_size)</li>
+<li>Max system load is O(pipeline)</li>
+<li>Cost is O(pipeline * ci_time * num_errors * log queue_size)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://docs.gitlab.com/ee/ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/">Gitlab Merge Trains</a>
+<ul>
+<li>Communicate through MR UX</li>
+<li>Has &quot;Land immediately&quot; button, jumping the queue</li>
+<li>Currently conflicts with &quot;Merge When Pipeline Succeeds&quot; feature</li>
+<li>Speculative execution, rather than batching
+<ul>
+<li>On success latency is always O(ci_time)</li>
+<li>Max system load is O(queue_size * pipeline)</li>
+<li>Cost is O(queue_size * pipeline)</li>
+</ul>
+</li>
+<li>Restarts process on failure
+<ul>
+<li>Latency is O(num_errors * ci_time)</li>
+<li>Max system load is O(queue_size * pipeline)</li>
+<li>Cost is O(pipeline * ci_time * num_errors * queue_size)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/Shopify/shipit-engine#merge-queue">ShipIt Merge Queue</a>
+<ul>
+<li>Used by Shopify
+<ul>
+<li>See also <a href="https://shopify.engineering/introducing-the-merge-queue">v1 announcement</a> and <a href="https://shopify.engineering/successfully-merging-work-1000-developers">v2 announcement</a></li>
+</ul>
+</li>
+<li>Integrates with Github</li>
+<li>Auto-rejects stale PRs (age and #commits)</li>
+<li>Communicate through @-mentions in PR comments</li>
+<li>Has &quot;Land immediately&quot; command, jumping the queue</li>
+<li>Queue locking for emergencies
+<ul>
+<li>Auto-lock on too many items in queue</li>
+</ul>
+</li>
+<li>Batching
+<ul>
+<li>Fixed size queue (they use 8) to balance throughput and fault isolation</li>
+<li>Batches run in parallel (speculative execution?).  They have it fixed at 3 to limit strain on CI resources.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/uber/arcanist/blob/master/src/workflow/ArcanistSubmitWorkflow.php">arc submit</a>
+<ul>
+<li>Used by Uber (forked arc)
+<ul>
+<li><a href="https://eng.uber.com/research/keeping-master-green-at-scale/">Paper</a> (<a href="https://blog.acolyer.org/2019/04/18/keeping-master-green-at-scale/">web version?</a>)</li>
+</ul>
+</li>
+<li>Speculation engine tries to predict build success
+<ul>
+<li>Graph is created with priority, success, and if builds two merges can safely be done at once</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2018</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

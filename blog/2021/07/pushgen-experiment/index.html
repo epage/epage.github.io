@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experiments with `pushgen`</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Experiments with `pushgen`</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;07&nbsp;Jul&nbsp;'21</time></li>
+              <li><i class="fa fa-tags"></i> programming, rust</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
+<code>pushgen</code></a>,
+a port of C++ <code>transrangers</code> to Rust with a <a href="https://github.com/joaquintides/transrangers/blob/master/rust.md">follow up
+post</a> from
+the author of <code>transrangers</code>.</p>
+<p>Seeing the performance numbers, I was curious what the experience was like with
+the different techniques compared in the followup and how the performance
+worked out in a real world application.</p>
+<p>I decided to port <a href="https://github.com/crate-ci/typos"><code>typos</code></a>, a source code
+spell checker, to
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.try_for_each"><code>try_for_each</code></a>
+and <a href="https://github.com/AndWass/pushgen"><code>pushgen</code></a>.</p>
+<p>For more on what <code>transrangers</code> and <code>pushgen</code> bring, see:</p>
+<ul>
+<li><a href="https://github.com/joaquintides/transrangers#intro"><code>transrangers</code>'s Intro</a></li>
+<li><a href="https://medium.com/@veedrac/rust-is-slow-and-i-am-the-cure-32facc0fdcb">Rust's iterators are inefficient, and here's what we can do about it.</a></li>
+</ul>
+<h2>Introduction to <code>typos</code></h2>
+<p><code>typos</code> scans a git repo, spell checking file names and content.  It will
+automatically ignore binary files.</p>
+<p>Spell checking involves:</p>
+<ul>
+<li>Extracting text that looks like
+<a href="https://www.unicode.org/reports/tr31/">identifiers</a> from the file.  To lower
+false positives, we try to detect and ignore emails, URLs, hashes, etc.</li>
+<li>Checking identifiers against a dictionary (atm has no content)</li>
+<li>If the dictionary could not confirm nor deny the spelling, we split the
+identifier into individual words (e.g. <code>PascalCase</code> -&gt; <code>Pascal</code> and <code>Case</code>).</li>
+<li>Check each word against against a dictionary</li>
+</ul>
+<h2>Architecture of <code>typos</code></h2>
+<p>In pseudo-code, <code>typos</code> looks like:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#b48ead;">def </span><span style="background-color:#2b303b;color:#8fa1b3;">walk_path</span><span style="background-color:#2b303b;color:#c0c5ce;">(</span><span style="background-color:#2b303b;color:#bf616a;">repo</span><span style="background-color:#2b303b;color:#c0c5ce;">):
+    </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">path </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#c0c5ce;">repo:
+        </span><span style="background-color:#2b303b;color:#8fa1b3;">check_file</span><span style="background-color:#2b303b;color:#c0c5ce;">(path)
+
+
+</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">check_file</span><span style="background-color:#2b303b;color:#c0c5ce;">(path):
+    </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">typo </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">check_str</span><span style="background-color:#2b303b;color:#c0c5ce;">(path.name):
+        </span><span style="background-color:#2b303b;color:#8fa1b3;">report</span><span style="background-color:#2b303b;color:#c0c5ce;">(typo)
+    content = path.</span><span style="background-color:#2b303b;color:#8fa1b3;">read_text</span><span style="background-color:#2b303b;color:#c0c5ce;">()
+    </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#c0c5ce;">not </span><span style="background-color:#2b303b;color:#8fa1b3;">is_binary</span><span style="background-color:#2b303b;color:#c0c5ce;">(content):
+        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">typo </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">check_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(content):
+            </span><span style="background-color:#2b303b;color:#8fa1b3;">report</span><span style="background-color:#2b303b;color:#c0c5ce;">(typo)
+
+
+</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">check_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):  </span><span style="background-color:#2b303b;color:#65737e;"># similar for `check_str`
+    </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#c0c5ce;">parser.</span><span style="background-color:#2b303b;color:#8fa1b3;">parse_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+        </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier in dictionary:
+            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">dictionary[identifier]
+        </span><span style="background-color:#2b303b;color:#b48ead;">else</span><span style="background-color:#2b303b;color:#c0c5ce;">:
+            </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">word </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier.</span><span style="background-color:#2b303b;color:#8fa1b3;">split</span><span style="background-color:#2b303b;color:#c0c5ce;">():
+                </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier in dictionary:
+                    </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">dictionary[identifier]
+
+
+</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">parse_bytes</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+    </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#8fa1b3;">is_ascii</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">ascii_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
+    </span><span style="background-color:#2b303b;color:#b48ead;">else</span><span style="background-color:#2b303b;color:#c0c5ce;">:
+        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">text </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">utf8_chunks</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+            </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">unicode_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+                </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
+
+
+</span><span style="background-color:#bf616a;color:#2b303b;">def</span><span style="background-color:#2b303b;color:#c0c5ce;"> </span><span style="background-color:#2b303b;color:#8fa1b3;">parse_str</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+    </span><span style="background-color:#2b303b;color:#b48ead;">if </span><span style="background-color:#2b303b;color:#8fa1b3;">is_ascii</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">ascii_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
+    </span><span style="background-color:#2b303b;color:#b48ead;">else</span><span style="background-color:#2b303b;color:#c0c5ce;">:
+        </span><span style="background-color:#2b303b;color:#b48ead;">for </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier </span><span style="background-color:#2b303b;color:#b48ead;">in </span><span style="background-color:#2b303b;color:#8fa1b3;">unicode_parser</span><span style="background-color:#2b303b;color:#c0c5ce;">(buffer):
+            </span><span style="background-color:#2b303b;color:#b48ead;">yield </span><span style="background-color:#2b303b;color:#c0c5ce;">identifier
+</span></pre>
+<p>Key takeaways:</p>
+<ul>
+<li>Starting with <code>check_bytes</code>, everything is composed of iterators nested in
+each other with transforms applied to them.</li>
+<li>Not as obvious in pseudo-code, extra layers are added to unify the iterator
+types between each branch.  In a language like Python, this is done by
+&quot;boxing&quot;.  In <code>typos</code>, I chose
+<a href="https://docs.rs/itertools/0.10.1/itertools/enum.Either.html"><code>Either</code></a> and
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a>.</li>
+</ul>
+<h2>Performance of <code>try_for_each</code></h2>
+<p>I need to first say, that I seem to have some jitter on my machine considering
+<a href="https://github.com/crate-ci/typos/pull/310#issuecomment-875713350">comparisons between <code>master</code> and <code>try_for_each</code></a>
+showed parsing taking 7% more time in some cases despite not changing.  I am
+running in WSL on a laptop that is plugged in with most applications closed.  I
+didn't spend much time making the environment less jittery.</p>
+<p>With that said, <code>try_for_each</code> seems to have slowed down <code>check_file</code> more than that jitter:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">check_file/Typos/code   time:   [147.52 us 150.23 us 153.51 us]
+                        thrpt:  [1.8886 MiB/s 1.9298 MiB/s 1.9653 MiB/s]
+                 change:
+                        time:   [+26.226% +29.951% +34.477%] (p = 0.00 &lt; 0.05)
+                        thrpt:  [-25.638% -23.048% -20.777%]
+                        Performance has regressed.
+Found 8 outliers among 100 measurements (8.00%)
+  5 (5.00%) high mild
+  3 (3.00%) high severe
+
+check_file/Typos/corpus time:   [50.001 ms 50.776 ms 51.638 ms]
+                        thrpt:  [11.257 MiB/s 11.448 MiB/s 11.626 MiB/s]
+                 change:
+                        time:   [+21.952% +24.403% +26.950%] (p = 0.00 &lt; 0.05)
+                        thrpt:  [-21.229% -19.616% -18.001%]
+                        Performance has regressed.
+Found 10 outliers among 100 measurements (10.00%)
+  6 (6.00%) high mild
+  4 (4.00%) high severe
+</span></pre>
+<p>Remember: <code>check_file</code> is doing a lot more than running iterators, like IO.</p>
+<p>One thing hurting <code>try_for_each</code> is that iterator authors can't provide
+their own optimized implementation yet because the
+<a href="https://doc.rust-lang.org/std/ops/trait.Try.html"><code>Try</code> trait isn't stable</a>.</p>
+<h2>Porting to <code>try_for_each</code></h2>
+<p>Since all iterators composed together and were only consumed in <code>check_file</code>,
+this made it easy to port to <code>try_for_each</code>, see
+<a href="https://github.com/crate-ci/typos/pull/310/files">PR #310</a>.</p>
+<p>If specializing <code>try_for_each</code> (technically overriding the provided
+<code>try_fold</code>) is going to be required to get the performance gains, that is
+unfortunate.  When implementing <code>Iterator</code>, its already easy to overlook what
+all other features we should implement for being a good citizen (e.g. size
+hints).  Besides forgetting <code>try_for_each</code>, we'll also have to implement our
+algorithms twice and keep them in sync.  A good test harness will help but all
+of this increases the friction for taking advantage of <code>try_for_each</code>.</p>
+<h2>Performance of <code>pushgen</code></h2>
+<p>For <code>pushgen</code>, the gains in lowering iteration overhead are not noticeable compared to everything else, like IO:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">check_file/Typos/code   time:   [113.92 us 115.85 us 118.02 us]
+                        thrpt:  [2.4566 MiB/s 2.5025 MiB/s 2.5449 MiB/s]
+                 change:
+                        time:   [-1.1247% +1.7826% +4.7350%] (p = 0.21 &gt; 0.05)
+                        thrpt:  [-4.5209% -1.7513% +1.1375%]
+                        No change in performance detected.
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+
+check_file/Typos/corpus time:   [38.571 ms 39.072 ms 39.617 ms]
+                        thrpt:  [14.673 MiB/s 14.877 MiB/s 15.071 MiB/s]
+                 change:
+                        time:   [-6.0200% -4.2708% -2.4899%] (p = 0.00 &lt; 0.05)
+                        thrpt:  [+2.5535% +4.4613% +6.4057%]
+                        Performance has improved.
+Found 9 outliers among 100 measurements (9.00%)
+  5 (5.00%) high mild
+  4 (4.00%) high severe
+</span></pre>
+<p>When breaking out just parsing, we do see decent improvements, for example:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">parse_str/unicode/code  time:   [13.505 us 13.705 us 13.909 us]
+                        thrpt:  [20.844 MiB/s 21.153 MiB/s 21.468 MiB/s]
+                 change:
+                        time:   [-19.030% -16.653% -14.273%] (p = 0.00 &lt; 0.05)
+                        thrpt:  [+16.650% +19.980% +23.503%]
+                        Performance has improved.
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+
+parse_str/ascii/code    time:   [13.742 us 13.959 us 14.208 us]
+                        thrpt:  [20.405 MiB/s 20.769 MiB/s 21.096 MiB/s]
+                 change:
+                        time:   [-12.491% -10.529% -8.5378%] (p = 0.00 &lt; 0.05)
+                        thrpt:  [+9.3348% +11.768% +14.274%]
+                        Performance has improved.
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+</span></pre>
+<p>And the overhead for adapting word-splitting into a <code>pushgen::Generator</code> was minimal:</p>
+<pre style="background-color:#2b303b;">
+<span style="background-color:#2b303b;color:#c0c5ce;">split/words/code        time:   [1.4384 us 1.4654 us 1.4973 us]
+                        thrpt:  [193.63 MiB/s 197.84 MiB/s 201.56 MiB/s]
+                 change:
+                        time:   [-1.9718% +2.1027% +5.9130%] (p = 0.29 &gt; 0.05)
+                        thrpt:  [-5.5829% -2.0594% +2.0114%]
+                        No change in performance detected.
+Found 3 outliers among 100 measurements (3.00%)
+  3 (3.00%) high mild
+
+split/words/corpus      time:   [2.7414 ms 2.7730 ms 2.8080 ms]
+                        thrpt:  [207.02 MiB/s 209.63 MiB/s 212.05 MiB/s]
+                 change:
+                        time:   [+2.0584% +3.7444% +5.7863%] (p = 0.00 &lt; 0.05)
+                        thrpt:  [-5.4698% -3.6092% -2.0169%]
+                        Performance has regressed.
+Found 8 outliers among 100 measurements (8.00%)
+  6 (6.00%) high mild
+  2 (2.00%) high severe
+</span></pre>
+<h2>Porting to <code>pushgen</code></h2>
+<p><code>pushgen</code> is in its early stages, at v0.0.1.  I had to implement a lot of
+features before porting <code>typos</code> to use <code>pushgen</code>.</p>
+<p>Porting to <code>pushgen</code> mostly involved importing traits and swapping types.</p>
+<ul>
+<li>I did port my custom <code>Utf8Chunks</code> <code>Iterator</code> to being a <code>pushgen::Generator</code>.</li>
+<li>I adapted my word-splitting <code>Iterator</code> with <code>pushgen::from_iter</code> since I knew
+that would be messier and I wanted to know whether it was worth it first.</li>
+<li>Activating these <code>pushgen::Generator</code>s was taken care of by basing my branch
+off of my <code>try_for_each</code> branch.</li>
+</ul>
+<p>See <a href="https://github.com/crate-ci/typos/pull/311/files">PR #311</a>.</p>
+<p>There are still areas to explore to match the feature set of <code>Iterator</code>, like
+<a href="https://github.com/AndWass/pushgen/issues/35"><code>Box&lt;Generator&gt;</code></a>, double-ended
+iterators, size hints, etc.</p>
+<p>I imagine the name <code>Generator</code> will become confusing as Rust
+<a href="https://doc.rust-lang.org/std/ops/trait.Generator.html"><code>std::ops::Generator</code></a>
+becomes stable.</p>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2021</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>

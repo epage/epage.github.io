@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Liquid v0.20</title><link>https://epage.github.io/blog/2020/03/liquid-v20/</link><description><![CDATA[<p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Experiments with `pushgen`</title><link>https://epage.github.io/blog/2021/07/pushgen-experiment/</link><description><![CDATA[<p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
+<code>pushgen</code></a>,
+a port of C++ <code>transrangers</code> to Rust with a <a href="https://github.com/joaquintides/transrangers/blob/master/rust.md">follow up
+post</a> from
+the author of <code>transrangers</code>.</p>
+]]></description><guid>https://epage.github.io/blog/2021/07/pushgen-experiment/</guid><pubDate>Wed, 07 Jul 2021 09:00:30 -0500</pubDate></item><item><title>Liquid v0.20</title><link>https://epage.github.io/blog/2020/03/liquid-v20/</link><description><![CDATA[<p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
 ]]></description><guid>https://epage.github.io/blog/2020/03/liquid-v20/</guid><pubDate>Mon, 16 Mar 2020 09:00:30 -0500</pubDate></item><item><title>Reflecting on Errors in 2019</title><link>https://epage.github.io/blog/2019/11/reflecting-on-errors-in-2019/</link><description><![CDATA[<p>With people reflecting on Rust in 2019 and what they want to see in 2020, error handling has come up again:</p>
 <ul>
 <li><a href="https://www.ncameron.org/blog/rust-in-2020-one-more-thing/">Rust in 2020, one more thing</a></li>
