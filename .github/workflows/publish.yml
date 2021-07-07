@@ -9,12 +9,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install
       run: |
-        curl -LSfs https://raw.githubusercontent.com/crate-ci/gh-install/master/v1/install.sh |
-          sh -s --
-          --git cobalt-org/cobalt.rs
-          --crate cobalt
-          --force
-          --target x86_64-unknown-linux-gnu
+        curl -LSfs https://raw.githubusercontent.com/crate-ci/gh-install/master/v1/install.sh | \
+          sh -s -- \
+          --git cobalt-org/cobalt.rs \
+          --crate cobalt \
+          --force \
+          --target x86_64-unknown-linux-gnu \
           --tag v0.16.0
         echo COBALT_BIN=~/.cargo/bin/cobalt >> $GITHUB_ENV
     - name: Build
