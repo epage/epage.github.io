@@ -148,7 +148,7 @@ of this increases the friction for taking advantage of `try_for_each`.
 
 ## Performance of `pushgen`
 
-For `pushgen`, the gains in lowering iteration overhead are not noticeable compared to everything else, like IO:
+For `pushgen`, the improvements from lowering iteration overhead are not noticeable compared to everything else, like IO:
 ```
 check_file/Typos/code   time:   [113.92 us 115.85 us 118.02 us]
                         thrpt:  [2.4566 MiB/s 2.5025 MiB/s 2.5449 MiB/s]
@@ -215,6 +215,9 @@ Found 8 outliers among 100 measurements (8.00%)
   6 (6.00%) high mild
   2 (2.00%) high severe
 ```
+
+`pushgen` won't be a magic bullet to improve performance but it might help with
+specific hot-loops.  Let profilers and benchmarks be your guide.
 
 ## Porting to `pushgen`
 
