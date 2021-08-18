@@ -62,9 +62,13 @@ Only running CI will detect these types of conflicts.</p>
 <ul>
 <li>To speed up PR feedback, its common to rely heavily on test avoidance but
 there are gaps where we don't have precise enough information and we err on
-the side of faster CI runs rather than more complete CI runs.  Sometimes, this is worked around by markers the user can leave to get extra validation.
-A Submit Queue gives us the best of all worlds: fast PR feedback and green-master.</li>
-<li>There is a gap between when a PR lands and CI pushing out artifacts.  Submit Queue artifacts could be staged and made available if the pipeline succeeds, making them available immediately on merge.</li>
+the side of faster CI runs rather than more complete CI runs.  Sometimes,
+this is worked around by markers the user can leave to get extra validation.
+A Submit Queue can be used to implement a two-tier CI system where you get
+the best of both worlds: fast PR feedback and green-master.</li>
+<li>There is a gap between when a PR lands and CI pushing out artifacts.  Submit
+Queue artifacts could be staged and made available if the pipeline succeeds,
+making them available immediately on merge.</li>
 </ul>
 <p>Considerations</p>
 <ul>
@@ -175,6 +179,27 @@ A Submit Queue gives us the best of all worlds: fast PR feedback and green-maste
 </li>
 </ul>
 </li>
+</ul>
+<p>TODO</p>
+<ul>
+<li><a href="https://medium.com/strava-engineering/butler-merge-queue-how-strava-merges-code-7095a3310930">Butler</a>
+<ul>
+<li>Native support for <code>fixup!</code> commits!</li>
+</ul>
+</li>
+<li><a href="https://mergify.io/">Mergify</a>
+<ul>
+<li><a href="https://docs.mergify.io/actions/queue/#multiple-queues">User-defined queues</a> is a nice
+way of handling priorities
+<ul>
+<li>Particularly allowing to bypass PR CI check since it will be redundant with merge-queue check.</li>
+</ul>
+</li>
+<li><a href="https://docs.mergify.io/actions/queue/#defining-pull-request-dependencies">Git-native PR dependencies</a></li>
+</ul>
+</li>
+<li><a href="https://mergequeue.com/">MergeQueue</a></li>
+<li><a href="https://mergetastic.com/">Mergtastic</a></li>
 </ul>
 
   </main>
