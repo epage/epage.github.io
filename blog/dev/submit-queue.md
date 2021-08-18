@@ -31,9 +31,13 @@ Other benefits to Submit Queues:
 
 - To speed up PR feedback, its common to rely heavily on test avoidance but
   there are gaps where we don't have precise enough information and we err on
-  the side of faster CI runs rather than more complete CI runs.  Sometimes, this is worked around by markers the user can leave to get extra validation.
-  A Submit Queue gives us the best of all worlds: fast PR feedback and green-master.
-- There is a gap between when a PR lands and CI pushing out artifacts.  Submit Queue artifacts could be staged and made available if the pipeline succeeds, making them available immediately on merge.
+  the side of faster CI runs rather than more complete CI runs.  Sometimes,
+  this is worked around by markers the user can leave to get extra validation.
+  A Submit Queue can be used to implement a two-tier CI system where you get
+  the best of both worlds: fast PR feedback and green-master.
+- There is a gap between when a PR lands and CI pushing out artifacts.  Submit
+  Queue artifacts could be staged and made available if the pipeline succeeds,
+  making them available immediately on merge.
 
 Considerations
 
@@ -96,3 +100,14 @@ Existing Submit Queues
     - [Paper](https://eng.uber.com/research/keeping-master-green-at-scale/) ([web version?](https://blog.acolyer.org/2019/04/18/keeping-master-green-at-scale/))
   - Speculation engine tries to predict build success
     - Graph is created with priority, success, and if builds two merges can safely be done at once
+
+TODO
+- [Butler](https://medium.com/strava-engineering/butler-merge-queue-how-strava-merges-code-7095a3310930)
+  - Native support for `fixup!` commits!
+- [Mergify](https://mergify.io/)
+  - [User-defined queues](https://docs.mergify.io/actions/queue/#multiple-queues) is a nice
+    way of handling priorities
+    - Particularly allowing to bypass PR CI check since it will be redundant with merge-queue check.
+  - [Git-native PR dependencies](https://docs.mergify.io/actions/queue/#defining-pull-request-dependencies)
+- [MergeQueue](https://mergequeue.com/)
+- [Mergtastic](https://mergetastic.com/)
