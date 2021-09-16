@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learnability of Rust</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Learnability of Rust</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;15&nbsp;Sep&nbsp;'21</time></li>
+              <li><i class="fa fa-tags"></i> programming, oss, rust</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <h2>tl;dr</h2>
+<p>As part of improving the learnability of Rust, I propose:</p>
+<ul>
+<li>The <code>.crs</code> file subset of <a href="https://github.com/DanielKeep/cargo-script">cargo-script</a> be brought into <code>cargo</code></li>
+<li>We support converting <code>.crs</code> to full cargo projects with <code>cargo init --from &lt;script&gt;.crs</code></li>
+<li>We collaborate on an ergonomics-focused standard-library-alternative, like <a href="https://docs.rs/eztd">eztd</a></li>
+</ul>
+<h2>Use Cases</h2>
+<p>Something I've really appreciated about Rust community is taking seemingly opposing principles
+and finding a way to bring them in harmony, for example:</p>
+<ul>
+<li>Memory safety without garbage collection</li>
+<li>Abstraction without overhead</li>
+<li>Concurrency without data races</li>
+<li>Stability without stagnation</li>
+</ul>
+<p>One I've been contemplating for a while is &quot;Learnability with control&quot;.  We've made incremental
+improvements to learnability, for example changes in the 2018 and 2021 editions, but I feel
+like we've only been working to a local maxima.  I appreciate the work
+<a href="https://without.boats/blog/revisiting-a-smaller-rust/">boats did in sketching out an ideal</a>
+which, even if incompatible with other goals in Rust, helps lift our sights
+past our local maxima.  More recently,
+<a href="https://www.youtube.com/watch?v=ylOpCXI2EMM">Niko encouraged us to be bold and creative</a>.</p>
+<p>In considering &quot;learnability&quot;, we should also keep in mind the related &quot;expert&quot; workflows:</p>
+<ul>
+<li>Prototyping</li>
+<li>One-off programs</li>
+</ul>
+<p>I'll use Python as our point of comparison in exploring these ideals in Rust
+due to its popularity and my familiarity with it.</p>
+<h2>Goals</h2>
+<p>Some parts of Python that stick out to me include:</p>
+<ol>
+<li>Low friction exploratory programming (e.g. REPL or notebooks)</li>
+<li>Low friction to experimenting (e.g. just open a &quot;.py&quot; file)</li>
+<li>Low friction discovery of &quot;good enough&quot; packages (i.e. batteries-included</li>
+<li>Reads as psuedo-code</li>
+<li>Small, easy to remember surface area (e.g. just use <code>[]</code> instead of a collection of subset/indexing functions)</li>
+<li>Design out error cases (e.g. no out of bounds errors on <code>[]</code>)</li>
+</ol>
+<p><em>(yes, there are counter-examples)</em></p>
+<p>For Rust, we also want: Scale to control, when needed.  We don't want a split ecosystem with a high porting cost between them.</p>
+<h2>Breaking It Down</h2>
+<p><img src="https://epage.github.io/img/hammer-time.gifv" alt="MC hammer: break it down" /></p>
+<p><strong>Exploratory programming</strong> comes in two parts</p>
+<ul>
+<li>Discovering what the actual API is</li>
+<li>Verifying behavior of the API</li>
+</ul>
+<p>For API discoveability, Python has to deal with dynamically generated APIs,
+which is less of a concern for Rust.  Rust does have traits that need to be
+pulled in and crate features that need to be enabled.  For those in an IDE, I'm
+assuming <a href="https://rust-analyzer.github.io/">rust-analyzer</a> handles these cases.
+For the rest of us, we have <code>rustdoc</code> which has high friction in being adapted to your live code.
+I'm assuming us non-IDE users are enough of a minority that we don't need to invest in alternatives.</p>
+<p>This still leaves us verifying assumptions on behavior of an API.  We can
+invest in a REPL or a Notebook just for this use case but I'm thinking we'll
+get a &quot;good enough&quot; solution faster by first investing in the next part.</p>
+<p>Python gets you <strong>quickly experimenting</strong> on your ideas by allowing you to have just a <code>.py</code>
+file.  Python doesn't scale too well though, running into problems with
+relative imports and requiring packages to be installed globally or learning
+about venvs.</p>
+<p>I think we can do better in Rust.  We already have
+<a href="https://github.com/DanielKeep/cargo-script">cargo-script</a> as a starting point
+for writing Rust code in a single file, pull in third-party dependencies, and
+have unit tests.  The one additional piece I think is needed is turning a
+<code>.crs</code> file into a full project with <code>Cargo.toml</code> for those times throw-away
+code becomes maintained code.</p>
+<p>This helps us with <strong>exploratory programming</strong> by being able to quickly write
+throw-away code.  I know <code>cargo-script</code> also has expression evaluation but I do
+not have experience with that and assume its too limited to help with the REPL
+case.</p>
+<p>Another benefit to adopting <code>cargo-script</code> is it'd make it easy to share
+reproduction cases in bug reports.</p>
+<p>For <strong>discovery of packages</strong>, Python takes the approach of
+&quot;batteries-included&quot;, meaning nearly everything you need is a part of the
+stdlib.  This comes at the cost of everything having to maintain the same
+compatibility guarantees, release on the same cadence, and original authors
+moving on from their package.  The community sometimes leaves behind the
+standard library and you have to be in-the-know of what the replacement is.</p>
+<p>With that said, a lot of the community still relies on the stdlib, whether because</p>
+<ul>
+<li>Its good enough</li>
+<li>Its discoverable</li>
+<li>It reduces stress by not having to research and make a decision</li>
+<li>Its universally available</li>
+<li>It is unlikely to break</li>
+</ul>
+<p>In Rust, we've had debates in the past about batteries-included,
+<a href="https://lib.rs/crates/stdx">batteries-adjacent</a>,
+<a href="https://rust-lang-nursery.github.io/rust-cookbook/">documentation</a>,
+or <a href="https://crates.io/crates?sort=recent-downloads">algorithms</a>.</p>
+<p>I think batteries-adjacent gets us most of the way there.  It ticks almost all
+the boxes of batteries included while not being limited in its evolution.  For
+being universally available, this is important in python mostly due to the
+dependency management pain in Python which we have solved with <code>cargo</code>.  This
+just leaves availability from isolated networks which is a minority case
+(though a big pain for those that do have to live with it).</p>
+<p>For breaking changes, we can mitigate this by the batteries-adjacent library
+being composed of crates, rather than having logic of its own,  This makes it
+easier to narrow down what sections broke compatibility and allows people to
+depend on an older version of that subset, just adding a dependency and
+changing their <code>use</code> statements.  If we maintain a certain level of friction to
+the process of crates being added (required level of maturity, RFC process), we
+are also likely to reduce the number of breaking changes.</p>
+<p>I think a lot of Rust is almost there for <strong>reading as psuedo-code</strong>.  At its
+best, Rust almost feels like Python.  Lifetimes and complex <code>where</code> clauses
+stand out to me as pain points.  I think a learning focused standard
+library-alternative that limits the use of lifetimes would both be easier to
+grok and help encourage writing code that borderlines on pseudo code.  When
+needing generics, favoring <code>impl</code> would also help to reduce some of the noise,
+despite its downsides.</p>
+<p>For a <strong>small surface area</strong>, if we take this standard library alternative, and
+apply Python's &quot;there is only one way to do it&quot; mantra, I think we can reduce
+quite a few functions at the cost of some runtime performance (for non-optimal
+choices) and occasional extra work by the developer.</p>
+<p>This standard library-alternative could <strong>design out errors</strong> as we re-examine
+why different APIs might error or panic and look to generalize it.  For
+example, instead of <code>text[range]</code> panicing on out-of-bounds, we re-define the
+behavior to
+<a href="https://github.com/epage/eztd/blob/main/crates/eztd-core/src/string/mod.rs#L666">return at most the start and end bound</a>.</p>
+<p>A sticky question is whether such a library's string type should stay focused
+on bytes or be focused on chars, avoiding panics when not aligned with character
+boundaries.  Working on chars is safer and more familiar but it will surprise
+people when a developer uses &quot;lower level&quot; Rust.</p>
+<p>With this learning-focused API, we can even leverage people's muscle memories
+to smooth out the transition to rust by <a href="https://github.com/epage/eztd/blob/main/crates/eztd-core/src/string/mod.rs#L334">providing familiar
+functions</a>.</p>
+<p>With all of this, we can still <strong>scale to give users control</strong> by providing interop
+with the standard library.  If an optimizer points out a hot loop involving it,
+a developer can drop down to the standard library version and make things
+faster.  This is also important for interop with the ecosystem and allowing
+gradual migration away from this standard library-alternative.</p>
+<h2>Performance</h2>
+<p>Being easy-to-use doesn't mean performance has to be abysmal as
+<a href="https://www.youtube.com/watch?v=CV5CjUlcqsw&amp;list=PL85XCvVPmGQgACNMZlhlRZ4zlKZG_iWH5&amp;index=4">Lily Mara's touched at RustConf</a>.</p>
+<p>For example, <code>cargo-script</code> re-uses dependency builds across scripts, speeding up builds at the risk of contention.</p>
+<p>For <code>eztd</code>, we can make <code>eztd::String</code> moderately performant with a no-lifetime API with</p>
+<ul>
+<li>Immutability</li>
+<li><a href="https://github.com/epage/eztd/blob/main/crates/eztd-core/src/string/inline.rs">Small-string optimization</a></li>
+<li><a href="https://github.com/epage/eztd/blob/main/crates/eztd-core/src/string/shared.rs#L8">Wrapping the heap allocation with <code>Arc</code></a></li>
+<li><a href="https://github.com/epage/eztd/blob/main/crates/eztd-core/src/string/shared.rs#L9-L10">Sharing <code>Arc&lt;str&gt;</code>s across instances by also tracking the relevant subset of the <code>str</code></a></li>
+</ul>
+<p>We can also reduce the build time overhead of <code>eztd</code> by</p>
+<ul>
+<li>Considering it a bug to have different versions of a dependency existing</li>
+<li>Leveraging features to disable sections of the crate</li>
+</ul>
+<p>To further speed up build times, maybe we should consider sharing dependency builds across all builds, not just <code>cargo-scrupt</code>.</p>
+<h2><code>eztd</code></h2>
+<p>I've started <a href="https://github.com/epage/eztd"><code>eztd</code></a> to showcase the ideas in
+this post and with the hope that it encourages others to help make this
+possible.</p>
+<p>Be sure to check out <code>eztd</code>'s <a href="https://github.com/epage/eztd/blob/main/CONTRIBUTING.md#design-guidelines">design
+guidelines</a>
+for some additional details on designing for ergonomics.</p>
+<p>Just as important are the goals are the non-goals:</p>
+<ul>
+<li>Being faster than Python</li>
+<li>Providing stable vocabulary terms (i.e. we'll bump major frequently)</li>
+</ul>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2021</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>
