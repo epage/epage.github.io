@@ -46,7 +46,7 @@ Some parts of Python that stick out to me include:
 1. Low friction exploratory programming (e.g. REPL or notebooks)
 2. Low friction to experimenting (e.g. just open a ".py" file)
 3. Low friction discovery of "good enough" packages (i.e. batteries-included
-4. Reads as psuedo-code
+4. Reads as pseudo-code
 5. Small, easy to remember surface area (e.g. just use `[]` instead of a collection of subset/indexing functions)
 6. Design out error cases (e.g. no out of bounds errors on `[]`)
 
@@ -127,7 +127,7 @@ changing their `use` statements.  If we maintain a certain level of friction to
 the process of crates being added (required level of maturity, RFC process), we
 are also likely to reduce the number of breaking changes.
 
-I think a lot of Rust is almost there for **reading as psuedo-code**.  At its
+I think a lot of Rust is almost there for **reading as pseudo-code**.  At its
 best, Rust almost feels like Python.  Lifetimes and complex `where` clauses
 stand out to me as pain points.  I think a learning focused standard
 library-alternative that limits the use of lifetimes would both be easier to
