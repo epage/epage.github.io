@@ -196,3 +196,5 @@ for some additional details on designing for ergonomics.
 Just as important are the goals are the non-goals:
 - Being faster than Python
 - Providing stable vocabulary terms (i.e. we'll bump major frequently)
+
+*[Discussed on reddit](https://www.reddit.com/r/rust/comments/ppfudv/learnability_of_rust/?)*
