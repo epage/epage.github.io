@@ -45,7 +45,7 @@ Some parts of Python that stick out to me include:
 
 1. Low friction exploratory programming (e.g. REPL or notebooks)
 2. Low friction to experimenting (e.g. just open a ".py" file)
-3. Low friction discovery of "good enough" packages (i.e. batteries-included
+3. Low friction discovery of "good enough" packages (i.e. batteries-included)
 4. Reads as pseudo-code
 5. Small, easy to remember surface area (e.g. just use `[]` instead of a collection of subset/indexing functions)
 6. Design out error cases (e.g. no out of bounds errors on `[]`)
