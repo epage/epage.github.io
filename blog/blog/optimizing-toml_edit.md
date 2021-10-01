@@ -19,7 +19,6 @@ allowing users to modify `.toml` files.
 |-----------------|-------------------------|--------------------|
 | toml_edit       | 8.7us                   | 271us              |
 | toml_edit::easy | 20.7us                  | 634us              |
-| toml-rs         | 4.7us                   | 121us              |
 
 **After:**
 
@@ -567,7 +566,6 @@ Some that I remember:
 |-----------------|-------------------------|--------------------|
 | toml_edit       | 8.7us                   | 271us              |
 | toml_edit::easy | 20.7us                  | 634us              |
-| toml-rs         | 4.7us                   | 121us              |
 
 **After:**
 
