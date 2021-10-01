@@ -9,6 +9,8 @@ With people reflecting on Rust in 2019 and what they want to see in 2020, error 
 - [Thoughts on Error Handling in Rust](https://lukaskalbertodt.github.io/2019/11/14/thoughts-on-error-handling-in-rust.html)
 - [Error Handling Survey](https://blog.yoshuawuyts.com/error-handling-survey/)
 
+<!-- more -->
+
 It felt like there was interest in moving `anyhow` into the stdlib.  While I
 feel that a lot of it is ready or near-ready (see below), I feel we
 have gotten stuck in a rut with the `context` pattern.  I've been told that

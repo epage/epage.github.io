@@ -10,6 +10,8 @@ data:
 ---
 *tl;dr Cache your code-gen results with the [`codegenrs` crate](https://crates.io/crates/codegenrs).*
 
+<!-- more -->
+
 Lately, there has been talk talk about improving build times, with a focus on
 reducing bloat like [regex breaking out logic into features that can be
 disabled](https://www.reddit.com/r/rust/comments/cz7u0j/psa_regex_13_permits_disabling_unicodeperformance/?st=k1k1fzk7&sh=69a9ab53),

@@ -13,6 +13,8 @@ hand rather than use something like [`error-chain`][error-chain]. In the case
 of [`assert_cli`][assert_cli], I decided to finally give [`failure`][failure] a
 try.
 
+<!-- more -->
+
 From `failure`'s [announcement][announcement]:
 
 > Failure is a Rust library intended to make it easier to manage your error

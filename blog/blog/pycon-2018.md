@@ -8,6 +8,8 @@ data:
 ---
 I went to with a coworker to [PyCon](https://us.pycon.org/2018/) this year ([videos](https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos)).
 
+<!-- more -->
+
 We had several conversations about the value gained by going.  Looking back, I
 think in aggregate it was worth it.  While I didn't always attend good talks, I
 got value from a lot of the little things:

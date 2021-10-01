@@ -15,6 +15,8 @@ As part of improving the learnability of Rust, I propose:
 - We support converting `.crs` to full cargo projects with `cargo init --from <script>.crs`
 - We collaborate on an ergonomics-focused standard-library-alternative, like [eztd](https://docs.rs/eztd)
 
+<!-- more -->
+
 ## Use Cases
 
 Something I've really appreciated about Rust community is taking seemingly opposing principles

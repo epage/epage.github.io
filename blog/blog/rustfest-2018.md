@@ -12,6 +12,8 @@ C++.  It offers similar (actually better) protections than GCed languages and
 the full language is available in any environment, including exception-like
 error handling in the Windows kernel.
 
+<!-- more -->
+
 1aim partially sponsored my attendance at RustFest.  At the start of the year,
 the Rust community organized working groups for targeted improvements to the
 language for [several use

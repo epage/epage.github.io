@@ -17,6 +17,8 @@ Seeing the performance numbers, I was curious what the experience was like with
 the different techniques compared in the followup and how the performance
 worked out in a real world application.
 
+<!-- more -->
+
 I decided to port [`typos`](https://github.com/crate-ci/typos), a source code
 spell checker, to
 [`try_for_each`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.try_for_each)

@@ -6,6 +6,8 @@ data:
 ---
 I’ve fallen into the pattern of using two kinds of languages: a rapid development language (Python) and a catch-all language (C++). I’ve long watched for something that would unseat C++ and I feel I finally found that in Rust.
 
+<!-- more -->
+
 A language for rapid development should allow me to quickly iterate on ideas even at the risk of there being bugs. In short, it shouldn’t be work.
 
 My catch-all language needs to be usable within any environment I’m working on, included embedded applications, minimize defects, and give me control to get the maximum performance. I’m willing to sacrifice on the workflow to meet these needs.

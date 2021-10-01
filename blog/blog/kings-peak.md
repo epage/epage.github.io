@@ -9,6 +9,8 @@ data:
 
 After more than ten years of no camping, this last spring I finally got back into it with trips out to [Pedernalles Falls](https://plus.google.com/photos/113583091680828898069/albums/5853517418104796993?authkey=CMPngsHisOHgJQ), [Lost Maples](https://plus.google.com/photos/113583091680828898069/albums/5856133974319246561), and Lake Georgetown ([car camping](https://plus.google.com/photos/113583091680828898069/albums/5866459684606744145) and [backpacking](https://plus.google.com/photos/113583091680828898069/albums/5876965869108141585)).  I've been itching to get back into real mountains though.  This week I had the opportunity to fly out to Utah and go camping with Brian up in the Uintas.
 
+<!-- more -->
+
 I flew most of my gear out with me.  I did pick up some Mountain House meals at Emergecy Essentials and stove fuel at Sports Authority.  In Austin it was hard to fathom how cold the mountains will be so I ended up borrowing some cold weather clothes from my brother-in-law as well as a pack (mine didn't fit in my luggage) and a flashlight (either I forgot it or the TSA took it).
 
 Monday | Tuesday | Wednesday | Thursday | Friday

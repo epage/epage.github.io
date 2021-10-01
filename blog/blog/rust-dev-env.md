@@ -6,6 +6,8 @@ data:
 ---
 Sadly, I’ve recently switched to Windows at home for some expediency reasons. I’ll call out the Windows-specific parts
 
+<!-- more -->
+
 ## Install [rustup](https://www.rust-lang.org/en-US/install.html)
 
 rustup is the toolchain manager. This helps you upgrade the compiler, cross compile, etc.

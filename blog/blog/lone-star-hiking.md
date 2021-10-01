@@ -11,6 +11,8 @@ I've lived in the Texas for over 5 years and only recently have I heard about th
 
 I took with me two friends who were wanting to give a longer backpacking trip a try. I decided to create a loop out of the Lone Star Hiking Trail and Little Lake Creek Loop Trail to keep things interesting for the group. According to the trail website, we were going to be out during hunting season which put restrictions on where we camped.
 
+<!-- more -->
+
 ## Thursday
 
 <img src="//1.bp.blogspot.com/-Wm0Z5yMOwhk/VHqgWIymlHI/AAAAAAAAM9w/6A9z8Peq7TY/s1600/20141127%2B01.png" title="Day 1: 6 Miles" width="75%" height="75%" />

@@ -9,6 +9,8 @@ My vision has usually hovered around 20/40 but that is with glasses and when my 
 
 I had thought most of my vision problems were due to my nystagmus. In my mid to late twenties I started to realize that my nystagmus was responsible for less of my vision issues than I had thought and that I actually had some pretty bad astigmatism. This realization opened up my eyes to the idea of doing something about my vision problems.
 
+<!-- more -->
+
 ## Contacts
 
 Contacts ended up being a non-option for me. I had read that they can help with nystagmus because they correct your vision across your whole peripheral, helping at the null points. Unfortunately my astigmatism got in the way. In the exam room, we expected contacts to improve my vision to 20/30 but I didn’t see that improvement once my contacts arrived. The optometrist theorized that contacts could only help with a part of my astigmatism and that to get the full benefit I’d have to wear contacts and glasses that are paired together. That would be the worst of both worlds and I decided against it.

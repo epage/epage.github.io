@@ -6,6 +6,7 @@ data:
 ---
 So I'm trying out [https://github.com/cobalt-org/cobalt.rs](Cobalt) and [https://pages.github.com/](github.io) for blogging.
 
+<!-- more -->
 
 ## [https://pages.github.com/](Setup) my user github.io repo
 

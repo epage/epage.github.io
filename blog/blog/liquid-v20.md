@@ -11,6 +11,8 @@ data:
 
 *[`liquid-rust`][liquid-rust] is a rust re-implementation of the [liquid][liquid] template engine made popular by the [jekyll][jekyll] static site generator.*
 
+<!-- more -->
+
 ### Highlights
 
 #### Conformance improvements

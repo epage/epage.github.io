@@ -9,6 +9,8 @@ data:
 ---
 *Context: [Call for Community Posts](https://blog.rust-lang.org/2018/01/03/new-years-rust-a-call-for-community-blogposts.html) and [other posts](http://readrust.net/rust2018/)*
 
+<!-- more -->
+
 ## Obligatory 2017 Reflection
 
 When I started with Rust, I was planning on blogging about my experience. As I

@@ -3,6 +3,8 @@ site:
   title: Ed's Home Page
   description: "Programming and other misc"
   base_url: "https://epage.github.io"
+default:
+  excerpt_separator: "<!-- more -->"
 pages:
   default:
     layout: default.liquid
