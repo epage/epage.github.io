@@ -5,7 +5,6 @@ allowing users to modify <code>.toml</code> files.</p>
 <table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
 <tr><td>toml_edit</td><td>8.7us</td><td>271us</td></tr>
 <tr><td>toml_edit::easy</td><td>20.7us</td><td>634us</td></tr>
-<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
 </tbody></table>
 <p><strong>After:</strong></p>
 <table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
