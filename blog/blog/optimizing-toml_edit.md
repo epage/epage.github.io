@@ -601,3 +601,5 @@ a more optimizable format, giving gains well past what we'd get with any toml
 library.  That seems like a lot of work, so hopefully we won't need it.
 
 *Thanks to Futurewei for sponsoring this work*
+
+*[Discussed on reddit](https://www.reddit.com/r/rust/comments/pze6vg/a_journey_in_optimizing_toml_edit/?)*
