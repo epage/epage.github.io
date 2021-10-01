@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Journey in Optimizing `toml_edit`</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>A Journey in Optimizing `toml_edit`</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;30&nbsp;Sep&nbsp;'21</time></li>
+              <li><i class="fa fa-tags"></i> programming, oss, rust</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <h2>tl;dr</h2>
+<p><a href="https://docs.rs/toml_edit"><code>toml_edit</code></a> is a format preserving TOML crate,
+allowing users to modify <code>.toml</code> files.</p>
+<p><strong>Before:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>8.7us</td><td>271us</td></tr>
+<tr><td>toml_edit::easy</td><td>20.7us</td><td>634us</td></tr>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+<p><strong>After:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>4.0us</td><td>149us</td></tr>
+<tr><td>toml_edit::easy</td><td>5.0us</td><td>179us</td></tr>
+</tbody></table>
+<p><strong>Target:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+<!-- more -->
+<p><em>Sorry for the formatting, I need to update my blog's theme</em></p>
+<h2>Goal</h2>
+<p>I am working on
+<a href="https://github.com/rust-lang/cargo/issues/5586">merging <code>cargo-add</code> into <code>cargo</code></a>.
+Concerns raised as part of this:</p>
+<ul>
+<li>Preserving formatting when modifying a users <code>Cargo.toml</code> is required</li>
+<li>Consistent TOML behavior, including errors, between the parts of Cargo
+modifying TOMLs and the parts that don't need to</li>
+</ul>
+<p>Rather than updating <code>toml_edit</code> to make it consistent with
+<a href="https://docs.rs/toml"><code>toml-rs</code></a> (what Cargo uses today) and then keeping it
+consistent over time, I proposed we see if we can make <code>toml_edit</code> serve all of
+Cargo's needs.</p>
+<p>Since then</p>
+<ul>
+<li>I've made <code>toml_edit</code> support the <a href="https://toml.io/en/">TOML 1.0 spec</a>,
+including passing the <a href="https://github.com/BurntSushi/toml-test">unofficial compliance suite</a></li>
+<li>Ported the <code>toml-rs</code> API on top of <code>toml_edit</code> as
+<a href="https://docs.rs/toml_edit/0.5.0/toml_edit/easy/index.html"><code>toml_edit::easy</code></a></li>
+<li><a href="https://github.com/rust-lang/cargo/pull/9932">Removed support for invalid TOML files from Cargo</a>
+to avoid having to support them in <code>toml_edit</code></li>
+</ul>
+<p>While there is still
+<a href="https://github.com/ordian/toml_edit/issues/133">some work to go</a>, we are
+nearly ready for trying <code>toml_edit</code> in Cargo except one thing: performance.</p>
+<h2>The Journey</h2>
+<h3>Know Your Target</h3>
+<p>When doing a drop-in replacement, it can be easy to assume the target is to
+maintain performance but you can then spend a lot of time on something that
+nobody will care about.  Unsure how much performance I could squeeze out of
+<code>toml_edit</code>, I especially wanted to know what my leeway was.  Alex Crichton
+was a big help in identifying our target, calling out specifically the Cargo's
+resolver, the code that walks the entire dependency hierarchy of crates, as
+being a user-impacting bottleneck, with <code>toml-rs</code> showing up when profiling.
+So not only does it need to be at least as fast, they want to optimize it
+further.</p>
+<p>Ideally, I'd go and create
+<a href="https://github.com/rust-lang/cargo/issues/9935">a resolver benchmark</a> and
+measure before/after to see how much of a real-world impact changes in TOML
+parsing performance would be.  I decided to first see what low hanging fruit
+existed in <code>toml_edit</code> to see if I could get it close to <code>toml-rs</code>.</p>
+<h3>Choose Your Equipment</h3>
+<p>To verify my optimizations, I wrote up some benchmarks.  I used
+<a href="https://bheisler.github.io/criterion.rs/book/index.html">criterion</a> for the
+feature set and being available on stable Rust.</p>
+<p>We already know parsing is our main care about.  What should we parse?  I
+generally like to see how my code scales over sample sizes since that
+highlights different performance problems.  Since we were mainly focusing on
+Cargo's resolver, I figured we'd want to focus on typical <code>Cargo.toml</code> files.
+For a small file, I selected the output of <code>cargo init</code>.  For a larger file, I
+chose Cargo's <code>Cargo.toml</code> file.</p>
+<p>I relied on the
+<a href="https://nnethercote.github.io/perf-book/profiling.html">performance book to help get started profiling</a>.
+I chose <code>callgrind</code> with <code>kcachegrind</code> as my visualizer because I had been
+meaning to try it out.</p>
+<p>I broke out some of my benchmarks as <code>examples/</code> for easy profiling.  Maybe there is a way around this with criterion, *shrug*.</p>
+<h3>The Downside to Format-Preserving</h3>
+<p>When parsing <code>key = 3.0e3  # hello!</code>, we need to break this down to:</p>
+<ul>
+<li>Key
+<ul>
+<li>The exact formatting used (e.g. <code>key</code> vs <code>&quot;key&quot;</code>)</li>
+<li>A format-agnostic version for lookups</li>
+<li>The trailing <code>&quot; &quot;</code></li>
+</ul>
+</li>
+<li>Value
+<ul>
+<li>The exact formatting used (e.g. <code>3.0e3</code> vs <code>3000.0</code>)</li>
+<li>A format-agnostic version for processing</li>
+<li>The leading <code>&quot; &quot;</code></li>
+<li>The trailing <code>&quot; # hello!&quot;</code></li>
+</ul>
+</li>
+</ul>
+<p>We also duplicate some of these for user convenience in working with the API.</p>
+<p>Compare this to <code>toml-rs</code> which only has to deal with <code>&quot;key&quot;</code> and <code>3.0e3</code>.</p>
+<p>This puts us at a severe disadvantage due to the number of allocations we make.
+Most keys are relatively short and people don't tend to use a lot of
+whitespace.  We can use a technique called small-string optimization which
+looks roughly like:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">enum </span><span style="color:#c0c5ce;">String {
+</span><span style="color:#c0c5ce;">    Inline([</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">; </span><span style="color:#d08770;">24</span><span style="color:#c0c5ce;">]),
+</span><span style="color:#c0c5ce;">    Normal(String),
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>This removes the need for allocations and we avoid an indirection to reference the allocation.</p>
+<p>I chose <a href="https://docs.rs/kstring"><code>kstring</code></a> over</p>
+<ul>
+<li><a href="https://docs.rs/smartstring"><code>smartstring</code></a> because we rarely need mutability and the assumptions it
+makes scares me from using it in anything but a top-level <code>[[bin]]</code></li>
+<li><a href="https://docs.rs/compact_str"><code>compact_str</code></a> didn't seem to have benchmarks last I looked</li>
+<li><a href="https://docs.rs/smol_str"><code>smol_str</code></a> last benchmarks I ran, it looked to be slower iirc</li>
+</ul>
+<p>By default, <code>kstring</code></p>
+<ul>
+<li>Inline strings store 15 bytes (16 bytes total with size)
+<ul>
+<li><code>max_inline</code> feature switches to storing 22-bytes (23 bytes total) which can be slower for smaller strings</li>
+</ul>
+</li>
+<li>Stores the heap string as <code>Box&lt;str&gt;</code>
+<ul>
+<li><code>arc</code> feature instead uses <code>Arc&lt;str&gt;</code> which replaces the cost of allocations with the cost of ref-counting.</li>
+</ul>
+</li>
+</ul>
+<p>When benchmarking different combinations, I found <code>max_inline</code> by itself gave
+the best results for our use cases.</p>
+<p>I replaced all strings with newtype wrapper around <code>KString</code> (so we could swap
+it out in the future) except the one in TOML values because</p>
+<ul>
+<li>Without munging up the grammar quite a bit, we need
+mutable strings to build up values or else we'd just be creating a <code>String</code>
+to convert it to a <code>KString</code>.</li>
+<li>Values are more in the user's face, so it felt more ergonomic to give them a familiar type.</li>
+<li>Allocations from values didn't seem to be too big of a deal in benchmarks</li>
+</ul>
+<p>In the end, this dropped our larger benchmark from 250us to 203us.</p>
+<p><em>See the <a href="https://github.com/ordian/toml_edit/pull/211">PR</a></em></p>
+<h3>The Price of Convenience with Parsers</h3>
+<p>Parser combinators, like <a href="https://docs.rs/nom">nom</a> or
+<a href="https://docs.rs/combine">combine</a>, make it easy to convert a
+<a href="https://github.com/toml-lang/toml/blob/master/toml.abnf">grammar</a> to code but
+can easily hide a lot of costs.</p>
+<h4>Unnecessary Allocations</h4>
+<p>The first is in allocations.  Say you want to parse a number, it could be easy to write</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">many0</span><span style="color:#c0c5ce;">(digit),
+</span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">: Vec&lt;</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt;| String::from_iter(c).</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(),
+</span><span style="color:#c0c5ce;">    )(input)
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>We are</p>
+<ul>
+<li>Allocating all <code>char</code>s into a <code>Vec</code></li>
+<li>Allocating a <code>String</code> from the <code>Vec&lt;char&gt;</code> for using <code>parse</code></li>
+</ul>
+<p>While this example is artificial, cases like this existed in <code>toml_edit</code> and I
+had to find them and replace them with operations like:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">many0_count</span><span style="color:#c0c5ce;">(digit)),
+</span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">| s.</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(),
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">    )(input)
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>This uses <code>many0_count</code> as a way of repeating a parser, without allocating, and
+then uses <code>recognize</code> to take the parsed region and turn it into a <code>&amp;str</code>.  No
+allocations!</p>
+<h4>Lack of Batching</h4>
+<p>Sometimes, you really do need that allocation, like parsing a string where you
+need to convert escape sequences (like <code>&quot;\t&quot;</code>) to their actual value.  For
+example, a (simplified) TOML grammar might look like:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_content</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, String&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">many0</span><span style="color:#c0c5ce;">(string_char),
+</span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">: Vec&lt;</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt;| String::from_iter(c),
+</span><span style="color:#c0c5ce;">    )(input)
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_char</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">alt</span><span style="color:#c0c5ce;">((
+</span><span style="color:#c0c5ce;">        string_unescaped,
+</span><span style="color:#c0c5ce;">        string_escaped,
+</span><span style="color:#c0c5ce;">    ))(input)
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_unescaped</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    ...
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_escaped</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    ...
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>Rather than adding a <code>char</code> at a time to a <code>String</code>, we can do it in batches,
+reducing the number of allocations and reducing the size of the hot loop:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_content</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, String&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">many0</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">            </span><span style="color:#96b5b4;">alt</span><span style="color:#c0c5ce;">((
+</span><span style="color:#c0c5ce;">                </span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">many1_count</span><span style="color:#c0c5ce;">(string_char)), |</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">| String::from(s)),
+</span><span style="color:#c0c5ce;">                </span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(escaped, |</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">| String::from(c))
+</span><span style="color:#c0c5ce;">            ))
+</span><span style="color:#c0c5ce;">        ),
+</span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">: Vec&lt;String&gt;| c.</span><span style="color:#96b5b4;">join</span><span style="color:#c0c5ce;">(&quot;&quot;),
+</span><span style="color:#c0c5ce;">    )(input)
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_unescaped</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    ...
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_escaped</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    ...
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>This optimizes the common case (characters) at the cost of an uncommon case
+(escape sequences).</p>
+<p>It looks like this dropped parse time by about 2%.  Not as much of a win as I was hoping.</p>
+<p><em>See a <a href="https://github.com/ordian/toml_edit/pull/209">PR</a></em></p>
+<h4>Bytes</h4>
+<p>Even though the parser receives a <code>&amp;str</code> and gives out a <code>&amp;str</code>, the inner loop
+needs to decode the bytes into <code>char</code> to process the grammar's tokens.  Let's
+see about bypassing that by parsing bytes instead of <code>char</code>.</p>
+<p>All the horror stories of people treating UTF-8 as bytes had me cautious about
+going down this route.  I first had to examine
+<a href="https://en.wikipedia.org/wiki/UTF-8#Encoding">UTF-8</a> to make sure we could
+distinguish ASCII grammar rules from a user's UTF-8 text.  Thankfully, the left
+most bit can ensures no ASCII byte can be mistaken for a later byte in a
+multi-byte character.  It also looks like the grammar will never have us split
+a multi-byte character, so we shouldn't corrupt already-valid UTF-8.</p>
+<p>Ensuring valid UTF-8 can be costly though.  By default, we'd use
+<code>std::from_utf8</code> to convert these bytes back to strings.  This will have to
+verify the string is valid UTF-8.  Can we bypass this?</p>
+<p>Most elements of TOML's gramamr are specify the exact characters supported
+like numbers and dates.  In these cases, we know the validation isn't required.</p>
+<p>So we can take</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">many0_count</span><span style="color:#c0c5ce;">(digit)),
+</span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">| s.</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(),
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">    )(input)
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>and speed it up by switching to:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">]) -&gt; IResult&lt;&amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">], </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">many0_count</span><span style="color:#c0c5ce;">(digit)),
+</span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">b</span><span style="color:#c0c5ce;">: &amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">]| {
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> s = </span><span style="color:#b48ead;">unsafe </span><span style="color:#c0c5ce;">{ </span><span style="color:#96b5b4;">from_utf8_unchecked</span><span style="color:#c0c5ce;">(b, &quot;</span><span style="color:#a3be8c;">`digit` filters out non-ASCII</span><span style="color:#c0c5ce;">&quot;) };
+</span><span style="color:#c0c5ce;">            s.</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(),
+</span><span style="color:#c0c5ce;">        }
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">    )(input)
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">pub</span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">crate</span><span style="color:#c0c5ce;">) </span><span style="color:#b48ead;">unsafe fn </span><span style="color:#8fa1b3;">from_utf8_unchecked</span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;b</span><span style="color:#c0c5ce;">&gt;(
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">bytes</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">&#39;b</span><span style="color:#c0c5ce;"> [</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">],
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">safety_justification</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">&#39;static str</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">) -&gt; &amp;</span><span style="color:#b48ead;">&#39;b str </span><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">cfg!(debug_assertions) {
+</span><span style="color:#c0c5ce;">        </span><span style="color:#65737e;">// Catch problems more quickly when testing
+</span><span style="color:#c0c5ce;">        std::str::from_utf8(bytes).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(safety_justification)
+</span><span style="color:#c0c5ce;">    } </span><span style="color:#b48ead;">else </span><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">        std::str::from_utf8_unchecked(bytes)
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>In switching to byte parsing, this still leaves us calling
+<code>std::str::from_utf8</code> for comments and quoted strings.  If we only allow
+end-users to pass in <code>&amp;str</code>, we know the original string was valid.  Our
+grammar <em>should</em> make sure we never split a multi-byte character.  We should
+be able to get away with <code>from_utf8_unchecked</code> everywhere.</p>
+<p>This seems iffy to me</p>
+<ul>
+<li>These <code>from_utf8_unchecked</code> calls would have a hidden dependence on the
+end-user API and we could add parsing of <code>&amp;[u8]</code> without knowing we need to
+update code or where all to update.</li>
+<li>They also have hidden dependence on the grammar and its correctness to ensure
+no multi-byte character is split.</li>
+</ul>
+<p>I checked in a profiler and <code>std::str::from_utf8</code> was only about 1% of the
+instruction count, so I decided it wasn't worth it at this time.</p>
+<p>This dropped our benchmarked parse times by 6-12%!</p>
+<p><em>See the <a href="https://github.com/ordian/toml_edit/pull/219">PR</a></em></p>
+<h4>The Cost of a Good Error</h4>
+<p>While all of my examples have been using <code>nom</code>, <code>toml_edit</code> actually uses
+<code>combine</code> (I'm just more familiar with <code>nom</code> and prefer the API).</p>
+<p>One feature of <code>combine</code> is built-in support for creating great errors.  For example, when parsing a TOML value, the code might look like</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#65737e;">// val = string / boolean / array / inline-table / date-time / float / integer
+</span><span style="color:#c0c5ce;">parse!(</span><span style="color:#96b5b4;">value</span><span style="color:#c0c5ce;">() -&gt; v::Value, {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">recognize_with_value</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">choice</span><span style="color:#c0c5ce;">((
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">string</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">|
+</span><span style="color:#c0c5ce;">                v::Value::String(Formatted::new(
+</span><span style="color:#c0c5ce;">                    s,
+</span><span style="color:#c0c5ce;">                ))
+</span><span style="color:#c0c5ce;">            ),
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">boolean</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">array</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::Array),
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">inline_table</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::InlineTable),
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">date_time</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">float</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">integer</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">    ))).</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(|(</span><span style="color:#bf616a;">raw</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">value</span><span style="color:#c0c5ce;">)| </span><span style="color:#96b5b4;">apply_raw</span><span style="color:#c0c5ce;">(value, raw))
+</span><span style="color:#c0c5ce;">});
+</span></pre>
+<p>Say you have a syntax error, like</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">key = invalid-value
+</span></pre>
+<p><code>combine</code> will check each <code>choice</code> and merge the errors.  It gives preference
+to the error that occurs earliest in the string and combines errors that happen
+at the same point.  For <code>invalid-value</code>, every value-type parser will fail at
+the <code>i</code> and the error will list out what character is instead expected from
+each type being parsed.</p>
+<p>The problem with this is logic for your error case is now costing you even when no
+user-facing errors happen as it falls through of the different
+<code>choice</code>s.  <code>callgrind</code> said that <code>Errors::merge</code> was costing around 12% of
+our total instruction count!</p>
+<p>Our options around this were:</p>
+<ul>
+<li>Dropping <code>combine</code>, whether to use <code>nom</code> or to hand-write a parser</li>
+<li>Implementing our own error handling for <code>combine</code>, tweaking the errors until they are good enough</li>
+<li>Use a little documented macro <code>dispatch!</code> that acts more like a <code>match</code>
+statement than a series of <code>if-else</code>s, speeding up our initial choice and
+removing the merging of errors, at the risk of negatively impacting our
+errors and requiring duplicating logic from a grammar rule in its caller.</li>
+</ul>
+<p>A holistic solution like dropping <code>combine</code> or changing the error handling
+would offer the most performance (hitting every case) while <code>dispatch!</code> would
+require playing whack-a-mole and could easily regress in the future.</p>
+<p>With that said, I went ahead with <code>dispatch!</code> because it was quick to try:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#65737e;">// val = string / boolean / array / inline-table / date-time / float / integer
+</span><span style="color:#c0c5ce;">parse!(</span><span style="color:#96b5b4;">value</span><span style="color:#c0c5ce;">() -&gt; v::Value, {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">recognize_with_value</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">look_ahead</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">any</span><span style="color:#c0c5ce;">()).</span><span style="color:#96b5b4;">then</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">e</span><span style="color:#c0c5ce;">| {
+</span><span style="color:#c0c5ce;">        dispatch!(e;
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">crate</span><span style="color:#c0c5ce;">::parser::strings::</span><span style="color:#d08770;">QUOTATION_MARK </span><span style="color:#c0c5ce;">|
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">crate</span><span style="color:#c0c5ce;">::parser::strings::</span><span style="color:#d08770;">APOSTROPHE </span><span style="color:#c0c5ce;">=&gt; </span><span style="color:#96b5b4;">string</span><span style="color:#c0c5ce;">().</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">| {
+</span><span style="color:#c0c5ce;">                v::Value::String(Formatted::new(
+</span><span style="color:#c0c5ce;">                    s,
+</span><span style="color:#c0c5ce;">                ))
+</span><span style="color:#c0c5ce;">            }),
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">crate</span><span style="color:#c0c5ce;">::parser::array::</span><span style="color:#d08770;">ARRAY_OPEN </span><span style="color:#c0c5ce;">=&gt; </span><span style="color:#96b5b4;">array</span><span style="color:#c0c5ce;">().</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::Array),
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">crate</span><span style="color:#c0c5ce;">::parser::inline_table::</span><span style="color:#d08770;">INLINE_TABLE_OPEN </span><span style="color:#c0c5ce;">=&gt; </span><span style="color:#96b5b4;">inline_table</span><span style="color:#c0c5ce;">().</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::InlineTable),
+</span><span style="color:#c0c5ce;">            </span><span style="color:#65737e;">// Uncommon enough not to be worth optimizing at this time
+</span><span style="color:#c0c5ce;">            _ =&gt; </span><span style="color:#96b5b4;">choice</span><span style="color:#c0c5ce;">((
+</span><span style="color:#c0c5ce;">                </span><span style="color:#96b5b4;">boolean</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">                    .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">                </span><span style="color:#96b5b4;">date_time</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">                    .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">                </span><span style="color:#96b5b4;">float</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">                    .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">                </span><span style="color:#96b5b4;">integer</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">                    .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
+</span><span style="color:#c0c5ce;">            )),
+</span><span style="color:#c0c5ce;">        )
+</span><span style="color:#c0c5ce;">    })).</span><span style="color:#96b5b4;">and_then</span><span style="color:#c0c5ce;">(|(</span><span style="color:#bf616a;">raw</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">value</span><span style="color:#c0c5ce;">)| </span><span style="color:#96b5b4;">apply_raw</span><span style="color:#c0c5ce;">(value, raw))
+</span><span style="color:#c0c5ce;">});
+</span></pre>
+<p>Sprinkling a few <code>dispatch!</code>s through the code took our larger benchmark case
+from 182us to 160us!</p>
+<p><em>See the <a href="https://github.com/ordian/toml_edit/pull/222">PR</a></em></p>
+<h3>Hidden Costs in <code>serde</code></h3>
+<p>While <code>toml_edit</code>s performance was now fairly close, Cargo will most care about
+the parts that are a drop-in replacement for <code>toml-rs</code> and <code>toml_edit::easy</code>
+was 3x slower than both <code>toml-rs</code> and <code>toml_edit</code>!</p>
+<p>Like <code>toml-rs</code>, the layer above <code>toml_edit::Document</code> is a <code>serde</code> API followed by a <code>Value</code> type.</p>
+<h4>Deserialization Ambiguity</h4>
+<p>When profiling <code>toml_edit::easy</code>, <code>toml_edit::Datetime</code> was showing up despite the sample code not using it!<br />
+When I first wrote <code>toml_edit::easy::de</code>, I serialized <code>toml_edit::Datetime</code> as
+a string.  This requires serde to parse each string, to see if it might be a
+date.  Files without a <code>Datetime</code> must pay the price for it existing.  On top
+of that, we might misinterpret a user's string as a <code>Datetime</code>.</p>
+<p>I decided to copy <code>toml-rs</code> and deserialize using a proprietary format sort-of like:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">DatetimeSerde {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">field</span><span style="color:#c0c5ce;">: String,
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>This cut our parse time from 602us to 484us!</p>
+<p><em>See the <a href="https://github.com/ordian/toml_edit/pull/226">PR</a></em></p>
+<h4>Untagged Enums</h4>
+<p>When profiling, a lot of the remaining time was in error reporting, including
+formatting of errors and allocations, particularly for <code>Value</code>.  This was
+strange, because no user-facing errors were occurring.  Deja vu.</p>
+<p>I decided to inspect the code that <code>#[derive(serde::Deserialize)]</code> was generating with <code>cargo expand</code>:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">automatically_derived</span><span style="color:#c0c5ce;">]
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; _serde::Deserialize&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Value {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">deserialize</span><span style="color:#c0c5ce;">&lt;__D&gt;(</span><span style="color:#bf616a;">__deserializer</span><span style="color:#c0c5ce;">: __D)
+</span><span style="color:#c0c5ce;">     -&gt; _serde::__private::Result&lt;</span><span style="color:#b48ead;">Self</span><span style="color:#c0c5ce;">, __D::Error&gt; </span><span style="color:#b48ead;">where
+</span><span style="color:#c0c5ce;">     __D: _serde::Deserializer&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> __content =
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">match </span><span style="color:#c0c5ce;">&lt;_serde::__private::de::Content as
+</span><span style="color:#c0c5ce;">                      _serde::Deserialize&gt;::deserialize(__deserializer)
+</span><span style="color:#c0c5ce;">                {
+</span><span style="color:#c0c5ce;">                _serde::__private::Ok(__val) =&gt; __val,
+</span><span style="color:#c0c5ce;">                _serde::__private::Err(__err) =&gt; {
+</span><span style="color:#c0c5ce;">                    </span><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">_serde::__private::Err(__err);
+</span><span style="color:#c0c5ce;">                }
+</span><span style="color:#c0c5ce;">            };
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">if let </span><span style="color:#c0c5ce;">_serde::__private::Ok(__ok) =
+</span><span style="color:#c0c5ce;">               _serde::__private::Result::map(&lt;</span><span style="color:#b48ead;">i64 </span><span style="color:#c0c5ce;">as
+</span><span style="color:#c0c5ce;">                                                  _serde::Deserialize&gt;::deserialize(_serde::__private::de::ContentRefDeserializer::&lt;__D::Error&gt;::new(&amp;__content)),
+</span><span style="color:#c0c5ce;">                                              Value::Integer)
+</span><span style="color:#c0c5ce;">           {
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">_serde::__private::Ok(__ok);
+</span><span style="color:#c0c5ce;">        }
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">if let </span><span style="color:#c0c5ce;">_serde::__private::Ok(__ok) =
+</span><span style="color:#c0c5ce;">               _serde::__private::Result::map(&lt;</span><span style="color:#b48ead;">f64 </span><span style="color:#c0c5ce;">as
+</span><span style="color:#c0c5ce;">                                                  _serde::Deserialize&gt;::deserialize(_serde::__private::de::ContentRefDeserializer::&lt;__D::Error&gt;::new(&amp;__content)),
+</span><span style="color:#c0c5ce;">                                              Value::Float) {
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">_serde::__private::Ok(__ok);
+</span><span style="color:#c0c5ce;">        }
+</span><span style="color:#c0c5ce;">	</span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">if let </span><span style="color:#c0c5ce;">_serde::__private::Ok(__ok) =
+</span><span style="color:#c0c5ce;">               _serde::__private::Result::map(&lt;Table as
+</span><span style="color:#c0c5ce;">                                                  _serde::Deserialize&gt;::deserialize(_serde::__private::de::ContentRefDeserializer::&lt;__D::Error&gt;::new(&amp;__content)),
+</span><span style="color:#c0c5ce;">                                              Value::Table) {
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">_serde::__private::Ok(__ok);
+</span><span style="color:#c0c5ce;">        }
+</span><span style="color:#c0c5ce;">        _serde::__private::Err(_serde::de::Error::custom(&quot;</span><span style="color:#a3be8c;">data did not match any variant of untagged enum Value</span><span style="color:#c0c5ce;">&quot;))
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>It is trying to deserialize each variant of the <code>enum</code> one after the other.
+Most values are <code>String</code>, <code>Table</code>, and <code>Array</code>, so it has to try <code>Integer</code>,
+<code>Float</code>, <code>Boolean</code>, and <code>Datetime</code> first.  For each error, it calls:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cold</span><span style="color:#c0c5ce;">]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">invalid_type</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">unexp</span><span style="color:#c0c5ce;">: Unexpected, </span><span style="color:#bf616a;">exp</span><span style="color:#c0c5ce;">: &amp;Expected) -&gt; </span><span style="color:#b48ead;">Self </span><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">    Error::custom(format_args!(&quot;</span><span style="color:#a3be8c;">invalid type: {}, expected {}</span><span style="color:#c0c5ce;">&quot;, unexp, exp))
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>Since nearly every variant has a unique type, we can use serde's data model to dispatch for us:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">impl</span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; serde::de::Deserialize&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Value {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">deserialize</span><span style="color:#c0c5ce;">&lt;D&gt;(</span><span style="color:#bf616a;">deserializer</span><span style="color:#c0c5ce;">: D) -&gt; Result&lt;Value, </span><span style="color:#b48ead;">D::</span><span style="color:#c0c5ce;">Error&gt;
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">where
+</span><span style="color:#c0c5ce;">        D: serde::de::Deserializer&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt;,
+</span><span style="color:#c0c5ce;">    {
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">ValueVisitor;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">impl</span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; serde::de::Visitor&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">ValueVisitor {
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">type </span><span style="color:#c0c5ce;">Value = Value;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">expecting</span><span style="color:#c0c5ce;">(&amp;</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">formatter</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">mut </span><span style="color:#c0c5ce;">std::fmt::Formatter&lt;&#39;_&gt;) -&gt; std::fmt::Result {
+</span><span style="color:#c0c5ce;">                formatter.</span><span style="color:#96b5b4;">write_str</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">any valid TOML value</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">visit_bool</span><span style="color:#c0c5ce;">&lt;E&gt;(</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">value</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">) -&gt; Result&lt;Value, E&gt; {
+</span><span style="color:#c0c5ce;">                Ok(Value::Boolean(value))
+</span><span style="color:#c0c5ce;">            }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">visit_i64</span><span style="color:#c0c5ce;">&lt;E&gt;(</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">value</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">i64</span><span style="color:#c0c5ce;">) -&gt; Result&lt;Value, E&gt; {
+</span><span style="color:#c0c5ce;">                Ok(Value::Integer(value))
+</span><span style="color:#c0c5ce;">            }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">            </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">        }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">        deserializer.</span><span style="color:#96b5b4;">deserialize_any</span><span style="color:#c0c5ce;">(ValueVisitor)
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>I feel like this happens enough, it'd be nice if <code>serde</code> offered an attribute
+that let you tell it what type to deserialize as so it has smaller <code>if-else</code>
+ladders</p>
+<p>This dropped our benchmark from 484us to 181us!</p>
+<p><em>See the <a href="https://github.com/ordian/toml_edit/pull/227">PR</a></em></p>
+<h3>What Failed?</h3>
+<p>Not all fixes are successful.  Unfortunately, failed attempts are usually not
+as well documented because they might not make it to being documented in a PR.</p>
+<p>Some that I remember:</p>
+<ul>
+<li>I already covered the Batching which had smaller gains than I had hoped.</li>
+<li>I tried a couple more ideas to further optimize <code>KString</code>, but they instead slowed it down.</li>
+<li>I did attempt a <code>nom</code> port but decided the code illegibility wasn't worth it,
+though I am <a href="https://github.com/Geal/nom/issues/1408">working to improve that</a></li>
+</ul>
+<h3>Re-cap of the Results</h3>
+<p><strong>Before:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>8.7us</td><td>271us</td></tr>
+<tr><td>toml_edit::easy</td><td>20.7us</td><td>634us</td></tr>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+<p><strong>After:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>4.0us</td><td>149us</td></tr>
+<tr><td>toml_edit::easy</td><td>5.0us</td><td>179us</td></tr>
+</tbody></table>
+<p><strong>Target:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+<h3>Where We Are At</h3>
+<p>Unfortunately, for practical <code>Cargo.toml</code> files, we are still noticeably slower
+in parsing.  Rather than invest a lot of time for small potential gains and risk
+complicating the code, I figure its time to shift focus to <code>toml_edit</code>s impact on
+<a href="https://github.com/rust-lang/cargo/issues/9935">a resolver benchmark</a> and
+evaluating where we an go from there.  Thanks to Eric Huss for their work on
+this benchmark!  Perfect timing!</p>
+<p>Thankfully, by having such a specific use case, we can explore a wider range of
+options if <code>toml_edit</code> does end up having a noticeable impact.  One route I've
+taken in other projects is looking to make up for the losses elsewhere in the
+process.  I think Cargo has an even better option available, bypass TOML
+parsing completely.  Most dependencies being walked, will be in crates.io
+packages, which are immutable.  We could convert their <code>Cargo.toml</code> files into
+a more optimizable format, giving gains well past what we'd get with any toml
+library.  That seems like a lot of work, so hopefully we won't need it.</p>
+<p><em>Thanks to Futurewei for sponsoring this work</em></p>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2021</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>

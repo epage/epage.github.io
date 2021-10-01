@@ -25,8 +25,39 @@
   <div>
     
     <div>
+      <h2><a href="/blog/2021/09/optimizing-toml-edit/">A Journey in Optimizing `toml_edit`</a></h2>
+      <p><h2>tl;dr</h2>
+<p><a href="https://docs.rs/toml_edit"><code>toml_edit</code></a> is a format preserving TOML crate,
+allowing users to modify <code>.toml</code> files.</p>
+<p><strong>Before:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>8.7us</td><td>271us</td></tr>
+<tr><td>toml_edit::easy</td><td>20.7us</td><td>634us</td></tr>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+<p><strong>After:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>4.0us</td><td>149us</td></tr>
+<tr><td>toml_edit::easy</td><td>5.0us</td><td>179us</td></tr>
+</tbody></table>
+<p><strong>Target:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+</p>
+      <h4><i class="fa fa-tags"></i> programming, oss, rust</h4>
+      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;30&nbsp;Sep&nbsp;'21</time>
+    </div>
+    
+    <div>
       <h2><a href="/blog/2021/09/learning-rust/">Learnability of Rust</a></h2>
       <p><h2>tl;dr</h2>
+<p>As part of improving the learnability of Rust, I propose:</p>
+<ul>
+<li>The <code>.crs</code> file subset of <a href="https://github.com/DanielKeep/cargo-script">cargo-script</a> be brought into <code>cargo</code></li>
+<li>We support converting <code>.crs</code> to full cargo projects with <code>cargo init --from &lt;script&gt;.crs</code></li>
+<li>We collaborate on an ergonomics-focused standard-library-alternative, like <a href="https://docs.rs/eztd">eztd</a></li>
+</ul>
 </p>
       <h4><i class="fa fa-tags"></i> programming, oss, rust</h4>
       <i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;15&nbsp;Sep&nbsp;'21</time>
@@ -39,6 +70,9 @@
 a port of C++ <code>transrangers</code> to Rust with a <a href="https://github.com/joaquintides/transrangers/blob/master/rust.md">follow up
 post</a> from
 the author of <code>transrangers</code>.</p>
+<p>Seeing the performance numbers, I was curious what the experience was like with
+the different techniques compared in the followup and how the performance
+worked out in a real world application.</p>
 </p>
       <h4><i class="fa fa-tags"></i> programming, rust</h4>
       <i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;07&nbsp;Jul&nbsp;'21</time>
@@ -47,6 +81,7 @@ the author of <code>transrangers</code>.</p>
     <div>
       <h2><a href="/blog/2020/03/liquid-v20/">Liquid v0.20</a></h2>
       <p><p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
+<p><em><a href="https://docs.rs/liquid"><code>liquid-rust</code></a> is a rust re-implementation of the <a href="https://shopify.github.io/liquid/">liquid</a> template engine made popular by the <a href="https://jekyllrb.com">jekyll</a> static site generator.</em></p>
 </p>
       <h4><i class="fa fa-tags"></i> programming, oss</h4>
       <i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;16&nbsp;Mar&nbsp;'20</time>

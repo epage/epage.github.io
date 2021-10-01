@@ -1,10 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Learnability of Rust</title><link>https://epage.github.io/blog/2021/09/learning-rust/</link><description><![CDATA[<h2>tl;dr</h2>
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>A Journey in Optimizing `toml_edit`</title><link>https://epage.github.io/blog/2021/09/optimizing-toml-edit/</link><description><![CDATA[<h2>tl;dr</h2>
+<p><a href="https://docs.rs/toml_edit"><code>toml_edit</code></a> is a format preserving TOML crate,
+allowing users to modify <code>.toml</code> files.</p>
+<p><strong>Before:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>8.7us</td><td>271us</td></tr>
+<tr><td>toml_edit::easy</td><td>20.7us</td><td>634us</td></tr>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+<p><strong>After:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml_edit</td><td>4.0us</td><td>149us</td></tr>
+<tr><td>toml_edit::easy</td><td>5.0us</td><td>179us</td></tr>
+</tbody></table>
+<p><strong>Target:</strong></p>
+<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
+<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
+</tbody></table>
+]]></description><guid>https://epage.github.io/blog/2021/09/optimizing-toml-edit/</guid><pubDate>Thu, 30 Sep 2021 09:00:30 -0500</pubDate></item><item><title>Learnability of Rust</title><link>https://epage.github.io/blog/2021/09/learning-rust/</link><description><![CDATA[<h2>tl;dr</h2>
+<p>As part of improving the learnability of Rust, I propose:</p>
+<ul>
+<li>The <code>.crs</code> file subset of <a href="https://github.com/DanielKeep/cargo-script">cargo-script</a> be brought into <code>cargo</code></li>
+<li>We support converting <code>.crs</code> to full cargo projects with <code>cargo init --from &lt;script&gt;.crs</code></li>
+<li>We collaborate on an ergonomics-focused standard-library-alternative, like <a href="https://docs.rs/eztd">eztd</a></li>
+</ul>
 ]]></description><guid>https://epage.github.io/blog/2021/09/learning-rust/</guid><pubDate>Wed, 15 Sep 2021 09:00:30 -0500</pubDate></item><item><title>Experiments with `pushgen`</title><link>https://epage.github.io/blog/2021/07/pushgen-experiment/</link><description><![CDATA[<p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
 <code>pushgen</code></a>,
 a port of C++ <code>transrangers</code> to Rust with a <a href="https://github.com/joaquintides/transrangers/blob/master/rust.md">follow up
 post</a> from
 the author of <code>transrangers</code>.</p>
+<p>Seeing the performance numbers, I was curious what the experience was like with
+the different techniques compared in the followup and how the performance
+worked out in a real world application.</p>
 ]]></description><guid>https://epage.github.io/blog/2021/07/pushgen-experiment/</guid><pubDate>Wed, 07 Jul 2021 09:00:30 -0500</pubDate></item><item><title>Liquid v0.20</title><link>https://epage.github.io/blog/2020/03/liquid-v20/</link><description><![CDATA[<p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
+<p><em><a href="https://docs.rs/liquid"><code>liquid-rust</code></a> is a rust re-implementation of the <a href="https://shopify.github.io/liquid/">liquid</a> template engine made popular by the <a href="https://jekyllrb.com">jekyll</a> static site generator.</em></p>
 ]]></description><guid>https://epage.github.io/blog/2020/03/liquid-v20/</guid><pubDate>Mon, 16 Mar 2020 09:00:30 -0500</pubDate></item><item><title>Reflecting on Errors in 2019</title><link>https://epage.github.io/blog/2019/11/reflecting-on-errors-in-2019/</link><description><![CDATA[<p>With people reflecting on Rust in 2019 and what they want to see in 2020, error handling has come up again:</p>
 <ul>
 <li><a href="https://www.ncameron.org/blog/rust-in-2020-one-more-thing/">Rust in 2020, one more thing</a></li>
