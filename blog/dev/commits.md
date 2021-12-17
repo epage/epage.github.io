@@ -19,9 +19,7 @@ Git offers tools to create a clean history upfront or to fix it up later.
 
 ## Why keep a clean history
 
-<center>
 [![History decays with time](https://imgs.xkcd.com/comics/git_commit.png)](https://xkcd.com/1296/0)
-</center>
 
 - Make it easy for someone to scan the history, parsing it for what they need.
 - Help future developers know the design assumptions rather than them rediscovering them in a costly way.
