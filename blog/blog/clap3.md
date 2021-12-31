@@ -24,6 +24,8 @@ Thanks to:
 - Embark, Sentry, repi, and many other sponsors
 - My employer, Futurewei, for giving me the opportunity to help wrap up clap 3.0
 
+<!-- more -->
+
 For users who helped us through testing, see our
 [release-candidate changelog](https://github.com/clap-rs/clap/discussions/3110)
 and
