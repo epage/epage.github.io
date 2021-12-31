@@ -1,4 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap 3.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2021/12/clap3/</link><description><![CDATA[<p>I figured a great way to close out the year 2021 is to wrap up the long awaited
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clap 3.0, a Rust CLI argument parser</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>clap 3.0, a Rust CLI argument parser</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;30&nbsp;Dec&nbsp;'21</time></li>
+              <li><i class="fa fa-tags"></i> programming, rust</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <p>I figured a great way to close out the year 2021 is to wrap up the long awaited
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md#300-2021-12-31">clap 3.0 release</a>!</p>
 <p>Some major milestones along the way:</p>
 <ul>
@@ -196,61 +226,35 @@ conventions</a> or allowing
 of tools rather than a framework.  Moving more of the <a href="https://github.com/clap-rs/clap/issues/3008">validation logic out of
 clap</a> will also be a step in that
 direction.</p>
-]]></description><guid>https://epage.github.io/blog/2021/12/clap3/</guid><pubDate>Thu, 30 Dec 2021 09:00:30 -0500</pubDate></item><item><title>A Journey in Optimizing `toml_edit`</title><link>https://epage.github.io/blog/2021/09/optimizing-toml-edit/</link><description><![CDATA[<h2>tl;dr</h2>
-<p><a href="https://docs.rs/toml_edit"><code>toml_edit</code></a> is a format preserving TOML crate,
-allowing users to modify <code>.toml</code> files.</p>
-<p><strong>Before:</strong></p>
-<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
-<tr><td>toml_edit</td><td>8.7us</td><td>271us</td></tr>
-<tr><td>toml_edit::easy</td><td>20.7us</td><td>634us</td></tr>
-</tbody></table>
-<p><strong>After:</strong></p>
-<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
-<tr><td>toml_edit</td><td>4.0us</td><td>149us</td></tr>
-<tr><td>toml_edit::easy</td><td>5.0us</td><td>179us</td></tr>
-</tbody></table>
-<p><strong>Target:</strong></p>
-<table><thead><tr><th></th><th><code>cargo init</code> Cargo.toml</th><th>cargo's Cargo.toml</th></tr></thead><tbody>
-<tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
-</tbody></table>
-]]></description><guid>https://epage.github.io/blog/2021/09/optimizing-toml-edit/</guid><pubDate>Thu, 30 Sep 2021 09:00:30 -0500</pubDate></item><item><title>Learnability of Rust</title><link>https://epage.github.io/blog/2021/09/learning-rust/</link><description><![CDATA[<h2>tl;dr</h2>
-<p>As part of improving the learnability of Rust, I propose:</p>
-<ul>
-<li>The <code>.crs</code> file subset of <a href="https://github.com/DanielKeep/cargo-script">cargo-script</a> be brought into <code>cargo</code></li>
-<li>We support converting <code>.crs</code> to full cargo projects with <code>cargo init --from &lt;script&gt;.crs</code></li>
-<li>We collaborate on an ergonomics-focused standard-library-alternative, like <a href="https://docs.rs/eztd">eztd</a></li>
-</ul>
-]]></description><guid>https://epage.github.io/blog/2021/09/learning-rust/</guid><pubDate>Wed, 15 Sep 2021 09:00:30 -0500</pubDate></item><item><title>Experiments with `pushgen`</title><link>https://epage.github.io/blog/2021/07/pushgen-experiment/</link><description><![CDATA[<p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
-<code>pushgen</code></a>,
-a port of C++ <code>transrangers</code> to Rust with a <a href="https://github.com/joaquintides/transrangers/blob/master/rust.md">follow up
-post</a> from
-the author of <code>transrangers</code>.</p>
-<p>Seeing the performance numbers, I was curious what the experience was like with
-the different techniques compared in the followup and how the performance
-worked out in a real world application.</p>
-]]></description><guid>https://epage.github.io/blog/2021/07/pushgen-experiment/</guid><pubDate>Wed, 07 Jul 2021 09:00:30 -0500</pubDate></item><item><title>Liquid v0.20</title><link>https://epage.github.io/blog/2020/03/liquid-v20/</link><description><![CDATA[<p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
-<p><em><a href="https://docs.rs/liquid"><code>liquid-rust</code></a> is a rust re-implementation of the <a href="https://shopify.github.io/liquid/">liquid</a> template engine made popular by the <a href="https://jekyllrb.com">jekyll</a> static site generator.</em></p>
-]]></description><guid>https://epage.github.io/blog/2020/03/liquid-v20/</guid><pubDate>Mon, 16 Mar 2020 09:00:30 -0500</pubDate></item><item><title>Reflecting on Errors in 2019</title><link>https://epage.github.io/blog/2019/11/reflecting-on-errors-in-2019/</link><description><![CDATA[<p>With people reflecting on Rust in 2019 and what they want to see in 2020, error handling has come up again:</p>
-<ul>
-<li><a href="https://www.ncameron.org/blog/rust-in-2020-one-more-thing/">Rust in 2020, one more thing</a></li>
-<li><a href="https://lukaskalbertodt.github.io/2019/11/14/thoughts-on-error-handling-in-rust.html">Thoughts on Error Handling in Rust</a></li>
-<li><a href="https://blog.yoshuawuyts.com/error-handling-survey/">Error Handling Survey</a></li>
-</ul>
-]]></description><guid>https://epage.github.io/blog/2019/11/reflecting-on-errors-in-2019/</guid><pubDate>Tue, 26 Nov 2019 19:09:27 +0000</pubDate></item><item><title>Speeding Up Rust Builds: Code-Gen Edition</title><link>https://epage.github.io/blog/2019/10/speeding-up-rust-builds-code-gen-edition/</link><description><![CDATA[<p><em>tl;dr Cache your code-gen results with the <a href="https://crates.io/crates/codegenrs"><code>codegenrs</code> crate</a>.</em></p>
-]]></description><guid>https://epage.github.io/blog/2019/10/speeding-up-rust-builds-code-gen-edition/</guid><pubDate>Thu, 10 Oct 2019 03:30:17 +0000</pubDate></item><item><title>RustFest Parist Trip Report</title><link>https://epage.github.io/blog/2018/06/rustfest-2018/</link><description><![CDATA[<p>I've been involved in the Rust community for about a year and a half now.  What
-attracted me to Rust is that is looks like the first viable replacement for
-C++.  It offers similar (actually better) protections than GCed languages and
-the full language is available in any environment, including exception-like
-error handling in the Windows kernel.</p>
-]]></description><guid>https://epage.github.io/blog/2018/06/rustfest-2018/</guid><pubDate>Mon, 04 Jun 2018 09:00:30 -0500</pubDate></item><item><title>PyCon 2018 Trip Report</title><link>https://epage.github.io/blog/2018/05/pycon-2018/</link><description><![CDATA[<p>I went to with a coworker to <a href="https://us.pycon.org/2018/">PyCon</a> this year (<a href="https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos">videos</a>).</p>
-]]></description><guid>https://epage.github.io/blog/2018/05/pycon-2018/</guid><pubDate>Fri, 18 May 2018 09:00:30 -0500</pubDate></item><item><title>Redefining Failure</title><link>https://epage.github.io/blog/2018/03/redefining-failure/</link><description><![CDATA[<p>I recently got the chance to redo the error handling in two different crates I
-help maintain. For <a href="https://github.com/cobalt-org/liquid-rust"><code>liquid</code></a>, I decided to write the error types by
-hand rather than use something like <a href="https://crates.io/crates/error-chain"><code>error-chain</code></a>. In the case
-of <a href="https://github.com/assert-rs/assert_cli"><code>assert_cli</code></a>, I decided to finally give <a href="https://github.com/withoutboats/failure"><code>failure</code></a> a
-try.</p>
-]]></description><guid>https://epage.github.io/blog/2018/03/redefining-failure/</guid><pubDate>Fri, 09 Mar 2018 03:08:23 +0000</pubDate></item><item><title>Crate Management for #rust2018</title><link>https://epage.github.io/blog/2018/01/crate-management/</link><description><![CDATA[<p><em>Context: <a href="https://blog.rust-lang.org/2018/01/03/new-years-rust-a-call-for-community-blogposts.html">Call for Community Posts</a> and <a href="http://readrust.net/rust2018/">other posts</a></em></p>
-]]></description><guid>https://epage.github.io/blog/2018/01/crate-management/</guid><pubDate>Fri, 26 Jan 2018 04:20:00 +0000</pubDate></item><item><title>Blog Transition</title><link>https://epage.github.io/blog/2018/01/blog-transition/</link><description><![CDATA[<p>I'll post relevant items from my old blog.  If you'd like to see all the old posts, go to <a href="eopage.blogspot.com">eopage.blogspot.com</a></p>
-]]></description><guid>https://epage.github.io/blog/2018/01/blog-transition/</guid><pubDate>Wed, 17 Jan 2018 09:00:30 -0500</pubDate></item><item><title>Off To A Shaky Start - LASIK and Nystagmus</title><link>https://epage.github.io/blog/2017/01/shaky-start/</link><description><![CDATA[My personal experience treating nystagmus
-]]></description><guid>https://epage.github.io/blog/2017/01/shaky-start/</guid><pubDate>Mon, 30 Jan 2017 17:23:30 -0500</pubDate></item><item><title>The Lone Star Hiking Trail</title><link>https://epage.github.io/blog/2014/12/lone-star-hiking/</link><description><![CDATA[Trip/equipment report for the Long Star Hiking Trail
-]]></description><guid>https://epage.github.io/blog/2014/12/lone-star-hiking/</guid><pubDate>Wed, 03 Dec 2014 22:27:30 -0500</pubDate></item><item><title>On Top of Utah - Hiking to Kings Peak</title><link>https://epage.github.io/blog/2013/08/kings-peak/</link><description><![CDATA[Trip/equipment report for Kings Peak in Utah
-]]></description><guid>https://epage.github.io/blog/2013/08/kings-peak/</guid><pubDate>Sat, 17 Aug 2013 14:46:30 -0500</pubDate></item></channel></rss>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2021</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>
