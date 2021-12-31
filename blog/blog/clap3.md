@@ -36,6 +36,7 @@ and
 Ported
 - [clap-cargp](https://crates.io/crates/clap-cargo)
 - [clap-verbosity-flag](https://crates.io/crates/clap-verbosity-flag)
+- [concolor-clap](https://crates.io/crates/concolor-clap)
 - [argparse-benchmarks-rs](https://github.com/rust-cli/argparse-benchmarks-rs)
 
 Remaining:
