@@ -88,7 +88,7 @@ have unit tests.  The one additional piece I think is needed is turning a
 code becomes maintained code.
 
 *(Note: cargo-script isn't maintained anymore, there are a variety of
-replacements, like [cargo-eval](https://github.com/reitermarkus/cargo-eval)).*
+replacements, like [cargo-eval](https://github.com/reitermarkus/cargo-eval) or [cargo-play](https://github.com/fanzeyi/cargo-play)).*
 
 This helps us with **exploratory programming** by being able to quickly write
 throw-away code.  I know `cargo-script` also has expression evaluation but I do
