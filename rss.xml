@@ -1,4 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap 3.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2021/12/clap3/</link><description><![CDATA[<p>I figured a great way to close out the year 2021 is to wrap up the long awaited
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Minor Semver Issue</title><link>https://epage.github.io/blog/2022/02/minor-semver-issue/</link><description><![CDATA[<p>Is adding a function in a patch release a violation of
+<a href="https://semver.org/">semver</a>?  Technically, yes but technical answers aren't
+always the right answers.</p>
+<p>This came up in a recent discussion focused on the
+relevant importance of setting the minimum patch version for a dependency.
+Some crates go so far as to never bump their minor version, like
+<a href="https://crates.io/crates/serde/versions">serde</a>.</p>
+]]></description><guid>https://epage.github.io/blog/2022/02/minor-semver-issue/</guid><pubDate>Fri, 04 Feb 2022 15:37:29 +0000</pubDate></item><item><title>clap 3.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2021/12/clap3/</link><description><![CDATA[<p>I figured a great way to close out the year 2021 is to wrap up the long awaited
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md#300-2021-12-31">clap 3.0 release</a>!</p>
 <p>Some major milestones along the way:</p>
 <ul>

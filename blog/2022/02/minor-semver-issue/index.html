@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minor Semver Issue</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>Minor Semver Issue</h2>
+          </div>
+          <div class="navbar-right">
+            <ul class="list-unstyled">
+              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;04&nbsp;Feb&nbsp;'22</time></li>
+              <li><i class="fa fa-tags"></i> programming, rust</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <article>
+        <p>Is adding a function in a patch release a violation of
+<a href="https://semver.org/">semver</a>?  Technically, yes but technical answers aren't
+always the right answers.</p>
+<p>This came up in a recent discussion focused on the
+relevant importance of setting the minimum patch version for a dependency.
+Some crates go so far as to never bump their minor version, like
+<a href="https://crates.io/crates/serde/versions">serde</a>.</p>
+<!-- more -->
+<p>Let's go to the semver spec, specifically <a href="https://semver.org/#spec-item-7">Item 7</a>:</p>
+<ol>
+<li>Minor version Y (x.Y.z | x &gt; 0) MUST be incremented if new, backwards compatible functionality is introduced to the public API.</li>
+<li>It MUST be incremented if any public API functionality is marked as deprecated.</li>
+<li>It MAY be incremented if substantial new functionality or improvements are introduced within the private code.</li>
+<li>It MAY include patch level changes.</li>
+<li>Patch version MUST be reset to 0 when minor version is incremented.</li>
+</ol>
+<p>As I said earlier, adding a new function deviates from the spec because it is
+&quot;new, backwards compatible functionality ... introduced to the public API&quot;.</p>
+<h2>Semantics of &quot;Violation&quot;</h2>
+<p>The original poster insisted on using the phrase &quot;violation of semver&quot; to
+describe this scenario.  Let's start with the semantics of &quot;violation&quot;.</p>
+<p>While it can be easy to dismiss conversations around semantics, we need to keep
+in mind that communication is about influencing other people.  If you use terms
+in an unexpected way, it will create a barrier making it harder or outright
+prevent you from influencing others and will likely add unnecessary frustration
+to all involved.  We need to consider not just the literal meaning of a word,
+or its denotation, but also its connotation.</p>
+<p>I believe the author was intending to say that some crate authors are not
+adhering to 100% of the semver spec.  Not all deviations from the spec are
+equal though.  Removing a functional part of a Rust crate's API in a minor
+release will break any dependent crate without a lockfile (tooling) and will
+break the expectations of those with a lockfile that run <code>cargo update</code>
+(cultural).  This deviation from tooling and cultural expectations is a source
+of problems and ideally leads to the release being yanked.  I feel these high
+impact problems are what people have in mind when people hear about a
+&quot;violation of semver&quot;.</p>
+<p>So what is the level of impact of a patch with an API addition?</p>
+<h2>Role of Minor and Patch Releases</h2>
+<p>My traditional understanding of patch releases is that they are low risk and
+easy to audit.  Semver doesn't seem to actually care about these cases since
+the spec only specifies &quot;MAY&quot; for updating the minor field on substantial new
+functionality (when the API is the same).  It doesn't even acknowledge the risk
+associated with large refactors with the spec being quiet on this case.  The
+focus is on API additions and deprecations for a minor release, compared to a patch.</p>
+<p>Even the value of that traditional understanding is diminished when tooling
+isn't there to support it.  At least in Rust, doing a <code>cargo update</code> updates
+freely across patch and minor releases.  You could constrain the version
+requirement to only update within patches but that will break anyone relying on
+your crate because <code>cargo</code> unifies version constraints within a major version,
+meaning there will be at most one copy of a crate per major.  If a common
+version within a major cannot be found, your build fails.  Overly constraining
+is a problem today in Rust and the errors aren't all that helpful (yet).</p>
+<p>Maybe I'm missing something but the only value I'm seeing in this semver rule
+is to say to users &quot;this version <em>might</em> contain changes of more interest than
+patch releases&quot;.</p>
+<h2>Release Early, Release Often</h2>
+<p>That a version might contain changes of interest breaks down depending on how
+far you take &quot;release early, release often&quot;.</p>
+<p>People might hold off on releases because</p>
+<ul>
+<li>They want a splashy release with a lot of lot of headlining features</li>
+<li>They need more extensive testing than the CI provides</li>
+<li>They need to resolve quality regressions caused by new features</li>
+<li>They need to finish large features that were merged incrementally without a way to gate access to it</li>
+<li>The release process itself adds friction to discourage releasing often</li>
+</ul>
+<p>For most of my projects, I release on every user-contributed user-facing PR.
+Releasing this often makes my users more efficient because they had a need
+driving their change and makes them happier not having to wait.  This works
+because I aim for a high confidence in my architecture and tests to ensure
+quality.  Even without when that is lacking, I know that the testing of
+unreleased code will be nearly non-existent while smaller releases will act as
+a form of rolling release and it gives users the granularity to isolate the
+problem and get the most benefit while they wait for a fix.  I also try to
+limit known regressions from new features and not expose features until they
+are ready.  With <a href="https://github.com/sunng87/cargo-release">cargo release</a>,
+there is little friction in publishing a new release.</p>
+<p>I'll be honest, I do miss the splashy marketing of having larger releases.  If
+I published every release, I would end up spamming reddit with multiple
+releases each day.</p>
+<p>With this continuous release model, what value am I providing users by bumping
+minor on all API additions?  Most API additions end up being small and drawing
+attention to them with a minor release creates just as much noise for the user
+to sift through as patch releases.</p>
+<p>Conversely, the bar set by semver spec would influence people to consolidate
+changes and make bigger releases to avoid the minor release noise, losing the
+benefits of continuously releasing.</p>
+<h2>Minor Value</h2>
+<p>For me, the value I see in minor versions are:</p>
+<ul>
+<li>Drawing attention to larger impact features.  This can't be determined by any
+technical measure but by the maintainer's understanding of their user base.
+Two competent maintainers could come to different conclusions on what
+justifies a minor release or not, and that is fine.</li>
+<li>Calling attention to semi-breaking-changes.  Semver does not clarify what
+counts as a breaking change is and <a href="https://xkcd.com/1172/">any change can break
+someone</a>, from bug fixes to changes to your build
+requirements.</li>
+<li>Rate limiting deprecations.  You might have noticed I've not acknowledged
+this part of the spec yet.  Its hard not be be <a href="https://xkcd.com/356/">nerd
+sniped</a> by deprecation warnings and they
+imply the existence of technical debt in the form of refactors to migrate
+to the new API before you are blocked on needing functionality only available
+in the new API or major version.</li>
+</ul>
+<h2>Version Requirements</h2>
+<p>So getting back to the topic that led to this discussion, when you use a
+<a href="https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#caret-requirements">&quot;semver&quot; version constraint
+(<code>^</code>)</a>,
+should you specify the patch field?   I think its preferred, with caveats.</p>
+<p>If your version constraint is under-specified, a person pulling in your crate
+could see a build failure because you needed a specific patch release but they
+already are using a compatible version of the dependency and so cargo won't
+upgrade it.  It doesn't matter if its an API addition or a bug fix, you can be
+relying on it either way.</p>
+<p>However, there are downsides to specifying a minimum minor or patch field.</p>
+<p>If your version constraint is incorrectly specified (too low), people depending
+on your crate fail as if you under-specified.</p>
+<p>If you always specify the latest version, you are safe but at minimum you cause
+unnecessary build churn for people depending on your crate.  Worst case,
+someone needs a dependency held back, either because of a bug or supported
+compiler versions and can't because your version requirement conflicts with
+what the user needs.</p>
+<p>It'd go a long way to solving this if we had a way to always test the version
+requirements (cargo's unstable <code>-Z minimal-versions</code>) and if all your
+dependencies tested it.  A stop gap measure is to always specify the full
+minimum version when adding or upgrading a dependency.  That is what will
+initially be in your lock file and what you and other active developers will
+develop against so most likely it will be correct.</p>
+
+      </article>
+    </main>
+    <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2022</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+  </body>
+</html>
