@@ -82,7 +82,8 @@ Instead, we created the [argfile](https://github.com/rust-cli/argfile) crate.
 - You are not restricted to using it with clap
 - You can customize it how you wish
 - You only pay for it if you need it
-- We only need to document the need it fills instead of bloating `App`s documentation with all of customization people want
+- We only need to document the need it fills instead of bloating `App`s
+  documentation with all of customization people want
 
 ### clap Moving Forward
 
