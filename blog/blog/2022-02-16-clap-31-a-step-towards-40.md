@@ -1,14 +1,13 @@
 ---
 title: "clap 3.1: A step towards 4.0"
-published_date: "2022-02-04 15:37:29 +0000"
+published_date: "2022-02-16 18:15:04 +0000"
 layout: default.liquid
-is_draft: true
+is_draft: false
 data:
   tags:
     - programming
     - rust
 ---
-
 [clap 3.1](https://docs.rs/clap/3.1.0) is here!  Clap is a CLI argument parser
 for Rust and the v3.1 releases focuses on API cleanup slated for clap 4.0.  See
 the [CHANGELOG](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md) for
