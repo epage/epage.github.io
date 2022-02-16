@@ -47,3 +47,7 @@ https://bradfitz.com/2020/01/30/joining-tailscale
 
 
 https://sans-io.readthedocs.io/how-to-sans-io.html
+
+>  State intertwines "value" and "time", so that to reason about the value of a piece of state you have to reason about time (like the interleaving of operations that could mutate the state)
+
+Supposedly from SiCP Ch 3
