@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clap 3.1: A step towards 4.0</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-left">
+            <h2>clap 3.1: A step towards 4.0</h2>
+          </div>
+        </div>
+      </nav>
+    </header>
+  <main class="container">
+    <p><a href="https://docs.rs/clap/3.1.0">clap 3.1</a> is here!  Clap is a CLI argument parser
+for Rust and the v3.1 releases focuses on API cleanup slated for clap 4.0.  See
+the <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> for
+details.</p>
+<p>clap 3.0 was in development for 4 years and though we saw comparisons to
+Half-life 3 in response to the release, we also saw people who cited the long
+gaps between breaking releases as a motivation for using it.  For clap to stay
+relevant we feel we need to avoid the stagnation of long release cycles while
+keeping things smooth for the users where clap is already &quot;good enough&quot;.  The
+v3.1 release is a major step in trying to strike that balance.</p>
+<!-- more -->
+<h3>clap's Model of Evolution</h3>
+<p>Traditionally, all features have been self-contained within the <code>clap::App</code>.
+Customization has been done through runtime flags and cargo feature flags.
+When a breaking change is needed, we batched them up into a large release
+with just a CHANGELOG to help you making it easy to miss the more subtle
+changes among basic transformations of &quot;X was renamed to Y&quot;.</p>
+<p>This has led to an ever growing API, a bloated code base, and gated evolution
+of user applications.</p>
+<p>For example, clap's <code>--help</code> flag can:</p>
+<ul>
+<li>Print auto-generated help</li>
+<li>Print help from a bespoke template language</li>
+<li>Print a hard coded string</li>
+<li>Be turned off completely</li>
+</ul>
+<p>Its unlikely the compiler can detect which you are using and compile out the
+other implementations.  So even though you will only ever use one of these, we
+have to compile support for all of them and include all of them in the final
+binary.  Its no wonder clap 
+<a href="https://github.com/rust-cli/argparse-benchmarks-rs">takes ~3x as long to compile as other parsers and results in ~20x the binary size</a>.
+<strong>This frequently gets excused as &quot;clap provides a lot for you&quot; but I feel there
+needs to be a better way, that a CLI parser can be as powerful as you need
+without paying for what you don't need.</strong></p>
+<h3>A better way?</h3>
+<p>We want to be able to continue to extend clap while:</p>
+<ul>
+<li>You pay for what you use</li>
+<li>Features are discoverable</li>
+<li>Clap's maintainers are not blocking meeting your needs or exploring new ideas</li>
+<li>Minimal upgrade impact</li>
+</ul>
+<p>Towards the end of clap 3's development, we started to look into how to
+minimize upgrade impact.  We decided to leverage the compiler's deprecation
+messages to take care of the more mechanical changes so we can focus the
+CHANGELOG on the more subtle changes that might be missed otherwise.  We spent
+a lot of time adding back in removed APIs, providing a smooth transition path
+from <a href="https://github.com/TeXitoi/structopt">structopt</a>, etc.  I feel like this
+was an overall success, both from my own experience of upgrading my
+applications to clap 3 and from feedback we got from users about how smooth the
+process was.</p>
+<p>As an example of new feature development, we had
+<a href="https://github.com/clap-rs/clap/issues/1693">a request</a>
+for <a href="https://docs.microsoft.com/en-us/windows/win32/midl/response-files">response-file support</a>.
+Following the existing patterns, this would have been built directly into
+clap's parser.  We might satisfy the immediate request but it opens the door
+for people wanting it to fill their needs.  Some prior art shows there are uses
+for <a href="https://docs.python.org/3/library/argparse.html#fromfile-prefix-chars">customizing the prefix character</a>.
+We'd also need to adapt to support different syntaxes in the wild, including whether:</p>
+<ul>
+<li>comments are supported (and what syntax)</li>
+<li>lines are treated literally or quoting and escaping is needed</li>
+<li>response files are processed recursively and how to resolve relative paths</li>
+</ul>
+<p>Instead, we created the <a href="https://github.com/rust-cli/argfile">argfile</a> crate.</p>
+<ul>
+<li>You are not restricted to using it with clap</li>
+<li>You can customize it how you wish</li>
+<li>You only pay for it if you need it</li>
+<li>We only need to document the need it fills instead of bloating <code>App</code>s documentation with all of customization people want</li>
+</ul>
+<h3>clap Moving Forward</h3>
+<p>Our new guidelines in clap's <a href="https://github.com/clap-rs/clap/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>:</p>
+<blockquote>
+<p>Our releases fall into one of:</p>
+<ul>
+<li>Major releases which are reserved for breaking changes
+<ul>
+<li>Aspire to at least 6-9 months between releases</li>
+<li>Remove all deprecated functionality</li>
+<li>Try to minimize new breaking changes to ease user transition and reduce time &quot;we go dark&quot; (unreleased feature-branch)</li>
+</ul>
+</li>
+<li>Minor releases which are for minor compatibility changes
+<ul>
+<li>Aspire to at least 2 months between releases</li>
+<li>Changes to MSRV</li>
+<li>Deprecating existing functionality</li>
+<li><code>#[doc(hidden)]</code> all deprecated items in the prior minor release</li>
+</ul>
+</li>
+<li>Patch releases
+<ul>
+<li>One for every user-facing, user-contributed PR (i.e. release early, release often)</li>
+</ul>
+</li>
+</ul>
+<p>If your change does not fit within a &quot;patch&quot; release, please coordinate with the clap maintainers for how to handle the situation.</p>
+<p>Some practices to avoid breaking changes</p>
+<ul>
+<li>Duplicate functionality, with old functionality marked as &quot;deprecated&quot;
+<ul>
+<li>Common documentation pattern: <code>/// Deprecated in [Issue #XXX](https://github.com/clap-rs/clap/issues/XXX), replaced with [intra-doc-link]</code></li>
+<li>Common deprecation pattern: <code>#[deprecated(since = &quot;X.Y.Z&quot;, note = &quot;Replaced with </code>ITEM<code> in Issue #XXX&quot;)]</code></li>
+<li>Please keep API addition and deprecation in separate commits in a PR to make it easier to review</li>
+</ul>
+</li>
+<li>Develop the feature behind an <code>unstable-&lt;name&gt;</code> feature flag with a stablization tracking issue (e.g. <a href="https://github.com/clap-rs/clap/issues/2861">Multicall Tracking issue</a>)</li>
+</ul>
+</blockquote>
+<p>While we expect this to evolve over time, we feel this is a good start to helping meet the needs from earlier.</p>
+<h3>What this means for clap 3.1</h3>
+<p>In v3.1, you'll find that we've changed a large swath of the API with
+deprecations.  We looked to our
+<a href="https://github.com/clap-rs/clap/issues?q=is%3Aopen+is%3Aissue+milestone%3A4.0+label%3AM-breaking-change">breaking-change issues for v4.0</a>
+and focused on a common theme of changes that can be implemented now by
+introducing a new API and deprecating an old one.  This allows us to develop
+iteratively and allow people to migrate in piecemeal rather than relying on
+large flag-day upgrades.</p>
+<p>One catch I've found with this is how I've been turning warnings into errors in CI.  I've been running something like:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">$ cargo clippy --workspace --all-features --all-targets -- -deny warnings
+</span></pre>
+<p>and didn't pay attention to the fact that my CI will start failing if a dependency marks
+an item as deprecated.  Without a lock file, your PRs might see failures
+unrelated to the change at hand.  With a lock file, you will be forced to
+respond to all deprecations just to upgrade.  Some see this as a good thing but
+I find the higher the cost of an upgrade, the more people avoid them and the
+slower you move.  Being able to decouple the upgrade and the migration can be a
+big help for evolving your code.</p>
+<p>I'd recommend changing your CI to:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">$ cargo clippy --workspace --all-features --all-targets -- --deny warnings --allow deprecated
+</span></pre>
+<h3>Participating in the Conversation</h3>
+<p>If you'd like to look over what we are hoping to accomplish in the future,
+check out our <a href="https://github.com/clap-rs/clap/milestones">milestones</a>.  They
+represent our areas of focus and aren't exclusive of other work happening).
+We are also doing a <a href="https://github.com/clap-rs/clap/discussions/3476">cross-issue brainstorming</a>
+of what clap's future API might look like.  <strong>Please pipe in with any feedback; we
+recognize that hearing your ideas is likely the only way to meet our ambitious
+goals!</strong></p>
+
+  </main>
+  <footer>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-left">
+         <a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a>
+      </div>
+      <div class="navbar-left">
+        <ul class="list-unstyled">
+          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
+          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
+          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
+        </ul>
+      </div>
+
+      <div class="navbar-right">
+        <ul class="list-unstyled">
+
+          <li><i class="fa fa-copyright"></i> 2022</li>
+
+          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
+          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+</body>
+</html>

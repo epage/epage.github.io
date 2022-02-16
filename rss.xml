@@ -1,4 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Minor Semver Issue</title><link>https://epage.github.io/blog/2022/02/minor-semver-issue/</link><description><![CDATA[<p>Is adding a function in a patch release a violation of
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap 3.1: A step towards 4.0</title><link>https://epage.github.io/blog/2022/02/clap-31-a-step-towards-40/</link><description><![CDATA[<p><a href="https://docs.rs/clap/3.1.0">clap 3.1</a> is here!  Clap is a CLI argument parser
+for Rust and the v3.1 releases focuses on API cleanup slated for clap 4.0.  See
+the <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> for
+details.</p>
+<p>clap 3.0 was in development for 4 years and though we saw comparisons to
+Half-life 3 in response to the release, we also saw people who cited the long
+gaps between breaking releases as a motivation for using it.  For clap to stay
+relevant we feel we need to avoid the stagnation of long release cycles while
+keeping things smooth for the users where clap is already &quot;good enough&quot;.  The
+v3.1 release is a major step in trying to strike that balance.</p>
+]]></description><guid>https://epage.github.io/blog/2022/02/clap-31-a-step-towards-40/</guid><pubDate>Wed, 16 Feb 2022 18:15:04 +0000</pubDate></item><item><title>Minor Semver Issue</title><link>https://epage.github.io/blog/2022/02/minor-semver-issue/</link><description><![CDATA[<p>Is adding a function in a patch release a violation of
 <a href="https://semver.org/">semver</a>?  Technically, yes but technical answers aren't
 always the right answers.</p>
 <p>This came up in a recent discussion focused on the
