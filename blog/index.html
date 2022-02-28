@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
+	<head>
+		<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>epage's blog</title>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 <link rel="stylesheet" href="/style.css" type="text/css" media="all" />
 <link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
 
-</head>
-<body>
-    <header>
-      <nav class="navbar navbar-default">
-        <div class="container-fluid">
-          <div class="navbar-left">
-            <h2>epage's blog</h2>
-          </div>
-        </div>
-      </nav>
-    </header>
-  <main class="container">
-    <div>
-  <div>
-    
-    <div>
-      <h2><a href="/blog/2022/02/clap-31-a-step-towards-40/">clap 3.1: A step towards 4.0</a></h2>
-      <p><p><a href="https://docs.rs/clap/3.1.0">clap 3.1</a> is here!  Clap is a CLI argument parser
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>epage's blog</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2022/02/clap-31-a-step-towards-40/">clap 3.1: A step towards 4.0</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;16&nbsp;Feb&nbsp;'22</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p><a href="https://docs.rs/clap/3.1.0">clap 3.1</a> is here!  Clap is a CLI argument parser
 for Rust and the v3.1 releases focuses on API cleanup slated for clap 4.0.  See
 the <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> for
 details.</p>
@@ -37,13 +42,23 @@ relevant we feel we need to avoid the stagnation of long release cycles while
 keeping things smooth for the users where clap is already &quot;good enough&quot;.  The
 v3.1 release is a major step in trying to strike that balance.</p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;16&nbsp;Feb&nbsp;'22</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2022/02/minor-semver-issue/">Minor Semver Issue</a></h2>
-      <p><p>Is adding a function in a patch release a violation of
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2022/02/minor-semver-issue/">Minor Semver Issue</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;04&nbsp;Feb&nbsp;'22</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>Is adding a function in a patch release a violation of
 <a href="https://semver.org/">semver</a>?  Technically, yes but technical answers aren't
 always the right answers.</p>
 <p>This came up in a recent discussion focused on the
@@ -51,13 +66,23 @@ relevant importance of setting the minimum patch version for a dependency.
 Some crates go so far as to never bump their minor version, like
 <a href="https://crates.io/crates/serde/versions">serde</a>.</p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;04&nbsp;Feb&nbsp;'22</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2021/12/clap3/">clap 3.0, a Rust CLI argument parser</a></h2>
-      <p><p>I figured a great way to close out the year 2021 is to wrap up the long awaited
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2021/12/clap3/">clap 3.0, a Rust CLI argument parser</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;30&nbsp;Dec&nbsp;'21</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>I figured a great way to close out the year 2021 is to wrap up the long awaited
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md#300-2021-12-31">clap 3.0 release</a>!</p>
 <p>Some major milestones along the way:</p>
 <ul>
@@ -76,13 +101,23 @@ maintainers or contributors along the way</li>
 <li>My employer, Futurewei, for giving me the opportunity to help wrap up clap 3.0</li>
 </ul>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;30&nbsp;Dec&nbsp;'21</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2021/09/optimizing-toml-edit/">A Journey in Optimizing `toml_edit`</a></h2>
-      <p><h2>tl;dr</h2>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2021/09/optimizing-toml-edit/">A Journey in Optimizing `toml_edit`</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;30&nbsp;Sep&nbsp;'21</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, oss, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><h2>tl;dr</h2>
 <p><a href="https://docs.rs/toml_edit"><code>toml_edit</code></a> is a format preserving TOML crate,
 allowing users to modify <code>.toml</code> files.</p>
 <p><strong>Before:</strong></p>
@@ -100,13 +135,23 @@ allowing users to modify <code>.toml</code> files.</p>
 <tr><td>toml-rs</td><td>4.7us</td><td>121us</td></tr>
 </tbody></table>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, oss, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;30&nbsp;Sep&nbsp;'21</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2021/09/learning-rust/">Learnability of Rust</a></h2>
-      <p><h2>tl;dr</h2>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2021/09/learning-rust/">Learnability of Rust</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;15&nbsp;Sep&nbsp;'21</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, oss, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><h2>tl;dr</h2>
 <p>As part of improving the learnability of Rust, I propose:</p>
 <ul>
 <li>The <code>.crs</code> file subset of <a href="https://github.com/DanielKeep/cargo-script">cargo-script</a> be brought into <code>cargo</code></li>
@@ -114,13 +159,23 @@ allowing users to modify <code>.toml</code> files.</p>
 <li>We collaborate on an ergonomics-focused standard-library-alternative, like <a href="https://docs.rs/eztd">eztd</a></li>
 </ul>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, oss, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;15&nbsp;Sep&nbsp;'21</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2021/07/pushgen-experiment/">Experiments with `pushgen`</a></h2>
-      <p><p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2021/07/pushgen-experiment/">Experiments with `pushgen`</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;07&nbsp;Jul&nbsp;'21</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>Recently, there was an <a href="https://www.reddit.com/r/rust/comments/oa6tcp/first_crate_pushgen_pushbased_approach_to/">announcement for
 <code>pushgen</code></a>,
 a port of C++ <code>transrangers</code> to Rust with a <a href="https://github.com/joaquintides/transrangers/blob/master/rust.md">follow up
 post</a> from
@@ -129,142 +184,234 @@ the author of <code>transrangers</code>.</p>
 the different techniques compared in the followup and how the performance
 worked out in a real world application.</p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;07&nbsp;Jul&nbsp;'21</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2020/03/liquid-v20/">Liquid v0.20</a></h2>
-      <p><p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2020/03/liquid-v20/">Liquid v0.20</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;16&nbsp;Mar&nbsp;'20</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, oss
+			
+		</li></ul>
+	</nav>
+	
+	<p><p><code>liquid</code> v0.20 resolves several planned breaking changes we've been holding off on.  This doesn't make us ready for 1.0 yet but this closes the gap significantly.</p>
 <p><em><a href="https://docs.rs/liquid"><code>liquid-rust</code></a> is a rust re-implementation of the <a href="https://shopify.github.io/liquid/">liquid</a> template engine made popular by the <a href="https://jekyllrb.com">jekyll</a> static site generator.</em></p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, oss</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;16&nbsp;Mar&nbsp;'20</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2019/11/reflecting-on-errors-in-2019/">Reflecting on Errors in 2019</a></h2>
-      <p><p>With people reflecting on Rust in 2019 and what they want to see in 2020, error handling has come up again:</p>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2019/11/reflecting-on-errors-in-2019/">Reflecting on Errors in 2019</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Tue&nbsp;26&nbsp;Nov&nbsp;'19</time>
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>With people reflecting on Rust in 2019 and what they want to see in 2020, error handling has come up again:</p>
 <ul>
 <li><a href="https://www.ncameron.org/blog/rust-in-2020-one-more-thing/">Rust in 2020, one more thing</a></li>
 <li><a href="https://lukaskalbertodt.github.io/2019/11/14/thoughts-on-error-handling-in-rust.html">Thoughts on Error Handling in Rust</a></li>
 <li><a href="https://blog.yoshuawuyts.com/error-handling-survey/">Error Handling Survey</a></li>
 </ul>
 </p>
-      
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Tue&nbsp;26&nbsp;Nov&nbsp;'19</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2019/10/speeding-up-rust-builds-code-gen-edition/">Speeding Up Rust Builds: Code-Gen Edition</a></h2>
-      <p><p><em>tl;dr Cache your code-gen results with the <a href="https://crates.io/crates/codegenrs"><code>codegenrs</code> crate</a>.</em></p>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2019/10/speeding-up-rust-builds-code-gen-edition/">Speeding Up Rust Builds: Code-Gen Edition</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;10&nbsp;Oct&nbsp;'19</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p><em>tl;dr Cache your code-gen results with the <a href="https://crates.io/crates/codegenrs"><code>codegenrs</code> crate</a>.</em></p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Thu&nbsp;10&nbsp;Oct&nbsp;'19</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2018/06/rustfest-2018/">RustFest Parist Trip Report</a></h2>
-      <p><p>I've been involved in the Rust community for about a year and a half now.  What
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2018/06/rustfest-2018/">RustFest Parist Trip Report</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;04&nbsp;Jun&nbsp;'18</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>I've been involved in the Rust community for about a year and a half now.  What
 attracted me to Rust is that is looks like the first viable replacement for
 C++.  It offers similar (actually better) protections than GCed languages and
 the full language is available in any environment, including exception-like
 error handling in the Windows kernel.</p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;04&nbsp;Jun&nbsp;'18</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2018/05/pycon-2018/">PyCon 2018 Trip Report</a></h2>
-      <p><p>I went to with a coworker to <a href="https://us.pycon.org/2018/">PyCon</a> this year (<a href="https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos">videos</a>).</p>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2018/05/pycon-2018/">PyCon 2018 Trip Report</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;18&nbsp;May&nbsp;'18</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, python
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>I went to with a coworker to <a href="https://us.pycon.org/2018/">PyCon</a> this year (<a href="https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos">videos</a>).</p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, python</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;18&nbsp;May&nbsp;'18</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2018/03/redefining-failure/">Redefining Failure</a></h2>
-      <p><p>I recently got the chance to redo the error handling in two different crates I
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2018/03/redefining-failure/">Redefining Failure</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;09&nbsp;Mar&nbsp;'18</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>I recently got the chance to redo the error handling in two different crates I
 help maintain. For <a href="https://github.com/cobalt-org/liquid-rust"><code>liquid</code></a>, I decided to write the error types by
 hand rather than use something like <a href="https://crates.io/crates/error-chain"><code>error-chain</code></a>. In the case
 of <a href="https://github.com/assert-rs/assert_cli"><code>assert_cli</code></a>, I decided to finally give <a href="https://github.com/withoutboats/failure"><code>failure</code></a> a
 try.</p>
 </p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;09&nbsp;Mar&nbsp;'18</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2018/01/crate-management/">Crate Management for #rust2018</a></h2>
-      <p><p><em>Context: <a href="https://blog.rust-lang.org/2018/01/03/new-years-rust-a-call-for-community-blogposts.html">Call for Community Posts</a> and <a href="http://readrust.net/rust2018/">other posts</a></em></p>
-</p>
-      <h4><i class="fa fa-tags"></i> programming, rust</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;26&nbsp;Jan&nbsp;'18</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2018/01/blog-transition/">Blog Transition</a></h2>
-      <p><p>I'll post relevant items from my old blog.  If you'd like to see all the old posts, go to <a href="eopage.blogspot.com">eopage.blogspot.com</a></p>
-</p>
-      
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;17&nbsp;Jan&nbsp;'18</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2017/01/shaky-start/">Off To A Shaky Start - LASIK and Nystagmus</a></h2>
-      <p>My personal experience treating nystagmus
-</p>
-      <h4><i class="fa fa-tags"></i> personal</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;30&nbsp;Jan&nbsp;'17</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2014/12/lone-star-hiking/">The Lone Star Hiking Trail</a></h2>
-      <p>Trip/equipment report for the Long Star Hiking Trail
-</p>
-      <h4><i class="fa fa-tags"></i> hiking</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;03&nbsp;Dec&nbsp;'14</time>
-    </div>
-    
-    <div>
-      <h2><a href="/blog/2013/08/kings-peak/">On Top of Utah - Hiking to Kings Peak</a></h2>
-      <p>Trip/equipment report for Kings Peak in Utah
-</p>
-      <h4><i class="fa fa-tags"></i> hiking</h4>
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">Sat&nbsp;17&nbsp;Aug&nbsp;'13</time>
-    </div>
-    
-  </div>
-</div>
+	
+</article>
 
-  </main>
-  <footer>
-  <nav class="navbar navbar-default">
-    <div class="container-fluid">
-      <div class="navbar-left">
-         <a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a>
-      </div>
-      <div class="navbar-left">
-        <ul class="list-unstyled">
-          <li><a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a></li>
-          <li><a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a></li>
-          <li><a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a></li>
-        </ul>
-      </div>
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2018/01/crate-management/">Crate Management for #rust2018</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;26&nbsp;Jan&nbsp;'18</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p><em>Context: <a href="https://blog.rust-lang.org/2018/01/03/new-years-rust-a-call-for-community-blogposts.html">Call for Community Posts</a> and <a href="http://readrust.net/rust2018/">other posts</a></em></p>
+</p>
+	
+</article>
 
-      <div class="navbar-right">
-        <ul class="list-unstyled">
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2018/01/blog-transition/">Blog Transition</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;17&nbsp;Jan&nbsp;'18</time>
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>I'll post relevant items from my old blog.  If you'd like to see all the old posts, go to <a href="eopage.blogspot.com">eopage.blogspot.com</a></p>
+</p>
+	
+</article>
 
-          <li><i class="fa fa-copyright"></i> 2018</li>
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2017/01/shaky-start/">Off To A Shaky Start - LASIK and Nystagmus</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;30&nbsp;Jan&nbsp;'17</time>
+			
+			<br/><i class="fa fa-tags"></i> personal
+			
+		</li></ul>
+	</nav>
+	
+	<p>My personal experience treating nystagmus
+</p>
+	
+</article>
 
-          <li><a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a></li>
-          <li><a href="https://github.com/cobalt-org/cobalt.rs"><img src="https://img.shields.io/badge/Built%20with-Cobalt-rust.svg" title="Build with Cobalt"/></a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</footer>
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2014/12/lone-star-hiking/">The Lone Star Hiking Trail</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Wed&nbsp;03&nbsp;Dec&nbsp;'14</time>
+			
+			<br/><i class="fa fa-tags"></i> hiking
+			
+		</li></ul>
+	</nav>
+	
+	<p>Trip/equipment report for the Long Star Hiking Trail
+</p>
+	
+</article>
 
-</body>
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/blog/2013/08/kings-peak/">On Top of Utah - Hiking to Kings Peak</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Sat&nbsp;17&nbsp;Aug&nbsp;'13</time>
+			
+			<br/><i class="fa fa-tags"></i> hiking
+			
+		</li></ul>
+	</nav>
+	
+	<p>Trip/equipment report for Kings Peak in Utah
+</p>
+	
+</article>
+
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
 </html>
