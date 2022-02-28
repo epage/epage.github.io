@@ -1,15 +1,24 @@
 ---
 title: "epage's blog"
 ---
-<div>
-  <div>
-    {% for post in collections.posts.pages %}
-    <div>
-      <h2><a href="/{{ post.permalink }}">{{ post.title }}</a></h2>
-      {% if post.description != "" %}<p>{{ post.description }}</p>{% elsif post.excerpt %}<p>{{ post.excerpt }}</p>{% else %}<br />{% endif %}
-      {% if post.data.tags %}<h4><i class="fa fa-tags"></i> {{ post.data.tags | join: ", " }}</h4>{% endif %}
-      <i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ post.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time>
-    </div>
-    {% endfor %}
-  </div>
-</div>
+{% for post in collections.posts.pages %}
+<article>
+	<nav>
+		<ul><li>
+			<h2><a href="/{{ post.permalink }}">{{ post.title }}</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ post.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time>
+			{% if post.data.tags %}
+			<br/><i class="fa fa-tags"></i> {{ post.data.tags | join: ", " }}
+			{% endif %}
+		</li></ul>
+	</nav>
+	{% if post.description != "" %}
+	<p>{{ post.description }}</p>
+	{% elsif post.excerpt %}
+	<p>{{ post.excerpt }}</p>
+	{% else %}
+	{% endif %}
+</article>
+{% endfor %}

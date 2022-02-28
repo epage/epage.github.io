@@ -1,29 +1,25 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    {% include "head.liquid" %}
-  </head>
-  <body>
-    <header>
-      <nav class="navbar navbar-default">
-        <div class="container-fluid">
-          <div class="navbar-left">
-            <h2>{{ page.title }}</h2>
-          </div>
-          <div class="navbar-right">
-            <ul class="list-unstyled">
-              <li><i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ page.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time></li>
-              {% if page.data.tags %}<li><i class="fa fa-tags"></i> {{ page.data.tags | join: ", "}}</li>{% endif %}
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
-    <main class="container">
-      <article>
-        {{ page.content }}
-      </article>
-    </main>
-    {% include "footer.liquid" %}
-  </body>
+	<head>
+		{% include "head.liquid" %}
+	</head>
+	<body>
+		<article>
+			<header>
+				<nav class="container-fluid">
+					<ul>
+						<li><h2>{{ page.title }}</h2></li>
+					</ul>
+					<ul>
+						<li>
+							<i class="fa fa-calendar"></i> <time pubdate="pubdate">{{ page.published_date | date:"%a&nbsp;%d&nbsp;%b&nbsp;'%y" }}</time>
+							{% if page.data.tags %}<br/><i class="fa fa-tags"></i> {{ page.data.tags | join: ", "}}{% endif %}
+						</li>
+					</ul>
+				</nav>
+			</header>
+			{{ page.content }}
+		</article>
+		{% include "footer.liquid" %}
+	</body>
 </html>

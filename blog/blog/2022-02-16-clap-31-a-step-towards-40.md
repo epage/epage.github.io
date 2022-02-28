@@ -1,7 +1,7 @@
 ---
 title: "clap 3.1: A step towards 4.0"
 published_date: "2022-02-16 18:15:04 +0000"
-layout: default.liquid
+layout: post.liquid
 is_draft: false
 data:
   tags:
