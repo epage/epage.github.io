@@ -41,11 +41,11 @@ Other benefits to Submit Queues:
 
 Considerations
 
-- Emergency fixes
+- Latency for merging emergency fixes
 - Uncaught failures in the Submit Queue CI run, potentially failing unrelated changes in the future
 - CI Flakiness rejecting changes unnecessarily and disrupting any speculative CI runs
-- Latency before changes become available
-- Controlling for side effects in Submit Queue CI runs since they might not land (e.g. deployments)
+- General latency before changes become available
+- Controlling for side effects (e.g. deployments) in Submit Queue CI runs since the merge might get rejected
 - Improve throughput through predicting failure
   - ML like Uber
   - PRs too old, like Shopify
@@ -77,12 +77,12 @@ Existing Submit Queues
   - Currently conflicts with "Merge When Pipeline Succeeds" feature
   - Speculative execution, rather than batching
     - On success latency is always O(ci_time)
-    - Max system load is O(queue_size * pipeline)
-    - Cost is O(queue_size * pipeline)
+    - Max system load is O(pipeline * queue_size)
+    - Cost is O(pipeline * ci_time * queue_size)
   - Restarts process on failure
     - Latency is O(num_errors * ci_time)
     - Max system load is O(queue_size * pipeline)
-    - Cost is O(pipeline * ci_time * num_errors * queue_size)
+    - Cost is O(pipeline * ci_time * queue_size * num_errors)
 - [ShipIt Merge Queue](https://github.com/Shopify/shipit-engine#merge-queue)
   - Used by Shopify
     - See also [v1 announcement](https://shopify.engineering/introducing-the-merge-queue) and [v2 announcement](https://shopify.engineering/successfully-merging-work-1000-developers)
