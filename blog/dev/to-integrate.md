@@ -30,6 +30,7 @@ Developer Efficiency
 - [Activation energy](https://www.nature.com/scitable/content/ne0000/ne0000/ne0000/ne0000/14747799/U1CP3-3_EnzymeActivation_revised.jpg).  Seems someone has already spoken on it: https://phab.duosec.org/D63607
 - Analogy of my experience staying hydrated at work: drinking fountain vs water bottle vs sippy cup
 - http://www.gigamonkeys.com/flowers/
+- https://about.sourcegraph.com/blog/developer-productivity-thoughts/
 
 OOP
 - https://news.ycombinator.com/item?id=23192264
@@ -43,6 +44,8 @@ OOP
 https://bradfitz.com/2020/01/30/joining-tailscale
 - Interesting to disect this since I disagree about Go (and he'd probably disagree about Rust)
 
+Simple vs easy / complex vs hard: https://www.youtube.com/watch?v=LKtk3HCgTa8
+
 [Five worlds](https://bradfitz.com/2020/01/30/joining-tailscale) and [discussion](https://www.reddit.com/r/programming/comments/i1445a/five_worlds_joel_on_software/fzv67f9/)
 
 
@@ -51,3 +54,6 @@ https://sans-io.readthedocs.io/how-to-sans-io.html
 >  State intertwines "value" and "time", so that to reason about the value of a piece of state you have to reason about time (like the interleaving of operations that could mutate the state)
 
 Supposedly from SiCP Ch 3
+
+Other notes
+- https://un.curl.dev/
