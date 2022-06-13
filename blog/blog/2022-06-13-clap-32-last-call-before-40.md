@@ -117,14 +117,14 @@ let cmd = Command::new("mycmd")
 let matches = cmd.try_get_matches_from(
     ["mycmd", "--quiet", "--quiet", "--verbose", "--verbose", "--verbose"]
 ).unwrap();
- assert_eq!(
-     *matches.get_one::<bool>("quiet").expect("defaulted by clap"),
-     Some(true)
- );
- assert_eq!(
-     *matches.get_one::<u8>("verbose").expect("defaulted by clap"),
-     Some(3)
- );
+assert_eq!(
+    *matches.get_one::<bool>("quiet").expect("defaulted by clap"),
+    Some(true)
+);
+assert_eq!(
+    *matches.get_one::<u8>("verbose").expect("defaulted by clap"),
+    Some(3)
+);
 ```
 
 In working on actions, we realized we could simplify things if we made
