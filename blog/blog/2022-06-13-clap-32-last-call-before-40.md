@@ -78,7 +78,7 @@ While updating the `ArgMatches` API for this, we took the time to make other imp
 - Not-present values are represented with an `Option` while before some calls
   used an `Option` while some used a `Result`
   ([#2505](https://github.com/clap-rs/clap/issues/2505))
-- `ArgMatches` functions panic when the argument value access doesn't match the
+- `ArgMatches` functions would panic when the argument value access doesn't match the
   argument definition but now we offer non-panicking variants
   ([#3621](https://github.com/clap-rs/clap/issues/3621))
 
