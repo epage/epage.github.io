@@ -41,7 +41,7 @@ type.  We did this via the
 <a href="https://github.com/clap-rs/clap/tree/master/examples/derive_ref#arg-types"><code>#[clap(parse(...)]</code> attribute</a>.</p>
 <p>In place of the <code>parse</code> attribute, the Builder API had</p>
 <ul>
-<li>Native support for <code>str</code> (<code>value_of</code>) and <code>str</code> (<code>value_of_os</code>, <code>value_of_os_lossy</code>) with various built-in validators</li>
+<li>Native support for <code>str</code> (<code>value_of</code>) and <code>OsStr</code> (<code>value_of_os</code>, <code>value_of_os_lossy</code>) with various built-in validators</li>
 <li>Support for <code>FromStr</code> types (<code>value_of_t</code>) which produced a lower quality error message than native validation would</li>
 </ul>
 <p><code>Arg::value_parser</code> brings the derive API's typing to the builder API.  We've
