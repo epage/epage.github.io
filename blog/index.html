@@ -21,6 +21,204 @@
 <article>
 	<nav>
 		<ul><li>
+			<h2><a href="/blog/2022/06/clap-32-last-call-before-40/">Clap 3.2: Last Call Before 4.0</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Mon&nbsp;13&nbsp;Jun&nbsp;'22</time>
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>With excitement and trepidation, I'm announcing the release of
+<a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">clap 3.2</a>.</p>
+<p>With clap 3.1, we <a href="https://epage.github.io/blog/2022/02/clap-31-a-step-towards-40/">discussed the need for a more open, extensible
+API</a> and clap
+3.2 represents one step in that direction.  With two new builder API concepts,
+we are able to deprecate the following concepts:</p>
+<ul>
+<li><code>Arg::allow_invalid_utf8</code></li>
+<li><code>Arg::validator</code>, <code>Arg::validator_os</code></li>
+<li><code>Arg::forbid_empty_values</code></li>
+<li><code>Arg::possible_values</code></li>
+<li><code>Arg::max_occurrences</code></li>
+<li><code>Arg::multiple_occurrences</code></li>
+<li><code>Command::args_override_self</code></li>
+<li><code>AppSettings::NoAutoVersion</code></li>
+<li><code>AppSettings::NoHelpVersion</code></li>
+</ul>
+<h3>Introducing <code>Arg::value_parser</code></h3>
+<p>The derive API has had to deal with adapting raw <code>OsString</code>s into the user's
+type.  We did this via the
+<a href="https://github.com/clap-rs/clap/tree/master/examples/derive_ref#arg-types"><code>#[clap(parse(...)]</code> attribute</a>.</p>
+<p>In place of the <code>parse</code> attribute, the Builder API had</p>
+<ul>
+<li>Native support for <code>str</code> (<code>value_of</code>) and <code>str</code> (<code>value_of_os</code>, <code>value_of_os_lossy</code>) with various built-in validators</li>
+<li>Support for <code>FromStr</code> types (<code>value_of_t</code>) which produced a lower quality error message than native validation would</li>
+</ul>
+<p><code>Arg::value_parser</code> brings the derive API's typing to the builder API.  We've
+ported some of the built-in validators to this new API, added new ones, and
+made it convenient to lookup the best value parser for a given type.  For
+example:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = clap::Command::new(&quot;</span><span style="color:#a3be8c;">raw</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        clap::Arg::new(&quot;</span><span style="color:#a3be8c;">color</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">color</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">value_parser</span><span style="color:#c0c5ce;">([&quot;</span><span style="color:#a3be8c;">always</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">auto</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">never</span><span style="color:#c0c5ce;">&quot;])
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">default_value</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">auto</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        clap::Arg::new(&quot;</span><span style="color:#a3be8c;">hostname</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">hostname</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">value_parser</span><span style="color:#c0c5ce;">(clap::builder::NonEmptyStringValueParser::new())
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">takes_value</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">required</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        clap::Arg::new(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">value_parser</span><span style="color:#c0c5ce;">(clap::value_parser!(</span><span style="color:#b48ead;">u16</span><span style="color:#c0c5ce;">).</span><span style="color:#96b5b4;">range</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">3000</span><span style="color:#c0c5ce;">..))
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">takes_value</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">required</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;">    );
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> m = cmd.</span><span style="color:#96b5b4;">try_get_matches_from</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">    [&quot;</span><span style="color:#a3be8c;">cmd</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--hostname</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">rust-lang.org</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--port</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">3001</span><span style="color:#c0c5ce;">&quot;]
+</span><span style="color:#c0c5ce;">).</span><span style="color:#96b5b4;">unwrap</span><span style="color:#c0c5ce;">();
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> color: &amp;String = m.</span><span style="color:#96b5b4;">get_one</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">color</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted</span><span style="color:#c0c5ce;">&quot;);
+</span><span style="color:#c0c5ce;">assert_eq!(color, &quot;</span><span style="color:#a3be8c;">auto</span><span style="color:#c0c5ce;">&quot;);
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> hostname: &amp;String = m.</span><span style="color:#96b5b4;">get_one</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">hostname</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">required</span><span style="color:#c0c5ce;">&quot;);
+</span><span style="color:#c0c5ce;">assert_eq!(hostname, &quot;</span><span style="color:#a3be8c;">rust-lang.org</span><span style="color:#c0c5ce;">&quot;);
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> port: </span><span style="color:#b48ead;">u16 </span><span style="color:#c0c5ce;">= *m.</span><span style="color:#96b5b4;">get_one</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">required</span><span style="color:#c0c5ce;">&quot;);
+</span><span style="color:#c0c5ce;">assert_eq!(port, </span><span style="color:#d08770;">3001</span><span style="color:#c0c5ce;">);
+</span></pre>
+<p>While updating the <code>ArgMatches</code> API for this, we took the time to make other improvements:</p>
+<ul>
+<li>Not-present values are represented with an <code>Option</code> while before some calls
+used an <code>Option</code> while some used a <code>Result</code>
+(<a href="https://github.com/clap-rs/clap/issues/2505">#2505</a>)</li>
+<li><code>ArgMatches</code> functions panic when the argument value access doesn't match the
+argument definition but now we offer non-panicking variants
+(<a href="https://github.com/clap-rs/clap/issues/3621">#3621</a>)</li>
+</ul>
+<h3>Introducing <code>ArgAction</code></h3>
+<p>Clap would infer how to process an argument when parsing.  There are cases
+where it doesn't quite do what users want and we need to offer more explicit
+control.  This is now done by specifying an <code>ArgAction</code>.  For now, this is a closed
+API but we hope to allow users to provide their own actions in the future as we
+firm up how it interacts with the parser.</p>
+<p>As part of how clap processed arguments, it special-cased flags to not store any value but instead
+users would just check if the flag was present or how many times the flag
+appeared.  This makes it so flags don't interact well with other parts of the
+API (e.g.
+<a href="https://docs.rs/clap/latest/clap/struct.Arg.html#method.default_value_if"><code>default_value_if</code></a>).
+In place of the old <code>ArgAction::IncOccurrences</code>, we are providing
+<code>ArgAction::SetTrue</code> and <code>ArgAction::Count</code> which will store their results
+as-if the user specified them on the command-line, allowing them to interact
+with the rest of clap's API without special casing.</p>
+<p>For example:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = Command::new(&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        Arg::new(&quot;</span><span style="color:#a3be8c;">quiet</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">quiet</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">action</span><span style="color:#c0c5ce;">(clap::builder::ArgAction::SetTrue)
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        Arg::new(&quot;</span><span style="color:#a3be8c;">verbose</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">verbose</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">action</span><span style="color:#c0c5ce;">(clap::builder::ArgAction::Count)
+</span><span style="color:#c0c5ce;">    );
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> matches = cmd.</span><span style="color:#96b5b4;">try_get_matches_from</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">    [&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--quiet</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--quiet</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--verbose</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--verbose</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--verbose</span><span style="color:#c0c5ce;">&quot;]
+</span><span style="color:#c0c5ce;">).</span><span style="color:#96b5b4;">unwrap</span><span style="color:#c0c5ce;">();
+</span><span style="color:#c0c5ce;"> assert_eq!(
+</span><span style="color:#c0c5ce;">     *matches.get_one::&lt;</span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">quiet</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted by clap</span><span style="color:#c0c5ce;">&quot;),
+</span><span style="color:#c0c5ce;">     Some(</span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;"> );
+</span><span style="color:#c0c5ce;"> assert_eq!(
+</span><span style="color:#c0c5ce;">     *matches.get_one::&lt;</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">verbose</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted by clap</span><span style="color:#c0c5ce;">&quot;),
+</span><span style="color:#c0c5ce;">     Some(</span><span style="color:#d08770;">3</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;"> );
+</span></pre>
+<p>In working on actions, we realized we could simplify things if we made
+<code>Command::args_override_self</code> the default and used actions to decide whether
+each new occurrence overrode prior occurrences (<code>ArgAction::Set</code>) or appended
+to them (<code>ArgAction::Append</code>).</p>
+<h3>Parsers and Actions for the Derive API</h3>
+<p>While all of the above is a major departure from the builder API, this is less
+impactful for the derive API because we know more about the user's intent. A
+user can opt-in to the new behavior by providing a default action
+(<code>#[clap(action)]</code>) or default value parser (<code>#[clap(value_parser)]</code>).  Default
+actions will be inferred from the data type while the parser will defer to
+<code>clap::value_parser!(T)</code> for the default.  This means users no longer need to
+remember to special case the parse attribute for <code>PathBuf</code> and the value will
+only be parsed once and stored rather than thrown away during validation.</p>
+<p>This behavior will become the default in clap 4.0.</p>
+<h3>Multicall and REPLs</h3>
+<p>On a completely unrelated note, we are stablizing <code>Command::multicall</code>.  This
+new setting will cause the binary name (<code>argv[0]</code>) to be parsed as a
+subcommand.  This allows for <a href="https://github.com/clap-rs/clap/blob/master/examples/multicall-busybox.rs">busybox-like
+binaries</a>
+where multiple programs are shipped in one binary with the personality being
+selected based on a hardlink name.  We also found this works quite well for
+<a href="https://github.com/clap-rs/clap/blob/master/examples/repl.rs">embedded command
+promots</a>.</p>
+<h3>Resolving Deprecations</h3>
+<p>To help in resolving the deprecations, check out these example updates:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/cargo/pull/10753">cargo</a> (Builder API)</li>
+<li><a href="https://github.com/EmbarkStudios/cargo-deny/pull/431">cargo deny</a> (Derive API)</li>
+</ul>
+<p>However, we recommend people experiment with it and provide
+<a href="https://github.com/clap-rs/clap/issues">feedback</a> but only commit if you are
+happy with the results.  We'll process the feedback and see how much we need to
+pivot with the API design introduce in clap 3.2.  When clap 4 is released, if
+we didn't depart much, we'll recommend upgrading to clap 3.2 to ease the
+migration to 4.0.  Otherwise, we'll work to help people upgrade to whatever
+clap 4.0 look like.</p>
+<p>I mentioned at the beginning some trepidation with this
+release.  It is major departure from how clap has previously worked.  We might
+have made mistakes in the design.  People might not like it.  We want clap to
+be moving forward to be ready for the needs of new and existing users but we
+don't want to alienate the users we already have.</p>
+<p>Normally, to deal with uncertainty, we start with feature-gating new work but
+these changes were invasive and it is difficult to gauge how successful a
+change is that isn't in a stable release.  However, we are coming up on when we
+can start on the clap 4.0 release and we can address any design sins then.
+This gives us the opportunity to collect more feedback with slightly lower
+risk.</p>
+<h3>Results</h3>
+<p>So did all of these changes help us meet our goal of improving compile times
+and reducing binary size?  No,
+<a href="https://github.com/rust-cli/argparse-benchmarks-rs">it made things worse</a> but
+that was expected as we just added more to the API without taking anything out.
+We are hoping that in clap 4.0 things will improve as we
+<a href="https://github.com/clap-rs/clap/issues/3021">remove deprecated features</a>.
+Even then, we do not expect major results as I suspect a lot of the binary size
+comes from a design philosophy and it will take time slowly chipping away at it
+until we have a more open API design.</p>
+<h3>Next Steps</h3>
+<p>Future areas of focus for improving out binary size and compile times include
+<a href="https://github.com/clap-rs/clap/issues/3021">customizing error and help reporting and pluggable defaults and validation</a>.</p>
+<p>Other focuses for clap 4.0 include:</p>
+<ul>
+<li><a href="https://github.com/clap-rs/clap/issues/1041">Removing lifetimes from the API</a></li>
+<li><a href="https://github.com/clap-rs/clap/issues/2688">Simplify how the number of values are specified</a> and <a href="https://github.com/clap-rs/clap/issues/2687">be less magical about it</a></li>
+<li>And <a href="https://github.com/clap-rs/clap/milestone/78">several more things</a></li>
+</ul>
+<p>We expect to let clap 3.2 settle for a month or so and then we'll get to work on clap 4.0.</p>
+</p>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
 			<h2><a href="/blog/2022/02/clap-31-a-step-towards-40/">clap 3.1: A step towards 4.0</a></h2>
 		</li></ul>
 		<ul><li>
