@@ -21,6 +21,8 @@ we are able to deprecate the following concepts:
 - `AppSettings::NoAutoVersion`
 - `AppSettings::NoHelpVersion`
 
+<!-- more -->
+
 ### Introducing `Arg::value_parser`
 
 The derive API has had to deal with adapting raw `OsString`s into the user's
