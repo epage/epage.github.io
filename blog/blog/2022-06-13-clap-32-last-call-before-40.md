@@ -154,7 +154,7 @@ binaries](https://github.com/clap-rs/clap/blob/master/examples/multicall-busybox
 where multiple programs are shipped in one binary with the personality being
 selected based on a hardlink name.  We also found this works quite well for
 [embedded command
-promots](https://github.com/clap-rs/clap/blob/master/examples/repl.rs).
+prompts](https://github.com/clap-rs/clap/blob/master/examples/repl.rs).
 
 ### Resolving Deprecations
 
