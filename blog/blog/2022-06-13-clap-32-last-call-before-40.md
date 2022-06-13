@@ -30,7 +30,7 @@ type.  We did this via the
 [`#[clap(parse(...)]` attribute](https://github.com/clap-rs/clap/tree/master/examples/derive_ref#arg-types).
 
 In place of the `parse` attribute, the Builder API had
-- Native support for `str` (`value_of`) and `str` (`value_of_os`, `value_of_os_lossy`) with various built-in validators
+- Native support for `str` (`value_of`) and `OsStr` (`value_of_os`, `value_of_os_lossy`) with various built-in validators
 - Support for `FromStr` types (`value_of_t`) which produced a lower quality error message than native validation would
 
 `Arg::value_parser` brings the derive API's typing to the builder API.  We've
