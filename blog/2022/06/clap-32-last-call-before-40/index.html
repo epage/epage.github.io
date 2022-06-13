@@ -125,14 +125,14 @@ with the rest of clap's API without special casing.</p>
 </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> matches = cmd.</span><span style="color:#96b5b4;">try_get_matches_from</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">    [&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--quiet</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--quiet</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--verbose</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--verbose</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--verbose</span><span style="color:#c0c5ce;">&quot;]
 </span><span style="color:#c0c5ce;">).</span><span style="color:#96b5b4;">unwrap</span><span style="color:#c0c5ce;">();
-</span><span style="color:#c0c5ce;"> assert_eq!(
-</span><span style="color:#c0c5ce;">     *matches.get_one::&lt;</span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">quiet</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted by clap</span><span style="color:#c0c5ce;">&quot;),
-</span><span style="color:#c0c5ce;">     Some(</span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">)
-</span><span style="color:#c0c5ce;"> );
-</span><span style="color:#c0c5ce;"> assert_eq!(
-</span><span style="color:#c0c5ce;">     *matches.get_one::&lt;</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">verbose</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted by clap</span><span style="color:#c0c5ce;">&quot;),
-</span><span style="color:#c0c5ce;">     Some(</span><span style="color:#d08770;">3</span><span style="color:#c0c5ce;">)
-</span><span style="color:#c0c5ce;"> );
+</span><span style="color:#c0c5ce;">assert_eq!(
+</span><span style="color:#c0c5ce;">    *matches.get_one::&lt;</span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">quiet</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted by clap</span><span style="color:#c0c5ce;">&quot;),
+</span><span style="color:#c0c5ce;">    Some(</span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;">);
+</span><span style="color:#c0c5ce;">assert_eq!(
+</span><span style="color:#c0c5ce;">    *matches.get_one::&lt;</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">verbose</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted by clap</span><span style="color:#c0c5ce;">&quot;),
+</span><span style="color:#c0c5ce;">    Some(</span><span style="color:#d08770;">3</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;">);
 </span></pre>
 <p>In working on actions, we realized we could simplify things if we made
 <code>Command::args_override_self</code> the default and used actions to decide whether
