@@ -206,3 +206,5 @@ Other focuses for clap 4.0 include:
 - And [several more things](https://github.com/clap-rs/clap/milestone/78)
 
 We expect to let clap 3.2 settle for a month or so and then we'll get to work on clap 4.0.
+
+*[Discuss on reddit](https://www.reddit.com/r/rust/comments/vbep9q/clap_32_last_call_before_40/?)*
