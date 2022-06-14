@@ -158,6 +158,9 @@ prompts](https://github.com/clap-rs/clap/blob/master/examples/repl.rs).
 
 ### Resolving Deprecations
 
+Update: we've made deprecations opt-in for now, see
+[#3830](https://github.com/clap-rs/clap/pull/3830) for more details
+
 To help in resolving the deprecations, check out these example updates:
 - [cargo](https://github.com/rust-lang/cargo/pull/10753) (Builder API)
 - [cargo deny](https://github.com/EmbarkStudios/cargo-deny/pull/431) (Derive API)
