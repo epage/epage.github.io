@@ -218,6 +218,7 @@ Unfortunately, I do not yet have experience with these.
 
 To integrate:
 - [073: Driven By Need, Guided By Example with Dan North](https://www.greaterthancode.com/driven-by-need-guided-by-example)
+- [I have complicated feelings about TDD](https://news.ycombinator.com/item?id=32509268)
 
 Property-based testing
 - Great intro: [video](https://www.youtube.com/watch?v=MYucYon2-lk) [slides](https://speakerdeck.com/pycon2018/hillel-wayne-beyond-unit-tests-taking-your-testing-to-the-next-level?slide=41)
