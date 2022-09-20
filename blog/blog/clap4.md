@@ -14,7 +14,7 @@ deprecated APIs and finishing what we couldn't do without breaking changes.
 This release builds on the new APIs introduced during 3.x, see also:
 - The [3.1 release](/blog/2022/02/clap-31-a-step-towards-40/)
 - The [3.2 release](/blog/2022/06/clap-32-last-call-before-40/)
-- Or the [CHANGELOG.md](https://github.com/clap-rs/clap/blob/v3-master/CHANGELOG.md) for the over 50 patch releases since 3.0.0
+- Or the [v3 CHANGELOG.md](https://github.com/clap-rs/clap/blob/v3-master/CHANGELOG.md) for the over 50 patch releases since 3.0.0
 
 To put this into numbers:
 
@@ -56,6 +56,12 @@ official release to allow for collecting and processing feedback.
 
 <!-- more -->
 
+## Upgrading
+
+Like with clap 3.0.0, we've prepared a [migration
+guide](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md#migrating) to
+help through the upgrade process.
+
 ## What Changed
 
 As a caution, this will be a mix of high-level and low-level details as we try
@@ -78,6 +84,9 @@ Some more specific changes:
 - [Introspecting on `ArgMatches`](#introspecting-on-argmatches)
 - [Non-bool Flags](#non-bool-flags)
 - [Fixing Parsing for Hyphenated Values](#fixing-parsing-for-hyphenated-values)
+
+If you want all the fine details:
+- [CHANGELOG](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
 
 You can also skip ahead to
 - [Looking Forward](#looking-forward)
@@ -642,8 +651,10 @@ with other CLI parsers so we can learn from all of the best and avoid
 [NIH syndrome](https://en.wikipedia.org/wiki/Not_invented_here).  For example,
 I've started
 [digging into click's documentation](https://github.com/clap-rs/clap/discussions/3454)
-to see what works well and how it might apply to clap.  This has already led to `value_parser!`s design being made extensible so we could support in it and `clap_derive` features like
-[`FileReader` and `FileWriter`](https://github.com/clap-rs/clap/issues/4074).
+to see what works well and how it might apply to clap.  This has already led to
+`value_parser!`s design being made extensible so we could support features like
+[`FileReader` and `FileWriter`](https://github.com/clap-rs/clap/issues/4074)
+with `value_parser!` and `clap_derive`.
 
 Lastly, of our
 [help-wanted Issues](https://github.com/clap-rs/clap/issues?q=is%3Aopen+is%3Aissue+label%3AE-help-wanted),
