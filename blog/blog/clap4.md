@@ -573,7 +573,7 @@ This happened between `5950c4b9..e81b1aac`
 <a id="fixing-parsing-for-hyphenated-values"></a>
 ### Fixing Parsing for Hyphenated Values
 
-clao supports parsing values that look like flags, whether they are numbers or
+clap supports parsing values that look like flags, whether they are numbers or
 flags to forward to another command.  This initially applied to all arguments
 in a `Command` with `AppSettings::AllowLeadingHyphen`.  A more `Command`-wide specialization
 was added with `AppSettings::AllowNegativeNumbers`.  Then we got an argument-specific
