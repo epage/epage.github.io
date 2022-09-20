@@ -110,7 +110,7 @@ The next change is that we are officially supporting old major versions:
 | v1                                                   | unsupported   | \- |
 
 We have not decided on when we will end-of-life each version; this is an experiment
-that we are iterating on as we go.  This policy is trying balance the need for
+that we are iterating on as we go.  This policy is trying to balance the need for
 developers to upgrade at their own pace with the burden for maintainers to support
 old versions.
 
