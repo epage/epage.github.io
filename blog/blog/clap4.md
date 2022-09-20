@@ -486,7 +486,7 @@ the arg is a part of.
  positional argument into a group and then pass hundreds of arguments into your
  command with `xargs`, we've now done a lot of extra clones that you likely
  didn't care about.
-- We are also wanting to better integrated `ArgGroup` into `clap_derive` (
+- We are also wanting to better integrate `ArgGroup` into `clap_derive` (
   [#3165](https://github.com/clap-rs/clap/issues/3165) 
   [#4211](https://github.com/clap-rs/clap/issues/4211),
   [#2621](https://github.com/clap-rs/clap/issues/2621)
