@@ -135,8 +135,7 @@ Problems with the colored help
 - The choice of colors was controversial, some liked it but others hated it.
   We want safe out-of-the-box defaults
 - Some applications have a specific branding to their color choices and clap's
-  colors don't fit within that and they would rather have none them clashing
-  colors
+  colors don't fit within that, so they would rather have none instead
 - If the developer was providing additional ASCII-formatted content, the
   partial coloring is glaring
 
