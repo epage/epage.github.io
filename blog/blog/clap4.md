@@ -565,9 +565,9 @@ Originally, this was possible in `clap_derive` but not with the builder API.
 While the `value_parser` / `ArgAction` APIs brought a lot of features from
 `clap_derive` to the builder API, this is one area where it regressed.
 
-I had noticed we could re-work `SetTrue`s semantics to reuse existing machinery
+I had noticed we could re-work `SetTrue`'s semantics to reuse existing machinery
 within clap to accomplish this:
-- Users can now override `SetTrue`s default `bool` value parser
+- Users can now override `SetTrue`'s default `bool` value parser
 - Developers can now rely on either 
   - Overriding `SetTrue` defaulting `arg.default_value("false")` (flag absent)
     and `arg.default_missing_value("true")` (flag present) with custom strings
@@ -652,7 +652,7 @@ with other CLI parsers so we can learn from all of the best and avoid
 I've started
 [digging into click's documentation](https://github.com/clap-rs/clap/discussions/3454)
 to see what works well and how it might apply to clap.  This has already led to
-`value_parser!`s design being made extensible so we could support features like
+`value_parser!`'s design being made extensible so we could support features like
 [`FileReader` and `FileWriter`](https://github.com/clap-rs/clap/issues/4074)
 with `value_parser!` and `clap_derive`.
 
