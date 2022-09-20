@@ -30,8 +30,7 @@ To put this into numbers:
 > Aside: Yes, those clap v2 -> v3 numbers are not good.
 >
 > For Builder API Surface, it is understandable when you consider we mostly didn't
-> remove functionality in v3 but deprecated it that eventually allowed us to
-> shrink the API down in 4.0.0.
+> remove functionality in v3 but deprecated it, removing it in v4.
 >
 > Lines of Code is mostly accounted for with the merge of `structopt` into
 > `clap` as `clap_derive`.  We continued to have significant growth after
@@ -40,17 +39,17 @@ To put this into numbers:
 > size.
 >
 > For code size and runtime, one factor is that things fell through the cracks
-> during clap v3's development.  clap went dark for an extended period of time
-> and went through several maintainers.  This isn't to say anyone maintainer is
-> at fault but that things get lost in hand offs.  Towards the end,
-> we double-downed on just getting out what we had and hadn't looked to see how
-> we compared to v2.
+> during clap v3's development.  clap's development went dark for an extended
+> period of time and went through several maintainers.  This isn't to say one
+> of the maintainers is at fault but that things get lost in hand offs.
+> Towards the end, we double-downed on just getting out what we had and hadn't
+> looked to see how we compared to v2.
 >
 > For code size, it looks like it was a lot of small changes that added up,
 > like changing a `VecMap` to a `BTreeMap`.
 >
-> For runtime, it seems to mostly be a single feature that caused it which was removed
-> [[5]](#removing-implicit-version-help-behavior).
+> For runtime, it seems to mostly be a single feature that caused it which was
+> removed in v4 [[5]](#removing-implicit-version-help-behavior).
 
 Our plan is to give about a week window between the release-candidate and the
 official release to allow for collecting and processing feedback.
