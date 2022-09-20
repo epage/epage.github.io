@@ -1,0 +1,91 @@
+<!-- Created with term-transcript v0.2.0 (https://github.com/slowli/term-transcript) -->
+<svg viewBox="0 0 720 318" width="720" height="318" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    :root {
+      --black: #000000; --i-black: #7f7f7f;
+      --blue: #0000ee; --i-blue: #5c5cff;
+      --cyan: #00cdcd; --i-cyan: #00ffff;
+      --green: #00cd00; --i-green: #00ff00;
+      --magenta: #cd00cd; --i-magenta: #ff00ff;
+      --red: #cd0000; --i-red: #ff0000;
+      --white: #e5e5e5; --i-white: #ffffff;
+      --yellow: #cdcd00; --i-yellow: #ffff00;
+      --hl-black: rgba(255, 255, 255, 0.1);
+    }
+    .container {
+      padding: 0 10px;
+      color: var(--white);
+      line-height: 18px;
+    }
+    .container pre {
+      padding: 0;
+      margin: 0;
+      font: 14px SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+      line-height: inherit;
+    }
+    .user-input {
+      margin: 0 -10px 6px;
+      color: var(--white);
+      background: var(--hl-black);
+      padding: 2px 10px;
+    }
+    .term-output { margin-bottom: 6px; }
+    .bold,.prompt { font-weight: bold; }
+    .italic { font-style: italic; }
+    .underline { text-decoration: underline; }
+    .dimmed { opacity: 0.7; }
+    .hard-br {
+      position: relative;
+      margin-left: 5px;
+    }
+    .hard-br:before {
+      content: '↓';
+      font-size: 16px;
+      height: 16px;
+      position: absolute;
+      bottom: 0;
+      transform: rotate(45deg);
+      opacity: 0.8;
+    }
+    .fg0 { color: var(--black); } .bg0 { background: var(--black); }
+    .fg1 { color: var(--red); } .bg1 { background: var(--red); }
+    .fg2 { color: var(--green); } .bg2 { background: var(--green); }
+    .fg3 { color: var(--yellow); } .bg3 { background: var(--yellow); }
+    .fg4 { color: var(--blue); } .bg4 { background: var(--blue); }
+    .fg5 { color: var(--magenta); } .bg5 { background: var(--magenta); }
+    .fg6 { color: var(--cyan); } .bg6 { background: var(--cyan); }
+    .fg7 { color: var(--white); } .bg7 { background: var(--white); }
+    .fg8 { color: var(--i-black); } .bg8 { background: var(--i-black); }
+    .fg9 { color: var(--i-red); } .bg9 { background: var(--i-red); }
+    .fg10 { color: var(--i-green); } .bg10 { background: var(--i-green); }
+    .fg11 { color: var(--i-yellow); } .bg11 { background: var(--i-yellow); }
+    .fg12 { color: var(--i-blue); } .bg12 { background: var(--i-blue); }
+    .fg13 { color: var(--i-magenta); } .bg13 { background: var(--i-magenta); }
+    .fg14 { color: var(--i-cyan); } .bg14 { background: var(--i-cyan); }
+    .fg15 { color: var(--i-white); } .bg15 { background: var(--i-white); }
+  </style>
+  <rect width="100%" height="100%" y="0" rx="4.5" style="fill: var(--black);" />
+  <svg x="0" y="10" width="720" height="298" viewBox="0 0 720 298">
+    <foreignObject width="720" height="298">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="container">
+        <div class="user-input"><pre><span class="prompt">$</span> git stash -h</pre></div>
+        <div class="term-output"><pre><span class="fg2">git-stash</span> 
+
+<span class="fg3">USAGE:</span>
+    git stash [OPTIONS]
+    git stash &lt;SUBCOMMAND&gt;
+
+<span class="fg3">OPTIONS:
+</span>    <span class="fg2">-h</span>, <span class="fg2">--help</span>                 Print help information
+    <span class="fg2">-m</span>, <span class="fg2">--message</span> <span class="fg2">&lt;MESSAGE&gt;</span>    
+
+<span class="fg3">SUBCOMMANDS</span><span class="fg3">:
+</span>    <span class="fg2">apply</span>    
+    <span class="fg2">help</span>     Print this message or the help of the given subcommand(s)
+    <span class="fg2">pop</span>      
+    <span class="fg2">push</span>     
+</pre></div>
+      </div>
+    </foreignObject>
+  </svg>
+</svg>
