@@ -599,7 +599,7 @@ This happened in `f731ce70..f97670ac`
 More immediately, I plan to focus on an experiment with how we style the
 output.  clap has had several challenges in supporting more customization
 - To customize the existing palette, we'd have to expose `termcolor` in the public API, requiring a breaking change to switch away
-- To accept styled content, we've have to expose an entire styling API that delays applying the styles until rendering
+- To accept styled content, we'd have to expose an entire styling API that delays applying the styles until rendering
 
 For the first, I've started work on
 [anstyle](https://docs.rs/anstyle/latest/anstyle/) (ANSI Styling) for providing
