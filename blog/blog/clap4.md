@@ -28,7 +28,8 @@ To put this into numbers:
 *(see [Methodology](#methodology) for more details)*
 
 > Aside: Yes, those clap v2 -> v3 numbers are not good.
-> For Builder API Surface is understandable when you consider we mostly didn't
+>
+> For Builder API Surface, it is understandable when you consider we mostly didn't
 > remove functionality in v3 but deprecated it that eventually allowed us to
 > shrink the API down in 4.0.0.
 >
