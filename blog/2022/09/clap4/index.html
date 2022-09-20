@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clap 4.0, a Rust CLI argument parser</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<article>
+			<header>
+				<nav class="container-fluid">
+					<ul>
+						<li><h2>clap 4.0, a Rust CLI argument parser</h2></li>
+					</ul>
+					<ul>
+						<li>
+							<i class="fa fa-calendar"></i> <time pubdate="pubdate">Tue&nbsp;20&nbsp;Sep&nbsp;'22</time>
+							<br/><i class="fa fa-tags"></i> programming, rust
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<p>We are excited to (pre-)announce clap 4.0!
+This release focuses on removing deprecated APIs and finishing what we couldn't
+do without breaking changes.  For more details see the
+<a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> (including the migration guide)
+and the
+<a href="https://docs.rs/clap/4.0.0-rc.1/clap/index.html">documentation</a>.</p>
+<p>This release builds on done in the 3.x releases and can be worth catching up on them:</p>
+<ul>
+<li>The <a href="/blog/2022/02/clap-31-a-step-towards-40/">3.1 release</a></li>
+<li>The <a href="/blog/2022/06/clap-32-last-call-before-40/">3.2 release</a></li>
+<li>Or the <a href="https://github.com/clap-rs/clap/blob/v3-master/CHANGELOG.md">v3 CHANGELOG.md</a> for the over 50 patch releases since 3.0.0</li>
+</ul>
+<p>To put all of this work into numbers:</p>
+<table><thead><tr><th></th><th>Baseline</th><th>2.34.0</th><th>3.0.0</th><th>3.2.21</th><th>4.0.0</th></tr></thead><tbody>
+<tr><td>Builder API Surface</td><td></td><td>174</td><td>245</td><td>282</td><td>165 <a href="#removing-deprecated-features">[1]</a> <a href="#num-args">[2]</a></td></tr>
+<tr><td>Lines of Code</td><td>6</td><td>13,462</td><td>17,308</td><td>24,044</td><td>20,653 <a href="#removing-deprecated-features">[1]</a> <a href="#removing-lifetimes">[3]</a></td></tr>
+<tr><td>Code size</td><td>218.2 KiB</td><td>487.0 KiB</td><td>609.3 KiB</td><td>605.5 KiB</td><td>544.3 KiB <a href="#removing-deprecated-features">[1]</a> <a href="#reducing-code-size">[4]</a></td></tr>
+<tr><td>Runtime</td><td></td><td>7.529 us</td><td>14.544 us</td><td>14.657 us</td><td>8.2478 us <a href="#removing-implicit-version-help-behavior">[5]</a></td></tr>
+</tbody></table>
+<p><em>(see <a href="#methodology">Methodology</a> for more details)</em></p>
+<blockquote>
+<p>Aside: Yes, those clap v2 -&gt; v3 numbers are not good.</p>
+<p>For Builder API Surface, it is understandable when you consider we mostly didn't
+remove functionality in v3 but deprecated it, removing it in v4.</p>
+<p>Lines of Code is mostly accounted for with the merge of <code>structopt</code> into
+<code>clap</code> as <code>clap_derive</code>.  We continued to have significant growth after
+that as we continued to develop replacement features for functionality in
+clap.  These more general solutions take up more lines though not more code
+size.</p>
+<p>For code size and runtime, one factor is that things fell through the cracks
+during clap v3's development.  clap's development went dark for an extended
+period of time and went through several maintainers.  This isn't to say one
+of the maintainers is at fault but that things get lost in hand offs.
+Towards the end, we double-downed on just getting out what we had and hadn't
+looked to see how we compared to v2.</p>
+<p>For code size, it looks like it was a lot of small changes that added up,
+like changing a <code>VecMap</code> to a <code>BTreeMap</code>.</p>
+<p>For runtime, it seems to mostly be a single feature that caused it which was
+removed in v4 <a href="#removing-implicit-version-help-behavior">[5]</a>.</p>
+</blockquote>
+<p>Our plan is to give about a week window between the release-candidate and the
+official release to allow for collecting and processing feedback.</p>
+<!-- more -->
+<h2>What Changed</h2>
+<p>As a caution, this will be a mix of high-level and low-level details as we try
+to show how each change impacts not just functionality but several different
+performance metrics to help understand the benefits of some features and the
+costs of others.</p>
+<p>Most people will care about:</p>
+<ul>
+<li><a href="#support-policy">Support Policy</a></li>
+<li><a href="#polishing-help-output">Polishing Help Output</a></li>
+<li><a href="#more-specific-derive-attributes">More Specific Derive Attributes</a></li>
+<li><a href="#num-args"><code>num_args</code></a></li>
+<li><a href="#removing-deprecated-features">Removing Deprecated Features</a></li>
+</ul>
+<p>Some more specific changes:</p>
+<ul>
+<li><a href="#reducing-code-size">Reducing Code Size</a></li>
+<li><a href="#removing-lifetimes">Removing Lifetimes</a></li>
+<li><a href="#removing-implicit-version-help-behavior">Removing Implicit Version/Help Behavior</a></li>
+<li><a href="#storing-ids-for-arggroup">Storing <code>Id</code>s for <code>ArgGroup</code></a></li>
+<li><a href="#introspecting-on-argmatches">Introspecting on <code>ArgMatches</code></a></li>
+<li><a href="#non-bool-flags">Non-bool Flags</a></li>
+<li><a href="#fixing-parsing-for-hyphenated-values">Fixing Parsing for Hyphenated Values</a></li>
+</ul>
+<p>You can also skip ahead to</p>
+<ul>
+<li><a href="#looking-forward">Looking Forward</a></li>
+<li><a href="#how-can-i-help">How Can I Help</a></li>
+</ul>
+<p><a id="support-policy"></a></p>
+<h3>Support Policy</h3>
+<p>Before getting into the details, I want to assure you that we understand the
+effort required to deal with breaking changes.  We both maintain CLIs using clap and have to
+deal with updating 500+ tests for clap.  We are trying to balance the needs of
+clap users for whom clap is already good enough with those who want to keep using clap
+but are discouraged by the build times, binary size, or some missing features.
+I'm hoping that the improvements we made will help justify the changes.</p>
+<p>With clap 3.0, we adopted a deprecation policy to help developers migrate to new
+versions.  After feedback from developers using clap, we adjusted that policy soon after clap
+3.2 so that deprecations are opt-in (via the <code>deprecated</code> feature flag) so you
+can choose the timetable of when to respond to them without extra noise from
+the deprecations.  We've also improved <code>clap_derive</code> to avoid deprecations
+being reported for code it generates on your behalf.</p>
+<p>The next change is that we are officially supporting old major versions:</p>
+<table><thead><tr><th>Version</th><th>Status</th><th>Support</th></tr></thead><tbody>
+<tr><td><a href="https://github.com/clap-rs/clap/tree/master">v4</a></td><td>active</td><td>Features and bug fixes target <code>master</code> by default</td></tr>
+<tr><td><a href="https://github.com/clap-rs/clap/tree/v3-master">v3</a></td><td>maintenance</td><td>Accepting trivial cherry-picks from <code>master</code> (i.e. minimal conflict resolution) by contributors</td></tr>
+<tr><td><a href="https://github.com/clap-rs/clap/tree/v2-master">v2</a></td><td>deprecated</td><td>Only accepting fixes for ecosystem-wide critical bugs</td></tr>
+<tr><td>v1</td><td>unsupported</td><td>-</td></tr>
+</tbody></table>
+<p>We have not decided on when we will end-of-life each version; this is an experiment
+that we are iterating on as we go.  This policy is trying to balance the need for
+developers to upgrade at their own pace with the burden for maintainers to support
+old versions.</p>
+<p>See also our <a href="https://github.com/clap-rs/clap/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a></p>
+<p><a id="polishing-help-output"></a></p>
+<h3>Polishing Help Output</h3>
+<table><thead><tr><th>Before</th><th>After</th></tr></thead><tbody>
+<tr><td><img src="/img/clap4/git-diff-3.2.21.svg" alt="screenshot" /></td><td><img src="/img/clap4/git-diff-4.0.0.svg" alt="screenshot" /></td></tr>
+<tr><td><img src="/img/clap4/git-stash-3.2.21.svg" alt="screenshot" /></td><td><img src="/img/clap4/git-stash-4.0.0.svg" alt="screenshot" /></td></tr>
+</tbody></table>
+<p>During clap 3.0.0 development, we were looking at removing
+<code>AppSettings::ColoredHelp</code>, making it always on.  This helped identify several
+problems with our existing colored help and started a broader re-examination of
+our <code>--help</code> output.  For more background on each decision, I
+recommend you check out the
+<a href="https://github.com/clap-rs/clap/issues/4132">parent issue</a></p>
+<p>Problems with the colored help</p>
+<ul>
+<li>The choice of colors was controversial, some liked it but others hated it.
+We want safe out-of-the-box defaults</li>
+<li>Some applications have a specific branding to their color choices and clap's
+colors don't fit within that, so they would rather have none instead</li>
+<li>If the developer was providing additional ASCII-formatted content, the
+partial coloring is glaring</li>
+</ul>
+<p>In the short term, <code>6079a871</code>, <code>8315ba3d</code>, <code>e02648e6</code> starts us off with a more neutral color palette by
+focusing on bold/underline, rather than colors.  Longer term, we need to allow
+users to customize the colors
+(<a href="https://github.com/clap-rs/clap/issues/3234">#3234</a>)
+and provide their own colored output
+(<a href="https://github.com/clap-rs/clap/issues/3108">#3108</a>).
+We plan to focus on this during clap 4.x.</p>
+<p>We then extended the styling to the usage line as well as the general structure
+of the help output.  This required dropping <code>textwrap</code> and included clean up
+that helped offset the extra code size from the extra formatting logic. This
+happened in <code>2e2b63fa..a6cb2e65</code></p>
+<ul>
+<li>Code size: 562.7KiB → 566.0 KiB (+3.3 KiB)</li>
+<li>Lines of Code: 19,078 → 19,468 <span style="color:red">(+390)</span></li>
+</ul>
+<p>A frequent point of confusion for users is that <code>-h</code> shows an abbreviated help
+and <code>--help</code> shows a detailed help.  <code>rg</code> and <code>bat</code> include messages in the
+output explaining the distinction.  I realized we could bake this directly into
+the description for <code>-h</code> and <code>--help</code>. This happened in <code>c1c269b4</code></p>
+<ul>
+<li>Code size: 567.1 KiB → 568.0 KiB (+0.9 KiB)</li>
+<li>Lines of Code: 19,693 → 19,708 (+15)</li>
+</ul>
+<p>When getting user feedback on <code>--help</code>, I noticed that their usage statement
+was meaningless, something like <code>prog [OPTIONS] [ARGS]</code>.  While showing
+everything can be too much (see <code>git -h</code>), showing too little negates the
+reason for the usage in the first place.  We've changed the usage to never
+collapse positional arguments into <code>[ARGS]</code> as that seems to strike a nice
+balance.  Longer term, we should provide ways for users to force certain args
+to not be collapsed or to allow specialized usages per case in an <code>ArgGroup</code>.
+This happened in <code>f3c4bfd9..a1256a6e</code></p>
+<ul>
+<li>Code size: 570.4 KiB → 567.1 KiB (-3.3 KiB)</li>
+<li>Lines of Code: 19,631 → 19,628 (-3)</li>
+</ul>
+<p>We also</p>
+<ul>
+<li>When looking at non-clap CLIs to avoid any <a href="https://en.wikipedia.org/wiki/Not_invented_here">NIH syndrome</a>, the ALL CAPS headers
+started bothering me more and more, so we switched to title case in <code>9b23a09f</code>.
+I know some users appreciated the man page style formatting but I'm hoping this
+will be a more polished look for people less familiar with man pages.</li>
+<li>When looking at the help after this change, it just felt off seeing
+&quot;Subcommand&quot;.  &quot;Subcommand&quot; is just a more specific case for &quot;Command&quot; and its
+rare to see others do this, so I went ahead and switched to &quot;Command&quot; in
+<code>42c94384</code>.</li>
+<li>In looking at other CLIs, I also noticed they tend to put subcommands front and
+center.  This makes sense since the parent commands are generally not usable on
+their own.  We followed suit in <code>83d6add9</code>.  One problem with putting subcommands
+first is when the help output scrolls off the screen.  This highlights an
+existing problem with clap help output.  We have started <a href="https://github.com/clap-rs/clap/issues/4201">investigating adding
+a pager to help output</a>.</li>
+<li>Made usage / arg displays more consistent in <code>02db3043</code>, <code>df76168</code>, <code>76dd3a18</code></li>
+<li>Removed name/version/author from the default <code>Command::help_template</code> as it is mostly redundant in <code>65b5b5f7</code></li>
+<li>Further condensed <code>--help</code> output by switching the template to have Usage on one line in <code>9a645d2d</code></li>
+<li>Even further condense <code>-h</code> with <code>next_line_help</code> by removing the blank lines between arguments in <code>bbb6c38b</code></li>
+<li>Aim for horizontal density by changing indentation from the less common 4 spaces to the more common 2 spaces in <code>65c28978..c95c9f2f</code></li>
+<li>Respect <code>COLUMNS</code> when we can't detect terminal width in <code>1466cd5f..79321f25</code></li>
+</ul>
+<p><a id="more-specific-derive-attributes"></a></p>
+<h3>More Specific Derive Attributes</h3>
+<p>We've added support for new derive attributes, deprecating the old ones.</p>
+<p>Before:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#65737e;">/// Simple program to greet a person
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser, Debug)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">clap</span><span style="color:#c0c5ce;">(author, version, about, long_about = None)]
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Args {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// Name of the person to greet
+</span><span style="color:#c0c5ce;">    #[clap(short, long, value_parser)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">name</span><span style="color:#c0c5ce;">: String,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// Number of times to greet
+</span><span style="color:#c0c5ce;">    #[clap(short, long, value_parser, default_value_t = 1)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">count</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>After:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#65737e;">/// Simple program to greet a person
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser, Debug)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">command</span><span style="color:#c0c5ce;">(author, version, about, long_about = None)]
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Args {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// Name of the person to greet
+</span><span style="color:#c0c5ce;">    #[arg(short, long)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">name</span><span style="color:#c0c5ce;">: String,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// Number of times to greet
+</span><span style="color:#c0c5ce;">    #[arg(short, long, default_value_t = 1)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">count</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>As we look forward to some planned <code>clap_derive</code> features (e.g.
+<a href="https://github.com/clap-rs/clap/issues/1807">#1807</a>,
+<a href="https://github.com/clap-rs/clap/issues/1553">#1553</a>
+),
+the use of a single <code>#[clap(...)]</code> attribute is limiting.  In addition,
+we have seen users frequently confused by how the derive and builder APIs
+relate (
+<a href="https://github.com/clap-rs/clap/discussions/4090">#4090</a>
+).  We are hoping that by migrating users to <code>#[command(...)]</code>,
+<code>#[arg(...)]</code>, and <code>#[value(...)]</code> attributes, code will be clearer, the derive
+will be easier to use, and we can expand on the capabilities of the derive API.</p>
+<p>This happened in <code>2f4e42f2..ba5eec31</code> and <code>20ba828f..f5138629</code> and as they are
+focusing on a code generating, they should have negligible impact on code size
+either way.</p>
+<p>This also provided an opportunity for us to do some much needed cleanup of <code>clap_derive</code>, including</p>
+<ul>
+<li>Reducing duplicate parsing in <code>a20c67c8..3ec2f0f7</code></li>
+<li>Improved error and deprecation reporting in <code>ebe181ac..20ba828f</code>, <code>f5138629..7ed7f71a</code>, <code>7ed7f71a..088b396d</code></li>
+</ul>
+<p><a id="num-args"></a></p>
+<h3><code>num_args</code></h3>
+<p>The new <code>num_args</code> defines how many command-line arguments should be consumed as values, per occurrence:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">et cmd = Command::new(&quot;</span><span style="color:#a3be8c;">prog</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">   .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(Arg::new(&quot;</span><span style="color:#a3be8c;">file</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">       .</span><span style="color:#96b5b4;">action</span><span style="color:#c0c5ce;">(ArgAction::Set)
+</span><span style="color:#c0c5ce;">       .</span><span style="color:#96b5b4;">num_args</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">2</span><span style="color:#c0c5ce;">)  </span><span style="color:#65737e;">// single value
+</span><span style="color:#c0c5ce;">       .</span><span style="color:#96b5b4;">short</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">F</span><span style="color:#c0c5ce;">&#39;))
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(Arg::new(&quot;</span><span style="color:#a3be8c;">mode</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">        .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">mode</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">        .</span><span style="color:#96b5b4;">num_args</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">..=</span><span style="color:#d08770;">1</span><span style="color:#c0c5ce;">))  </span><span style="color:#65737e;">// range of values
+</span><span style="color:#c0c5ce;">        .</span><span style="color:#96b5b4;">default_value</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">plaid</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">        .</span><span style="color:#96b5b4;">default_missing_value</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">slow</span><span style="color:#c0c5ce;">&quot;);
+</span></pre>
+<p>Previously, clap has had several ways for controlling how many values will be captured
+without always being clear on how they interacted, including</p>
+<ul>
+<li><code>Arg::multiple_values(true)</code></li>
+<li><code>Arg::number_of_values(4)</code></li>
+<li><code>Arg::min_values(2)</code></li>
+<li><code>Arg::max_values(20)</code></li>
+<li><code>Arg::takes_value(true)</code></li>
+</ul>
+<p>These have now all been collapsed into <code>Arg::num_args</code>.
+Most changes happened between <code>ee06707c..179faa6b</code></p>
+<ul>
+<li>Code size: 564.4 KiB → 563.5 KiB (-0.9 KiB)</li>
+<li>Lines of Code: 17,854 → 17,946 (+92)</li>
+</ul>
+<p>See
+<a href="https://github.com/clap-rs/clap/issues/2688">Issue 2688</a> for more background.</p>
+<p><a id="removing-deprecated-features"></a></p>
+<h3>Removing Deprecated Features</h3>
+<p>A lot of deprecations were merely the removal of functions.  Others involved
+changing defaults, percolating the effect throughout, and simplifying the code
+as a result.</p>
+<p>The most fundamental changes were the introduction of</p>
+<ul>
+<li><a href="https://docs.rs/clap/latest/clap/enum.ArgAction.html">ArgAction</a> which provided more transparency into clap's behavior</li>
+<li><a href="https://docs.rs/clap/latest/clap/builder/struct.Arg.html#method.value_parser">Arg::value_parser</a> which made clap's validation more open ended, allowing the deprecation of a lot of built-in validators</li>
+</ul>
+<p>Removing deprecated APIs were done in <code>16bd7599..017b87ab</code> (<a href="https://github.com/clap-rs/clap/pull/3963">#3963</a>) and <code>017b87ab..ee06707c</code></p>
+<ul>
+<li>Code size: 604.6 KiB → 564.5 KiB <span style="color:green">(-40.1 KiB)</span></li>
+<li>Lines of Code: 23,254 → 17,854 <span style="color:green">(-5,400)</span></li>
+</ul>
+<p>This is in addition to the Builder API Surface shrinking dramatically, making
+it easier to discover and use the features that clap provides.</p>
+<p><a id="reducing-code-size"></a></p>
+<h3>Reducing Code Size</h3>
+<p>Along the way some more specific actions were taken to reduce code size.</p>
+<p>The first was to move off of <code>IndexMap</code>, <code>IndexSet</code>,
+<code>HashMap</code>, and <code>HashSet</code> to a custom built <code>FlatSet</code> and <code>FlatMap</code>.  clap does
+not deal in big numbers and can get away with just using a <code>Vec</code> and manually
+enforcing uniqueness by iterating over it.  <code>FlatSet</code> codifies that approach.
+<code>FlatMap</code> takes the same approach but uses separate <code>Vec</code>s for the keys and
+values.</p>
+<p>Benefit</p>
+<ul>
+<li>Removed some dependencies (<code>indexmap</code>, <code>hashbrown</code>)</li>
+<li>Minimizing the number of containers means more reuse when they get monomorphized</li>
+<li>Building on <code>Vec</code>s allow even more monomorphized reuse as a <code>FlatStr&lt;Str&gt;</code> is
+really just a <code>Vec&lt;Str&gt;</code>.  This is more acute for <code>FlatMap</code> since we store
+the keys and values separately.  A <code>FlatMap&lt;Str, Vec&lt;Str&gt;&gt;</code> is really a
+<code>(Vec&lt;Str&gt;, Vec&lt;Vec&lt;Str&gt;&gt;)</code>, allowing reuse between the key and value and any
+<code>FlatSet&lt;Str&gt;</code> or <code>Vec&lt;Str&gt;</code> in the code base.</li>
+</ul>
+<p>This happened in <code>b344f1cf..084a6dff</code></p>
+<ul>
+<li>Code size: 561.2 KiB → 525.2 KiB  <span style="color:green">(-36 KiB)</span></li>
+<li>Lines of Code: 17,789 → 18,075  (+286)</li>
+</ul>
+<p>I tried doing the parallel-<code>Vec</code> approach for our formatted output
+(<code>Vec&lt;(Style, String)&gt;</code>) but it wasn't an immediate win, so I dropped that
+effort as it didn't look like there was enough to optimize about my
+proof-of-concept to get a noticeable win.</p>
+<p>Some of our increases in binary size this release came from being more detailed
+in our <a href="#polishing-help-output">help formatting</a>.  Code that previously wrote
+to a <code>String</code> now worked with our formatted output (<code>Vec&lt;(Style, String)&gt;</code>).
+My hope is we can re-work this data structure in
+<a href="https://github.com/clap-rs/clap/issues?q=is%3Aopen+is%3Aissue+milestone%3A4.x">a future 4.x release</a>.
+To see how much this will help reduce binary size, I switched to a straight
+<code>String</code> when the <code>color</code> feature flag is disabled.</p>
+<p>This happened in <code>e75da2f8</code></p>
+<ul>
+<li>Code size: 542.7 KiB → 542.4 KiB (-0.3 KiB)</li>
+<li>Code size without <code>color</code>: 533.6 KiB → 518.2 KiB <span style="color:green">(-15.4 KiB)</span></li>
+<li>Lines of Code: 20,426 → 20,470  (+34)</li>
+</ul>
+<p>Next, we split the formatting of errors out and wrapped it in a trait, allowing
+more naive implementations or just not rendering any details at all.  This is
+an example of using traits for reducing size rather than throwing in more
+feature flags which can be harder to maintain and harder for a developer to discover
+and use well.</p>
+<p>This happened in <code>956789c3..d219c69c</code>.  An application that switches from the
+&quot;rich&quot; to the &quot;null&quot; formatter dropped code size by <span style="color:green">6 KiB</span>.  This won't show up
+in our usual metrics as this is opt-in and the example we are using for
+measuring does not opt-in.</p>
+<p>When adopting <code>StyledStr</code>, we also needed some behavior that <code>textwrap</code> didn't
+seem to provide, so we re-implemented a subset that fit our needs (incremental
+wrapping).</p>
+<p>This happened in <code>37f2efb0</code></p>
+<ul>
+<li>Code size: 577.6 KiB → 565.1 KiB <span style="color:green">(-12.5 KiB)</span></li>
+<li>Lines of Code: 19,250 → 19,483  (+233)</li>
+</ul>
+<p>In cleaning up <code>clap_derive</code>, we found some redundant generated code that we
+cleaned up in <code>0b5f95e3</code>.  Our usual benchmark doesn't cover this case.  I ran
+another one and didn't see any noticeable change, so congrats to the compiler
+optimizing it?</p>
+<p>Looking for another way to break down where all of the code size for clap comes
+from, I split out auto-generated <code>help</code>, auto-generated <code>usage</code>, and <code>error-context</code> features.</p>
+<p>This happened in <code>94c5802a..c26e7fd6</code></p>
+<ul>
+<li>Code size: 542.9 KiB → 544.3 KiB (+2.6 KiB)</li>
+<li>Lines of Code: 20,312 → 20,653  (+341)</li>
+</ul>
+<p>Breaking clap down by feature:</p>
+<ul>
+<li>Removing auto-generated <code>help</code>: 495.3 KiB <span style="color:green">(-49.0 KiB)</span></li>
+<li>Removing auto-generated <code>usage</code>: 520.0 KiB <span style="color:green">(-24.3 KiB)</span></li>
+<li>Removing <code>color</code>: 504.0 KiB <span style="color:green">(-40.3 KiB)</span></li>
+<li>Removing <code>suggestions</code>: 509.1 KiB <span style="color:green">(-35.2 KiB)</span></li>
+<li>Removing <code>suggestions</code>+<code>error-context</code>: 489.2 KiB <span style="color:green">(-55.1 KiB)</span></li>
+<li>Removing all of the above: 422.6 KiB <span style="color:green">(-121.7 KiB)</span></li>
+</ul>
+<p><a id="removing-lifetimes"></a></p>
+<h3>Removing Lifetimes</h3>
+<p>In the most common case, a developer never sees that clap borrows data or deal with
+the lifetimes on the data types.  You just use the builder or derive and it is
+all taken care of for you and is fairly fast with low code size.</p>
+<p>However, when you do notice them they can be a pain to deal with.  Consider these use cases</p>
+<ul>
+<li>An application with a <code>--log &lt;PATH&gt;</code> parameter that defaults to a filename containing the 
+current timestamp.  With the builder API, this can be frustrating to return
+the <code>Command</code> from a function and more so with the derive API as it only
+supports <code>'static</code> lifetimes.  Your only options is to
+work around this with <code>once_cell</code> or leaking the memory</li>
+<li>An application that generates the <code>Command</code> from a file using
+<a href="https://docs.rs/clap-serde/latest/clap_serde/">clap_serde</a></li>
+</ul>
+<p>When doing this, we wanted to use newtypes to allow</p>
+<ul>
+<li>Flexibility in changing how we optimize the strings (use <code>String</code>,
+<code>Cow&lt;'static, str&gt;</code>, etc), so we created <code>Str</code> and <code>OsStr</code></li>
+<li>Clarify some distinctions in the API and offer more type safety between them,
+so we created <code>Id</code> for <code>Arg::new()</code> and <code>ArgGroup::new()</code></li>
+<li>Allow developer-provided formatted content in
+<a href="https://github.com/clap-rs/clap/issues?q=is%3Aopen+is%3Aissue+milestone%3A4.x">a future 4.x release</a>,
+so we created <code>StyledStr</code></li>
+</ul>
+<p>To keep things convenient for the common case, we updated our APIs to accept
+<code>impl Into&lt;Str&gt;</code> and <code>impl Into&lt;OsStr&gt;</code>.  This gave us the opportunity to
+re-evaluate APIs that accepted a <code>&amp;'static str</code> instead of a <code>&amp;'static OsStr</code>
+or had separate <code>str</code> and <code>OsStr</code> versions to clean this all up.</p>
+<p>The use of <code>impl Into&lt;Str&gt;</code> did run into problems with the few places we had
+<code>impl Into&lt;Option&lt;T&gt;&gt;</code> for resetting of fields because <code>None</code> was ambiguous on
+what type it was coming from, so we created the <code>IntoResettable</code> trait to
+resolve these ambiguities.</p>
+<p><code>a5494573..5950c4b9</code></p>
+<ul>
+<li>Code size: 525.2 KiB → 553.4 KiB <span style="color:red">(+28.2 KiB)</span></li>
+<li>Lines of Code: 18,075 → 18,460 <span style="color:red">(+385)</span></li>
+</ul>
+<p><code>e81b1aac..c6b8a7ba</code></p>
+<ul>
+<li>Code size: 553.4 KiB → 565.7 KiB <span style="color:red">(+12.3 KiB)</span></li>
+<li>Lines of Code: 18,524 → 18,873 <span style="color:red">(+349)</span></li>
+</ul>
+<p><code>d4ec9ca5..956789c3</code></p>
+<ul>
+<li>Code size: 565.7 KiB → 563.6 KiB (-2.1 KiB)</li>
+<li>Lines of code: 18,876 → 18,883 (+7)</li>
+</ul>
+<p>We originally accepted <code>String</code> in the API and had a <code>perf</code> feature flag to
+control whether you prefer code size or runtime performance.  In looking back
+at these numbers, the cost of accepting <code>String</code>s in clap's API seemed too high
+for the how often this feature would be used.  We instead shifted it so clap
+accepts only <code>&amp;'static str</code> by default and the <code>string</code> feature flag changes
+the API to accept <code>String</code>s as well, restoring most of the code size and runtime
+performance from before we made any of these changes.</p>
+<p><code>1365b088..6dc8c994</code></p>
+<ul>
+<li>Code size: 567.2 KiB → 541.1 KiB <span style="color:green">(+26.1 KiB)</span></li>
+<li>Lines of code: 20,233 → 20,278 (+45)</li>
+</ul>
+<p>As I mentioned, we have to support some fields being resettable.  We've made
+this more consistent by allowing nearly all fields to be reset in
+<code>ee387c66..7ee121a2</code></p>
+<p><a id="removing-implicit-version-help-behavior"></a></p>
+<h3>Removing Implicit Version/Help Behavior</h3>
+<p>clap 3.0.0 tried to make <code>--version</code> and <code>--help</code> flags as easy to modify as possible</p>
+<ul>
+<li>You could use the built-in behavior</li>
+<li>You could tweak their behavior with <code>cmd.mut_arg(&quot;help&quot;, |arg| arg.help(&quot;Custom message&quot;))</code> and have that propagated to subcommands</li>
+<li>You could provide your own, implicitly disabling the built-in help flag</li>
+<li>Along with providing your own, you can explicitly disable the built-in help flag</li>
+</ul>
+<p>All of those automatically show help output when present which you could disable, making it a regular flag.</p>
+<p>Magic, while making some cases easy, also makes it difficult to divine the
+rules and force it to do what you want.  This had come up several times in
+supporting developers but <a href="https://github.com/clap-rs/clap/issues/3405">Issue #3405</a>
+was the tipping point for re-thinking how we do this.</p>
+<p>Now, things are simplified down to</p>
+<ul>
+<li>You can use the built-in behavior</li>
+<li>You can disable the built-in behavior explicitly with
+<code>cmd.disable_help_flag(true)</code> and provide your own flag.  For your custom
+help flag to show clap's help automatically, call <code>arg.action(ArgAction::Help)</code>.</li>
+</ul>
+<p>Most changes happened between <code>0129d99f..6bc8dfd3</code></p>
+<ul>
+<li>Code size: 563.5 KiB → 561.6 KiB (-1.9 KiB)</li>
+<li>Lines of Code: 17,944 → 17,789 (-155)</li>
+</ul>
+<p>Specifically <code>f70ebe89</code> is where almost all of the parse speed gains happened
+between clap v3 and clap v4, returning clap back to clap v2's performance.</p>
+<p><a id="storing-ids-for-arggroup"></a></p>
+<h3>Storing <code>Id</code>s for <code>ArgGroup</code></h3>
+<p>Something that can easily be missed in clap is that when we are parsing and
+store a value in <code>ArgMatches</code>, we also store that value in all <code>ArgGroup</code>s that
+the arg is a part of.</p>
+<ul>
+<li>This can really balloon the  number of allocations performed.  Say you put a
+positional argument into a group and then pass hundreds of arguments into your
+command with <code>xargs</code>, we've now done a lot of extra clones that you likely
+didn't care about.</li>
+<li>We are also wanting to better integrate <code>ArgGroup</code> into <code>clap_derive</code> (
+<a href="https://github.com/clap-rs/clap/issues/3165">#3165</a> 
+<a href="https://github.com/clap-rs/clap/issues/4211">#4211</a>,
+<a href="https://github.com/clap-rs/clap/issues/2621">#2621</a>
+).
+There isn't a way for <code>clap_derive</code> to know which variant
+of an enum it should match.</li>
+</ul>
+<p>So we've changed things up and now for each occurrence (not value) of an
+argument, we are storing its arg <code>Id</code> in the <code>ArgGroup</code>, reducing the number of
+allocations involved (since an <code>Id</code> might not even be on the heap) and making
+it easier to make programmatic decisions about the argument.</p>
+<p>This happened in <code>41be1bed</code></p>
+<ul>
+<li>Code size: 550.0 KiB → 550.7 KiB (+0.7 KiB)</li>
+<li>Lines of Code: 18,057 → 18,062 (+5)</li>
+</ul>
+<p><a id="introspecting-on-argmatches"></a></p>
+<h3>Introspecting on <code>ArgMatches</code></h3>
+<p>A fairly regular request is for iterating over the arguments in <code>ArgMatches</code>,
+whether for
+<a href="https://github.com/clap-rs/clap/blob/master/examples/find.rs#L27">re-organizing the data by order of arguments for commands like <code>find</code></a>
+or for
+<a href="https://github.com/clap-rs/clap/discussions/2763">layered configuration</a>.
+This was blocked on how we were storing argument <code>Id</code>s.  During the development
+of clap 3.0, <code>Id</code>s were switched from a string to a hash of the string.  This
+removed the need for a lifetime on <code>ArgMatches</code>, reduced memory overhead, and
+opened the door for allowing alternative <code>Id</code> types in the future.  The problem
+is that it is a one way process (can't get a string back from the hash) and the
+way the traits were laid out it made it error prone (easy to accidentally
+look up a hash of a hash).</p>
+<p>After re-examining the alternative <code>Id</code> types feature request
+(<a href="https://github.com/clap-rs/clap/issues/1104">#1104</a>),
+we decided to not move forward with that route.  This meant we could go back to
+strings, especially with our previous lifetime changes, and make it fairly
+ergonomic to allow people to enumerate the arguments that were parsed.</p>
+<p>This happened in <code>7486a0b4</code> though it was dependent on a batch of the lifetime
+work mentioned earlier.  See the lifetime-removal work for metrics.</p>
+<p><a id="non-bool-flags"></a></p>
+<h3>Non-bool Flags</h3>
+<p>Sometimes you want a flag to convey something more specific than
+<code>true</code>/<code>false</code>, like a <code>--https</code> flag tracking the relevant port:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = Command::new(&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        Arg::new(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">https</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">action</span><span style="color:#c0c5ce;">(clap::ArgAction::SetTrue)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">value_parser</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">                value_parser!(</span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">)
+</span><span style="color:#c0c5ce;">                    .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">b</span><span style="color:#c0c5ce;">| -&gt; </span><span style="color:#b48ead;">usize </span><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">                        </span><span style="color:#b48ead;">if</span><span style="color:#c0c5ce;"> b { </span><span style="color:#d08770;">443 </span><span style="color:#c0c5ce;">} </span><span style="color:#b48ead;">else </span><span style="color:#c0c5ce;">{ </span><span style="color:#d08770;">80 </span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">                    })
+</span><span style="color:#c0c5ce;">            )
+</span><span style="color:#c0c5ce;">    );
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> matches = cmd.</span><span style="color:#96b5b4;">get_matches_from</span><span style="color:#c0c5ce;">([&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--https</span><span style="color:#c0c5ce;">&quot;]);
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> port = matches.get_one::&lt;</span><span style="color:#b48ead;">usize</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">copied</span><span style="color:#c0c5ce;">();
+</span><span style="color:#c0c5ce;">assert_eq!(port, Some(</span><span style="color:#d08770;">443</span><span style="color:#c0c5ce;">));
+</span></pre>
+<p>Originally, this was possible in <code>clap_derive</code> but not with the builder API.
+While the <code>value_parser</code> / <code>ArgAction</code> APIs brought a lot of features from
+<code>clap_derive</code> to the builder API, this is one area where it regressed.</p>
+<p>I had noticed we could re-work <code>SetTrue</code>'s semantics to reuse existing machinery
+within clap to accomplish this:</p>
+<ul>
+<li>Users can now override <code>SetTrue</code>'s default <code>bool</code> value parser</li>
+<li>Developers can now rely on either 
+<ul>
+<li>Overriding <code>SetTrue</code> defaulting <code>arg.default_value(&quot;false&quot;)</code> (flag absent)
+and <code>arg.default_missing_value(&quot;true&quot;)</code> (flag present) with custom strings
+to be parsed by the value_parser</li>
+<li>Adapt a <code>bool</code> value parser via <code>ValueParser::map</code></li>
+</ul>
+</li>
+</ul>
+<p>This happened between <code>5950c4b9..e81b1aac</code></p>
+<ul>
+<li>Code size: 553.4 KiB → 553.4 KiB (0)</li>
+<li>Lines of Code: 18,460 → 18,524 (+64)</li>
+</ul>
+<p><a id="fixing-parsing-for-hyphenated-values"></a></p>
+<h3>Fixing Parsing for Hyphenated Values</h3>
+<p>clap supports parsing values that look like flags, whether they are numbers or
+flags to forward to another command.  This initially applied to all arguments
+in a <code>Command</code> with <code>AppSettings::AllowLeadingHyphen</code>.  A more <code>Command</code>-wide specialization
+was added with <code>AppSettings::AllowNegativeNumbers</code>.  Then we got an argument-specific
+<code>ArgSettings::AllowHyphenValues</code>.  Unfortunately, the latter missed some cases in
+<code>AppSettings::AllowLeadingHyphen</code>.  Developers were finding the <code>Arg</code>-specific one first
+and running into road blocks.  We updated the now <code>Arg::allow_hyphen_values</code> to
+operate like the <code>Command</code> version.</p>
+<p>In working on this, it gave us an opportunity to re-evaluate this API.
+Normally, a single <code>Arg</code> needs to accept hyphen values, especially numbers, and
+it can lead to unexpected behavior to enable it on all <code>Arg</code>s via a <code>Command</code>
+setting.  We've now mirrored <code>Command::allow_negative_numbers</code> to <code>Arg</code> and
+deprecated all of the <code>Command</code> variants of these settings.  We then did
+similar for a closely related setting, <code>Command::trailing_var_args</code> which
+brings it inline with its related <code>Arg::last</code>.</p>
+<p>This happened in <code>f731ce70..f97670ac</code></p>
+<ul>
+<li>Code size: 568.4 KiB → 572.1 KiB (+3.7 KiB)</li>
+<li>Lines of Code: 19,900 → 20,041 (+241)</li>
+</ul>
+<p><a id="looking-forward"></a></p>
+<h2>Looking Forward</h2>
+<p>More immediately, I plan to focus on an experiment with how we style the
+output.  clap has had several challenges in supporting more customization</p>
+<ul>
+<li>To customize the existing palette, we'd have to expose <code>termcolor</code> in the public API, requiring a breaking change to switch away</li>
+<li>To accept styled content, we'd have to expose an entire styling API that delays applying the styles until rendering</li>
+</ul>
+<p>For the first, I've started work on
+<a href="https://docs.rs/anstyle/latest/anstyle/">anstyle</a> (ANSI Styling) for providing
+a common definition of ANSI styles with a minimal API so it is safe to put in
+public APIs (once it hits 1.0).</p>
+<p>The second is because of a fundamental design restriction in existing terminal
+styling crates; they couple together styling with terminal capabilities.  I'm
+going to experiment with an alternative route where the user styles their
+output with their preferred ANSI styling crate and then the output stream
+adapts it as needed, whether that means stripping the escape codes when piping
+to a file or turning them into wincon API calls for older Windows versions.
+The biggest risk is the performance hit when needing to adapt the output.  My
+hope is that the cost will be acceptable for most applications.</p>
+<p>In addition to this being a low maintenance way of accepting styled output, my
+hope is that this will simplify clap's rendering code to get the same size
+benefits as our <a href="#reducing-code-size">optimization for <code>StyledStr</code> without the <code>color</code>
+feature</a> which saved 15 KiB in code size.</p>
+<p>Speaking of code size, while we've made reductions during clap 4.0, our work is still not done
+(
+<a href="https://github.com/clap-rs/clap/issues/2037">#2037</a>,
+<a href="https://github.com/clap-rs/clap/issues/1365">#1365</a>
+).  Seeing the success of clap v4, we are optimistic that <a href="https://github.com/clap-rs/clap/discussions/3476">a more open API
+design</a> will continue to
+reduce code size while making clap more flexible.</p>
+<p><a id="how-can-i-help"></a></p>
+<h2>How Can I Help</h2>
+<p>First, we welcome any feedback on what is going into clap 4.0.0 which is why we
+are pre-announcing so we have opportunities to re-evaluate based on feedback.
+It can be difficult to weigh feedback on Issues as the audience tends to be
+small and self-selecting to those who agree, so we recognize the need for
+finding ways to remove that bias and collect feedback from a wider audience.</p>
+<p>Second, we would love for you to share what is great or what doesn't work well
+with other CLI parsers so we can learn from all of the best and avoid
+<a href="https://en.wikipedia.org/wiki/Not_invented_here">NIH syndrome</a>.  For example,
+I've started
+<a href="https://github.com/clap-rs/clap/discussions/3454">digging into click's documentation</a>
+to see what works well and how it might apply to clap.  This has already led to
+<code>value_parser!</code>'s design being made extensible so we could support features like
+<a href="https://github.com/clap-rs/clap/issues/4074"><code>FileReader</code> and <code>FileWriter</code></a>
+with <code>value_parser!</code> and <code>clap_derive</code>.</p>
+<p>Lastly, of our
+<a href="https://github.com/clap-rs/clap/issues?q=is%3Aopen+is%3Aissue+label%3AE-help-wanted">help-wanted Issues</a>,
+the one I'm most excited for is
+<a href="https://github.com/clap-rs/clap/issues/3166">#3166</a> as it will make
+completions more featureful, less buggy, and more consistent across shells.</p>
+<p><a id="methodology"></a></p>
+<h2>Methodology</h2>
+<ul>
+<li><code>master</code> as of <code>16bd7599..c26e7fd6</code></li>
+<li>Baseline is a simple program that reads all arguments and prints them back out</li>
+<li>API Surface:
+<ul>
+<li><code>rg -U '\([\s]*(mut )?self,'</code> for <code>Command</code>, <code>Arg</code>, and <code>ArgGroup</code></li>
+<li><code>rg '=&gt; Flags::'</code> for <code>AppSettings</code> and <code>ArgSettings</code></li>
+<li>The 3.0.0 numbers are particularly bloated as setters were added for each <code>AppSettings</code> / <code>ArgSettings</code></li>
+</ul>
+</li>
+<li>Lines of Code: <code>tokei src clap_derive/src</code>
+<ul>
+<li><code>clap_derive</code> didn't exist for clap 2 and accounts for 3,000-4,000 lines of code</li>
+<li>While LoC is a flawed metric, we can get a rough feel for compile times with it</li>
+</ul>
+</li>
+<li>Code size: <code>.text</code> from <code>cargo bloat --release --features cargo --example cargo-example</code>
+<ul>
+<li>This includes more than clap, like the example code itself, <code>std</code>, and any other dependencies</li>
+</ul>
+</li>
+<li>Runtime: <code>cargo bench --bench 06_rustup -- parse_rustup_with_sc</code>
+<ul>
+<li>When removing lifetimes from the API, we traded off speed for binary size.
+Using the <code>--features clap/perf</code>, the time changes to 11.790us at the cost
+of 10 KiB in <code>.text</code> size (for <code>cargo-example</code>).</li>
+</ul>
+</li>
+</ul>
+<!--
+$ rg -U '\([\s]*(mut )?self,' src/app/mod.rs src/args/group.rs src/args/arg.rs --stats
+112
+$ rg '=> Flags::' src/*/settings.rs  --stats
+62
+
+$ rg -U '\([\s]*(mut )?self,' src/build/app/mod.rs src/build/arg/mod.rs src/build/arg_group.rs  --stats
+172
+$ rg '=> Flags::' src/build/*/*settings.rs  --stats
+73
+
+$ rg -U '\([\s]*(mut )?self,' src/build/app/mod.rs src/build/arg/mod.rs src/build/arg_group.rs  --stats
+209
+$ rg '=> Flags::' src/builder/*settings.rs  --stats
+73
+
+$ rg -U '\([\s]*(mut )?self,' src/builder/command.rs src/builder/arg.rs src/builder/arg_group.rs  --stats
+165
+
+
+fn main() {
+    let args = std::env::args_os();
+    for arg in args {
+        println!("{:?}", arg);
+    }
+}
+-->
+
+		</article>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
