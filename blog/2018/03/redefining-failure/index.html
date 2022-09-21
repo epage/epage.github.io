@@ -25,6 +25,7 @@
 					</ul>
 				</nav>
 			</header>
+			<main class="container">
 			<p>I recently got the chance to redo the error handling in two different crates I
 help maintain. For <a href="https://github.com/cobalt-org/liquid-rust"><code>liquid</code></a>, I decided to write the error types by
 hand rather than use something like <a href="https://crates.io/crates/error-chain"><code>error-chain</code></a>. In the case
@@ -399,6 +400,7 @@ add to <code>context.value</code> to avoid duplication.</li>
 <li>Performance is controlled by only heap allocating or capturing a back trace if context is added.</li>
 </ul>
 
+			</main>
 		</article>
 			<nav>
 		<ul>
