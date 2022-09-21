@@ -315,7 +315,7 @@ values.</p>
 <ul>
 <li>Removed some dependencies (<code>indexmap</code>, <code>hashbrown</code>)</li>
 <li>Minimizing the number of containers means more reuse when they get monomorphized</li>
-<li>Building on <code>Vec</code>s allow even more monomorphized reuse as a <code>FlatStr&lt;Str&gt;</code> is
+<li>Building on <code>Vec</code>s allow even more monomorphized reuse as a <code>FlatSet&lt;Str&gt;</code> is
 really just a <code>Vec&lt;Str&gt;</code>.  This is more acute for <code>FlatMap</code> since we store
 the keys and values separately.  A <code>FlatMap&lt;Str, Vec&lt;Str&gt;&gt;</code> is really a
 <code>(Vec&lt;Str&gt;, Vec&lt;Vec&lt;Str&gt;&gt;)</code>, allowing reuse between the key and value and any
