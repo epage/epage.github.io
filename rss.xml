@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap 4.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2022/09/clap4/</link><description><![CDATA[<p>We are excited to (pre-)announce clap 4.0!
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap 4.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2022/09/clap4/</link><description><![CDATA[<p>We are excited to <del>(pre-)</del> announce clap 4.0!
 This release focuses on removing deprecated APIs and finishing what we couldn't
 do without breaking changes.  For more details see the
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> (including the migration guide)
@@ -11,11 +11,11 @@ and the
 <li>Or the <a href="https://github.com/clap-rs/clap/blob/v3-master/CHANGELOG.md">v3 CHANGELOG.md</a> for the over 50 patch releases since 3.0.0</li>
 </ul>
 <p>To put all of this work into numbers:</p>
-<table><thead><tr><th></th><th>Baseline</th><th>2.34.0</th><th>3.0.0</th><th>3.2.21</th><th>4.0.0</th></tr></thead><tbody>
-<tr><td>Builder API Surface</td><td></td><td>174</td><td>245</td><td>282</td><td>165 <a href="#removing-deprecated-features">[1]</a> <a href="#num-args">[2]</a></td></tr>
-<tr><td>Lines of Code</td><td>6</td><td>13,462</td><td>17,308</td><td>24,044</td><td>20,653 <a href="#removing-deprecated-features">[1]</a> <a href="#removing-lifetimes">[3]</a></td></tr>
-<tr><td>Code size</td><td>218.2 KiB</td><td>487.0 KiB</td><td>609.3 KiB</td><td>605.5 KiB</td><td>544.3 KiB <a href="#removing-deprecated-features">[1]</a> <a href="#reducing-code-size">[4]</a></td></tr>
-<tr><td>Runtime</td><td></td><td>7.529 us</td><td>14.544 us</td><td>14.657 us</td><td>8.2478 us <a href="#removing-implicit-version-help-behavior">[5]</a></td></tr>
+<table><thead><tr><th></th><th>Baseline</th><th>2.34.0</th><th>3.0.0</th><th>3.2.21</th><th>4.0.0-rc.1</th><th>4.0.0</th></tr></thead><tbody>
+<tr><td>Builder API Surface</td><td></td><td>174</td><td>245</td><td>282</td><td>165 <a href="#removing-deprecated-features">[1]</a> <a href="#num-args">[2]</a></td><td>166</td></tr>
+<tr><td>Lines of Code</td><td>6</td><td>13,462</td><td>17,308</td><td>24,044</td><td>20,653 <a href="#removing-deprecated-features">[1]</a> <a href="#removing-lifetimes">[3]</a></td><td>20,839</td></tr>
+<tr><td>Code size</td><td>218.2 KiB</td><td>487.0 KiB</td><td>609.3 KiB</td><td>605.5 KiB</td><td>544.3 KiB <a href="#removing-deprecated-features">[1]</a> <a href="#reducing-code-size">[4]</a></td><td>542.6 KiB</td></tr>
+<tr><td>Runtime</td><td></td><td>7.529 us</td><td>14.544 us</td><td>14.657 us</td><td>8.2478 us <a href="#removing-implicit-version-help-behavior">[5]</a></td><td>7.6455 us</td></tr>
 </tbody></table>
 <p><em>(see <a href="#methodology">Methodology</a> for more details)</em></p>
 <blockquote>
@@ -38,8 +38,8 @@ like changing a <code>VecMap</code> to a <code>BTreeMap</code>.</p>
 <p>For runtime, it seems to mostly be a single feature that caused it which was
 removed in v4 <a href="#removing-implicit-version-help-behavior">[5]</a>.</p>
 </blockquote>
-<p>Our plan is to give about a week window between the release-candidate and the
-official release to allow for collecting and processing feedback.</p>
+<p><del>Our plan is to give about a week window between the release-candidate and the
+official release to allow for collecting and processing feedback.</del></p>
 ]]></description><guid>https://epage.github.io/blog/2022/09/clap4/</guid><pubDate>Tue, 20 Sep 2022 21:30:48 +0000</pubDate></item><item><title>Clap 3.2: Last Call Before 4.0</title><link>https://epage.github.io/blog/2022/06/clap-32-last-call-before-40/</link><description><![CDATA[<p>With excitement and trepidation, I'm announcing the release of
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">clap 3.2</a>.</p>
 <p>With clap 3.1, we <a href="https://epage.github.io/blog/2022/02/clap-31-a-step-towards-40/">discussed the need for a more open, extensible

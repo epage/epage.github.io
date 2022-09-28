@@ -26,7 +26,7 @@
 				</nav>
 			</header>
 			<main class="container">
-			<p>We are excited to (pre-)announce clap 4.0!
+			<p>We are excited to <del>(pre-)</del> announce clap 4.0!
 This release focuses on removing deprecated APIs and finishing what we couldn't
 do without breaking changes.  For more details see the
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> (including the migration guide)
@@ -39,11 +39,11 @@ and the
 <li>Or the <a href="https://github.com/clap-rs/clap/blob/v3-master/CHANGELOG.md">v3 CHANGELOG.md</a> for the over 50 patch releases since 3.0.0</li>
 </ul>
 <p>To put all of this work into numbers:</p>
-<table><thead><tr><th></th><th>Baseline</th><th>2.34.0</th><th>3.0.0</th><th>3.2.21</th><th>4.0.0</th></tr></thead><tbody>
-<tr><td>Builder API Surface</td><td></td><td>174</td><td>245</td><td>282</td><td>165 <a href="#removing-deprecated-features">[1]</a> <a href="#num-args">[2]</a></td></tr>
-<tr><td>Lines of Code</td><td>6</td><td>13,462</td><td>17,308</td><td>24,044</td><td>20,653 <a href="#removing-deprecated-features">[1]</a> <a href="#removing-lifetimes">[3]</a></td></tr>
-<tr><td>Code size</td><td>218.2 KiB</td><td>487.0 KiB</td><td>609.3 KiB</td><td>605.5 KiB</td><td>544.3 KiB <a href="#removing-deprecated-features">[1]</a> <a href="#reducing-code-size">[4]</a></td></tr>
-<tr><td>Runtime</td><td></td><td>7.529 us</td><td>14.544 us</td><td>14.657 us</td><td>8.2478 us <a href="#removing-implicit-version-help-behavior">[5]</a></td></tr>
+<table><thead><tr><th></th><th>Baseline</th><th>2.34.0</th><th>3.0.0</th><th>3.2.21</th><th>4.0.0-rc.1</th><th>4.0.0</th></tr></thead><tbody>
+<tr><td>Builder API Surface</td><td></td><td>174</td><td>245</td><td>282</td><td>165 <a href="#removing-deprecated-features">[1]</a> <a href="#num-args">[2]</a></td><td>166</td></tr>
+<tr><td>Lines of Code</td><td>6</td><td>13,462</td><td>17,308</td><td>24,044</td><td>20,653 <a href="#removing-deprecated-features">[1]</a> <a href="#removing-lifetimes">[3]</a></td><td>20,839</td></tr>
+<tr><td>Code size</td><td>218.2 KiB</td><td>487.0 KiB</td><td>609.3 KiB</td><td>605.5 KiB</td><td>544.3 KiB <a href="#removing-deprecated-features">[1]</a> <a href="#reducing-code-size">[4]</a></td><td>542.6 KiB</td></tr>
+<tr><td>Runtime</td><td></td><td>7.529 us</td><td>14.544 us</td><td>14.657 us</td><td>8.2478 us <a href="#removing-implicit-version-help-behavior">[5]</a></td><td>7.6455 us</td></tr>
 </tbody></table>
 <p><em>(see <a href="#methodology">Methodology</a> for more details)</em></p>
 <blockquote>
@@ -66,8 +66,8 @@ like changing a <code>VecMap</code> to a <code>BTreeMap</code>.</p>
 <p>For runtime, it seems to mostly be a single feature that caused it which was
 removed in v4 <a href="#removing-implicit-version-help-behavior">[5]</a>.</p>
 </blockquote>
-<p>Our plan is to give about a week window between the release-candidate and the
-official release to allow for collecting and processing feedback.</p>
+<p><del>Our plan is to give about a week window between the release-candidate and the
+official release to allow for collecting and processing feedback.</del></p>
 <!-- more -->
 <h2>What Changed</h2>
 <p>As a caution, this will be a mix of high-level and low-level details as we try
@@ -97,6 +97,12 @@ costs of others.</p>
 <li><a href="#looking-forward">Looking Forward</a></li>
 <li><a href="#how-can-i-help">How Can I Help</a></li>
 </ul>
+<p>Since 4.0.0-rc.1, the biggest change is that we made the new actions behave like the original clap 3
+actions when multiple occurrences are used.  See
+<a href="https://github.com/clap-rs/clap/issues/4261">Issue #4261</a>
+to further details and to discuss this.  See
+<a href="https://github.com/clap-rs/clap/releases">GitHub Releases</a>
+for more details.</p>
 <p><a id="support-policy"></a></p>
 <h3>Support Policy</h3>
 <p>Before getting into the details, I want to assure you that we understand the
@@ -677,8 +683,9 @@ completions more featureful, less buggy, and more consistent across shells.</p>
 <p><a id="methodology"></a></p>
 <h2>Methodology</h2>
 <ul>
-<li><code>master</code> as of
-<a href="https://github.com/clap-rs/clap/compare/16bd7599..c26e7fd6"><code>16bd7599..c26e7fd6</code></a></li>
+<li>4.0.0-rc.1 as of <a href="https://github.com/clap-rs/clap/compare/16bd7599..c26e7fd6"><code>16bd7599..c26e7fd6</code></a></li>
+<li>4.0.0 as of [<code>16bd7599..9cd19395</code>](https://github.com/clap-rs/clap/compare/16bd7599..9cd19395</li>
+<li>rust 1.63.0</li>
 <li>Baseline is a simple program that reads all arguments and prints them back out</li>
 <li>API Surface:
 <ul>
@@ -698,13 +705,7 @@ completions more featureful, less buggy, and more consistent across shells.</p>
 <li>This includes more than clap, like the example code itself, <code>std</code>, and any other dependencies</li>
 </ul>
 </li>
-<li>Runtime: <code>cargo bench --bench 06_rustup -- parse_rustup_with_sc</code>
-<ul>
-<li>When removing lifetimes from the API, we traded off speed for binary size.
-Using the <code>--features clap/perf</code>, the time changes to 11.790us at the cost
-of 10 KiB in <code>.text</code> size (for <code>cargo-example</code>).</li>
-</ul>
-</li>
+<li>Runtime: <code>cargo bench --bench 06_rustup -- parse_rustup_with_sc</code></li>
 </ul>
 <!--
 $ rg -U '\([\s]*(mut )?self,' src/app/mod.rs src/args/group.rs src/args/arg.rs --stats
