@@ -3,7 +3,7 @@ This release focuses on removing deprecated APIs and finishing what we couldn't
 do without breaking changes.  For more details see the
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> (including the migration guide)
 and the
-<a href="https://docs.rs/clap/4.0.0-rc.1/clap/index.html">documentation</a>.</p>
+<a href="https://docs.rs/clap/4.0.0/clap/index.html">documentation</a>.</p>
 <p>This release builds on done in the 3.x releases and can be worth catching up on them:</p>
 <ul>
 <li>The <a href="/blog/2022/02/clap-31-a-step-towards-40/">3.1 release</a></li>
