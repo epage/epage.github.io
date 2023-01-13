@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap 4.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2022/09/clap4/</link><description><![CDATA[<p>We are excited to <del>(pre-)</del> announce clap 4.0!
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap v4.1, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2023/01/clap-v4-1/</link><description><![CDATA[<p><a href="https://docs.rs/clap/latest/clap/">clap</a> v4.1.0 is now out!  See the
+<a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">changelog</a> for more
+details.</p>
+]]></description><guid>https://epage.github.io/blog/2023/01/clap-v4-1/</guid><pubDate>Fri, 13 Jan 2023 15:18:37 +0000</pubDate></item><item><title>clap 4.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2022/09/clap4/</link><description><![CDATA[<p>We are excited to <del>(pre-)</del> announce clap 4.0!
 This release focuses on removing deprecated APIs and finishing what we couldn't
 do without breaking changes.  For more details see the
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">CHANGELOG</a> (including the migration guide)

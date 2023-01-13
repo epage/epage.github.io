@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clap v4.1, a Rust CLI argument parser</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>clap v4.1, a Rust CLI argument parser</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p><a href="https://docs.rs/clap/latest/clap/">clap</a> v4.1.0 is now out!  See the
+<a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">changelog</a> for more
+details.</p>
+<!-- more -->
+<h2>What Changed</h2>
+<p>This is a fairly minor, minor release.</p>
+<h3>Stablized Occurrences</h3>
+<p>Typically, your application wants to parse the arguments the same way between these two styles:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">$ cargo build --features one,two --features three,four
+</span><span style="color:#c0c5ce;">$ cargo build --features one,two,three,four
+</span></pre>
+<p>However, there are times you need to differentiate between each occurrence of
+an argument which we now support with <code>ArgMatches::get_occurrences</code>.</p>
+<p>For our derive users, support for this is behind the <code>unstable-v5</code> feature flag
+as changing <code>Vec&lt;Vec&lt;T&gt;&gt;</code> to mean &quot;group by occurrence&quot; would be a breaking
+change.  <strong>We would appreciate ideas and input on
+<a href="https://github.com/clap-rs/clap/issues/4626">#4626</a> to improve this and other
+inferred behavior from types in the future.</strong></p>
+<p><em>Special thanks to <a href="https://github.com/tmccombs">tmccombs</a> for working on this</em></p>
+<h3>Error Message Improvements</h3>
+<p>Before:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">error: Found argument &#39;--optio&#39; which wasn&#39;t expected, or isn&#39;t valid in this context
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">  Did you mean &#39;--option&#39;?
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">For more information try &#39;--help&#39;
+</span></pre>
+<p>After:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">  note: argument &#39;--option&#39; exists
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">For more information, try &#39;--help&#39;.
+</span></pre>
+<p>clap has not had a style guide and has generally been inconsistent in error
+messages.  While we've worked to make them more consistent, having a stated
+goal of what we want to be consistent with would help.  As an experiment, we've
+adopted the 
+<a href="https://rustc-dev-guide.rust-lang.org/diagnostics.html#suggestion-style-guide">rustc diagnostic style guide</a>.</p>
+<p>Example rustc error:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">error[E0425]: cannot find value `arg1` in this scope
+</span><span style="color:#c0c5ce;">    --&gt; src/builder/command.rs:4249:23
+</span><span style="color:#c0c5ce;">     |
+</span><span style="color:#c0c5ce;">4249 |                 arg = arg1.help(&quot;Print help&quot;);
+</span><span style="color:#c0c5ce;">     |                       ^^^^ help: a local variable with a similar name exists: `arg`
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">For more information about this error, try `rustc --explain E0425`.
+</span><span style="color:#c0c5ce;">error: could not compile `clap` due to previous error
+</span></pre>
+<p>While changing errors, this gave us an opportunity to do some wordsmithing on
+the errors to make the problem easier to scan for by</p>
+<ul>
+<li>Being more succinct</li>
+<li>Putting the most important details first</li>
+</ul>
+<p>The challenge with succinctness is it can come across as being gruff.  When a
+user gets an error, they are likely frustrated and we need to help defuse
+things rather than leave them frustrated or make them more frustrated.  I'm
+hoping these messages don't cross over into being gruff but if people have
+ideas on how to improve them further, we are open to it!</p>
+<p>As part of this, we've clarified in our
+<a href="https://github.com/clap-rs/clap/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>
+what help/error changes constitute a major and minor incompatibility.  Help and
+error output is not meant to be machine readable, so the normal breakage rules
+do not apply.  However, what is a concern is consistency with an application's
+UI, whether it produces clap-like custom errors or partially overrides some
+of the output.</p>
+<h2>What didn't change</h2>
+<p>As you saw, this does does not contain the most anticipated features,
+<a href="https://github.com/clap-rs/clap/issues/3234">theming</a> and
+<a href="https://github.com/clap-rs/clap/issues/1433">styled user values</a>.  Those
+remain our top priority within the clap project.  The error work was more to
+clear off a branch that has been sitting on my computer for months (waiting a
+sufficient time for a minor release).</p>
+<p>Originally, we had this work planned to immediately follow the clap v4.1
+release.  One slow down was that I took on maintainership of the
+<a href="https://crates.io/crates/toml"><code>toml</code></a> crate which had many PRs open for
+years.  I felt that I needed to give the <code>toml</code> crate enough attention so I
+could more easily review and get these languishing changes in.  I'll be posting
+more on this soon.</p>
+<p>The <code>toml</code> work extended into some planned family leave that left me with
+little time for open source work for a couple of months.  For what time I did
+have, I needed to be focused so I could get anything done.</p>
+<p>Once the <code>toml</code> work wraps up (hopefully soon), I'll be returning to theming
+and user styled text for clap.</p>
+<p>What you can do to help:</p>
+<ul>
+<li>For theming, we need an API-stable way for users to specifying text styling.
+We are preparing the <code>anstyle</code> crate for this purpose and would appreciate
+<a href="https://github.com/epage/anstyle/issues/14">feedback</a> on the API and ANSI
+style support so we can go as long as possible between breaking changes.</li>
+<li>For user styled text, our plan is to use the most minimal and stable API we
+can think of, ANSI escape codes.  This does mean we need to be able to strip
+them from output when unsupported which is being tracked in
+<a href="https://github.com/epage/anstyle/issues/5">anstyle#5</a>.</li>
+</ul>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
