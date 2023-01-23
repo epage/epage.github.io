@@ -109,7 +109,7 @@ format-preserving information, avoiding allocations for serde support.
 `Document::from_str` has to replace those spans with strings to allow editing.
 We don't keep the spans around for the editing API to keep the size of each
 `Item` in memory smaller.  The spans also present a lot of challenges in an
-editing API as we can't guarentee what source they are associated with.
+editing API as we can't guarantee what source they are associated with.
 
 Also, a lot of small pieces of polish were found through `toml`s tests, e.g.
 inconsistent casing and newlines in errors.
