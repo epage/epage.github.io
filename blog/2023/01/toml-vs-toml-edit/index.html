@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>`toml` vs `toml_edit`</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>`toml` vs `toml_edit`</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p><a href="https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#060---2023-01-23"><code>toml</code> v0.6</a>
+is now out with a new parser and renderer, addressing several existing issues
+and ensuring compliance with the TOML 1.0 compliance tests.  This was done by
+leveraging the
+<a href="https://crates.io/crates/toml_edit"><code>toml_edit</code></a> crate.</p>
+<!-- more -->
+<h2>Why <code>toml_edit</code></h2>
+<p>Last March, alexcrichton put out <a href="https://github.com/toml-rs/toml-rs/issues/460">a call for a maintainer</a> for the
+<a href="https://crates.io/crates/toml"><code>toml</code></a> crate.  I had become a maintainer of
+the <code>toml_edit</code> crate as part of my work
+on <code>cargo add</code>, getting <code>toml_edit</code> in shape that it became the only TOML parser in
+cargo (see
+<a href="https://github.com/rust-lang/cargo/pull/10086">rust-lang/cargo#10086</a>) as the
+cargo team wanted consistent parse behavior.  I offered to take over
+maintenance of <code>toml</code> with goal of migrating <code>toml</code> onto <code>toml_edit</code>.</p>
+<p><code>toml</code> fills a similar role as <code>serde_json</code>, providing serde support for the
+<a href="https://toml.io/en/">TOML format</a> and a default data structure to deserialize
+into.  <code>toml_edit</code> is more complex and slower because it needs to preserve all
+end-user formatting from parse to display.  As part of the cargo work, we got
+<a href="/blog/2021/09/optimizing-toml-edit/"><code>toml_edit</code> a lot closer to <code>toml</code> in performance</a>
+and offered the <code>easy</code> module as a <code>toml</code> compatibility layer.</p>
+<p>In <em>theory</em>, we could just migrate everyone from <code>toml</code> to <code>toml_edit</code> and be
+done.</p>
+<p>In <em>practice</em>, there is no way to help people through a crate rename.
+With <code>structopt</code> being absorbed into <code>clap</code> in 2021, we are still seeing people
+use <code>structopt</code> unaware of the change over.  Additionally, there was interest
+in a more stable API than what <code>toml_edit</code> offers as we had a lot of churn due
+to the low level details in the API and as we figure out how best to allow
+editing of TOML documents.</p>
+<p>So keeping the <code>toml</code> crate around was worthwhile and we could lighten the
+community's overall maintenance burden by combining efforts / code.</p>
+<h2>Impact on <code>toml</code> users</h2>
+<p><code>toml</code> now passes all <a href="https://github.com/BurntSushi/toml-test">compliance tests</a> for TOML 1.0, including</p>
+<ul>
+<li><a href="https://github.com/toml-rs/toml/issues/439">Not erroring when a table appends to dotted keys</a></li>
+<li><a href="https://github.com/toml-rs/toml/issues/483">No more stray <code>,</code> when writing arrays of tables</a></li>
+<li><a href="https://github.com/toml-rs/toml/issues/403">No more <code>ValueAfterTable</code> errors when writing top-level key-value pairs</a>, requiring users to <a href="https://docs.rs/toml/0.5.11/toml/ser/fn.tables_last.html">opt-in to a fix</a></li>
+</ul>
+<p>Error information also improved, most notably the error messages are changing from the old</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">invalid type: string &quot;a&quot;, expected isize\nin `foo.bar`
+</span></pre>
+<p>to <code>toml_edit</code>'s</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">TOML parse error at line 2, column 7
+</span><span style="color:#c0c5ce;">  |
+</span><span style="color:#c0c5ce;">2 | bar = &quot;a&quot;
+</span><span style="color:#c0c5ce;">  |       ^^^
+</span><span style="color:#c0c5ce;">invalid type: string &quot;a&quot;, expected isize
+</span></pre>
+<p>Callers can also render the errors as they wish, like with
+<a href="https://crates.io/crates/ariadne">ariadne</a>.
+We also improved the quality of the span information being reported.</p>
+<p>Pulling in <code>toml_edit</code> also helped highlight some issues with <code>toml</code>s API.
+<a href="https://docs.rs/toml/latest/toml/value/enum.Value.html"><code>toml::Value</code></a> would
+allow you to <code>Display</code> anything.  If it looked like a document, it would be
+rendered as such.  Otherwise, it would be rendered as a value.  This dynamic API
+makes it easy to get things wrong.  Instead, <code>toml::Value</code> always <code>Display</code>s a
+TOML value while <code>toml::Table</code> will <code>Display</code> a TOML document.  Similar for
+parse.  A concrete example of what this allows is for
+<a href="https://github.com/toml-rs/toml/issues/363">unambiguously parsing <code>[&quot;a&quot;, &quot;b&quot;]</code> as either document or a value</a>.</p>
+<p>Users should also expect maintenance going forward to improve as the code base
+is easier to support and not just because of the two-for-one maintenance.
+Before, <code>toml</code> had a handwritten parser that had to deal the non-linear nature
+of TOML.  Now, <code>toml</code> parses everything to an AST and then deserialzies to the
+end-users data types.  Separating the steps of parsing and deserialize
+simplifies them, making it easier to confidently make changes.  The parser is
+also easier to update as it is higher level, using a parser combinator crate.</p>
+<p>In rough terms, we expect compiles to be slightly slower as more code across
+more dependencies is being built.  Parse time is also about twice what it
+was before (62us to 110us for cargo's <code>Cargo.toml</code> on my machine).  We do have
+ideas on how to further improve parse times.  We do not track <code>Display</code> time
+for TOML, assuming it isn't in a critical path.</p>
+<h2>Impact on <code>toml_edit</code> users</h2>
+<p>As already mentioned, <code>toml_edit</code> users now have a more stable subset of the API that shares behavior and compile-time.</p>
+<p>Otherwise, the biggest gain is span support.  We now track the location of each
+<code>Item</code> within the original document while parsing.  This allows you to
+deserialize to
+<a href="https://docs.rs/serde_spanned/latest/serde_spanned/struct.Spanned.html"><code>serde_spanned::Spanned&lt;T&gt;</code></a>
+to capture that location.  Deserialize errors will now look more like parse
+errors, showing the error location, and allow you to lookup the span
+programmatically.</p>
+<p>Unfortunately, span information is only exposed through serde and errors at
+this time.  To <a href="https://github.com/toml-rs/toml/pull/429">maintain performance</a>,
+we only capture spans while parsing rather than Strings for all of the
+format-preserving information, avoiding allocations for serde support.
+<code>Document::from_str</code> has to replace those spans with strings to allow editing.
+We don't keep the spans around for the editing API to keep the size of each
+<code>Item</code> in memory smaller.  The spans also present a lot of challenges in an
+editing API as we can't guarentee what source they are associated with.</p>
+<p>Also, a lot of small pieces of polish were found through <code>toml</code>s tests, e.g.
+inconsistent casing and newlines in errors.</p>
+<p>We did speed up <code>toml_edit::de</code>, with parsing cargo's <code>Cargo.toml</code> going from
+115us to 111us.  However, <code>Document::from_str</code> slowed down, going from 85us to
+103us.  We have hopes to recover the performance loss.</p>
+<p>Long term, the <code>toml_edit::easy</code> API is going to go away in favor of <code>toml</code>.</p>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>

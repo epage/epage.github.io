@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap v4.1, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2023/01/clap-v4-1/</link><description><![CDATA[<p><a href="https://docs.rs/clap/latest/clap/">clap</a> v4.1.0 is now out!  See the
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>`toml` vs `toml_edit`</title><link>https://epage.github.io/blog/2023/01/toml-vs-toml-edit/</link><description><![CDATA[<p><a href="https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#060---2023-01-23"><code>toml</code> v0.6</a>
+is now out with a new parser and renderer, addressing several existing issues
+and ensuring compliance with the TOML 1.0 compliance tests.  This was done by
+leveraging the
+<a href="https://crates.io/crates/toml_edit"><code>toml_edit</code></a> crate.</p>
+]]></description><guid>https://epage.github.io/blog/2023/01/toml-vs-toml-edit/</guid><pubDate>Mon, 23 Jan 2023 20:09:26 +0000</pubDate></item><item><title>clap v4.1, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2023/01/clap-v4-1/</link><description><![CDATA[<p><a href="https://docs.rs/clap/latest/clap/">clap</a> v4.1.0 is now out!  See the
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">changelog</a> for more
 details.</p>
 ]]></description><guid>https://epage.github.io/blog/2023/01/clap-v4-1/</guid><pubDate>Fri, 13 Jan 2023 15:18:37 +0000</pubDate></item><item><title>clap 4.0, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2022/09/clap4/</link><description><![CDATA[<p>We are excited to <del>(pre-)</del> announce clap 4.0!
