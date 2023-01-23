@@ -41,7 +41,7 @@ to the low level details in the API and as we figure out how best to allow
 editing of TOML documents.
 
 So keeping the `toml` crate around was worthwhile and we could lighten the
-community's overall maintenance burden by combining efforts / code.
+community's overall maintenance burden by combining efforts and code.
 
 ## Impact on `toml` users
 
