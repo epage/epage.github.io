@@ -106,7 +106,7 @@ format-preserving information, avoiding allocations for serde support.
 <code>Document::from_str</code> has to replace those spans with strings to allow editing.
 We don't keep the spans around for the editing API to keep the size of each
 <code>Item</code> in memory smaller.  The spans also present a lot of challenges in an
-editing API as we can't guarentee what source they are associated with.</p>
+editing API as we can't guarantee what source they are associated with.</p>
 <p>Also, a lot of small pieces of polish were found through <code>toml</code>s tests, e.g.
 inconsistent casing and newlines in errors.</p>
 <p>We did speed up <code>toml_edit::de</code>, with parsing cargo's <code>Cargo.toml</code> going from
