@@ -287,14 +287,8 @@ So what does winnow bring to the table?
 - [Clearer Usage](#usage)
 - [Simpler, Easier API](#simple)
 - [Easier Debugging](#debug)
-
-That said, the work isn't over yet and I would greatly appreciate [learning with you in how to further improve winnow](https://github.com/winnow-rs/winnow/discussions).
-Some specific topics I want to highlight include:
-- [Clearer names / module hierarchy](https://github.com/winnow-rs/winnow/discussions/95)
-- [What is needed for binary parsing?](https://github.com/winnow-rs/winnow/discussions/85)
-- [What is needed for streaming/partial/incomplete parsing?](https://github.com/winnow-rs/winnow/discussions/169)
-- [Should built-in parsers return `impl Parser` rather than `impl FnMut`](https://github.com/winnow-rs/winnow/issues/162)
-- [Should parsers use associated types rather than generics](https://github.com/winnow-rs/winnow/issues/163)
+- [`Located` and `Stateful`](#stream)
+- [The Future](#future)
 
 <a id="usage"></a>
 #### Clearer Usage
@@ -302,13 +296,76 @@ Some specific topics I want to highlight include:
 <a id="simple"></a>
 #### Simpler, Easier API
 
+Looking back over my parsers, I see I'm using a fraction of what `nom` offered me because
+- Parsers were lost in the noise
+- Composing the pieces was not obvious
+
+This matches my experience in using and now maintaining clap: the larger an API
+is, the less people are likely to discover what is available, lowering the
+value gained by each new API addition.
+
+The first area I focused on was trying to remove the distinction between
+"complete" and "streaming" parsers.  `nom` has a lot of parsers behave somewhat
+differently when the input isn't completely in-memory.  Currently, that is
+handled by having parsers duplicated, like with
+`nom::bytes::complete::take_while` vs `nom::bytes::streaming::take_while`.
+
+Problems with this:
+- It is easy to unintentionally choose the wrong kind of mix them together, getting incorrect behavior that only shows with certain inputs
+- The extra nesting makes it harder to browse the API and discover functionality
+
+After [some experimentation](https://github.com/rust-bakery/nom/issues/1535), I
+found that we could tag the input type as being `Partial` and all of the
+parsers could switch their behavior.  The complete case (default) sees no
+overhead from this switching.  A `Partial` tag can be implemented that shows no
+overhead but I decided to make the default `Partial` support being able to
+switch to complete-parsing at runtime (e.g. the `Reader` reported the true
+end-of-input).  The overhead looks to mostly be from the larger input type
+which should be reduced with
+[Issue #72: Improving performance for `Located`](https://github.com/winnow-rs/winnow/issues/72).
+
+Inspired by combine, I next looked to using Rust-native types for parsers:
+- Tuples sequence parsers
+- Literals act as `tag`s
+
+For example, before:
+```rust
+delimited(char('('), number, char(')'))
+```
+After
+```rust
+delimited('(', number, ')')
+```
+
+We can also extend this to defining character classes with `one_of`:
+- `&str`, `&[]`, and ranges (`0..=9`) as sets of characters
+- Closures as predicates
+- tuples to compose these together
+
+For example, before:
+```rust
+fn hexdigit(input: &str) -> IResult<&str, char> {
+    one_of("0123456789abcdefgABCDEFG")
+}
+```
+After
+```rust
+fn hexdigit(input: &str) -> IResult<&str, char> {
+    one_of(('0'..='9', 'a'..='f', 'A'..='F'))
+}
+```
+
+This let us also get the variations of `one_of`, like `satisfy`.  This also
+applies to `take_while0` and related parsers, simplifying what we offer there
+as well.
+
 <a id="debug"></a>
 #### Easier Debugging
 
 I felt the [nom-tracable](https://crates.io/crates/nom-tracable) crate was a
-great idea but pulling in a dependency you only want to pay for when debugging
-seemed untenable.  For my own nom parsers, I had made one-off tracing
-combinators.  What if it was built-in and all of the built-in parsers supported it?
+great idea but never used it myself as I didn't want to pull in a dependency
+just for debugging and instead made one-off tracing combinators.  What if it
+was built-in and all of the built-in parsers supported it?
 
 This led to the `trace` combinator which does nothing in normal builds but will
 dump the parse state when your parser is built with `--features winnow/debug`.
@@ -321,3 +378,41 @@ The trace can be severely hampered by the debug output of your input when
 parsing bytes, `&[u8]` printing a list of numbers isn't too helpful, so we
 created `winnow::Bytes` and `winnow::BStr` newtypes with debug output tailored
 to different parsing applications.
+
+<a id="stream"></a>
+#### `Located` and `Stateful`
+
+`toml` required `toml_edit` to track input spans of the TOML AST.  In `nom`, this is generally done with 
+[nom_locate](https://crates.io/crates/nom_locate) which never sat right with me due to:
+- Reporting the column [without regard for the inherent complexity](https://manishearth.github.io/blog/2017/01/14/stop-ascribing-meaning-to-unicode-code-points/)
+- Overhead from proactively tracking the line, rather than just the span
+- This mysterious `extra` field that would go unused in my applications
+
+On a reddit thread, I came across [pori](https://crates.io/crates/pori) which improves on this:
+- Separate `Stateful` and `Located` wrapper types
+- `Located` only tracks the span, not lines or "columns"
+
+In working with this, I realized that there was still some unnecesaarry
+overhead from tracking the span as you parse.  If you just add `Located`
+without capturing any spans, your parser slows down.  I was able to rework this
+so there is no active bookkeeping, making the overhead negligable compared to a
+`Stateful<I, usize>`.
+
+<a id="future"></a>
+#### The Future
+
+That said, the work isn't over yet.
+
+I've started laying out [short term](https://github.com/winnow-rs/winnow/milestone/2) and [long term](https://github.com/winnow-rs/winnow/issues) plans and am particularly excited for:
+- [Issue #72: Improving performance for `Located`](https://github.com/winnow-rs/winnow/issues/72)
+- [Issue #96: Error recovery support](https://github.com/winnow-rs/winnow/issues/96)
+
+Some of the work is a bit more nebulous and we would love your input on it!
+- [Clearer names / module hierarchy](https://github.com/winnow-rs/winnow/discussions/95)
+- [What is needed for binary parsing?](https://github.com/winnow-rs/winnow/discussions/85)
+- [What is needed for streaming/partial/incomplete parsing?](https://github.com/winnow-rs/winnow/discussions/169)
+- [Should built-in parsers return `impl Parser` rather than `impl FnMut`](https://github.com/winnow-rs/winnow/issues/162)
+- [Should parsers use associated types rather than generics](https://github.com/winnow-rs/winnow/issues/163)
+
+I also expect people to bring a lot of other ideas to the table and look forward to
+[learning with you in how to further improve winnow](https://github.com/winnow-rs/winnow/discussions).
