@@ -8,7 +8,7 @@ data:
     - rust
 ---
 
-It is finally time to take the wraps off where I've disappeared to over the
+It is finally time to take the wraps off where I disappeared to over the
 last 6 months. Besides the family leave, I've mostly been chalking this up to
 working on
 [toml_edit](https://epage.github.io/blog/2023/01/toml-vs-toml-edit/) but one
@@ -40,7 +40,7 @@ When I got involved with toml_edit, it had been using
 library. While I was more familiar with nom, having used it in my own
 projects, I adapted.
 
-While working to get toml_edit into cargo, the two biggest problems I had were:
+While working on getting toml_edit into cargo, the two biggest problems I had were:
 
 - Unlike nom, combine commits to a parse result by default and you have to
   opt-in to backtracking
@@ -49,8 +49,8 @@ While working to get toml_edit into cargo, the two biggest problems I had were:
   nature of parsers describing how to parse, rather than directly parsing.
 
 Thankfully [Marwes](https://github.com/Marwes) was responsive and helped me
-through these challenges! I got toml_edit of sufficient quality to merge it
-into cargo, allowing merging `cargo add` into cargo.
+through these challenges! I was able to improve toml_edit so it could be merged
+into cargo, unblocking `cargo add` from being merged into cargo.
 
 I thought things were fine and had moved on until I got a ping from [nnethercote](https://nnethercote.github.io/):
 
@@ -130,13 +130,13 @@ into the Lisp cult of parentheses.
 [![XKCD: Lisp](https://imgs.xkcd.com/comics/lisp_cycles.png)](https://xkcd.com/297/)
 
 In working on a large, readable parser, I felt switching to nom would be too
-large of a regression. While I had been happy with nom before, my parsers
-had been small and I didn't have the point of comparison of working with
-combine which focused more on trait functions (compare a standalone `map` vs
-`Iterator::map`) and had niceties like implementing the `Parser` trait for
-tuples to sequence parsers.
+large of a regression. While I had been happy with nom before, my experience
+was limited. My parsers had been small and I didn't have the point of
+comparison of working with combine.  combine focused more on
+trait functions (compare a standalone `map` vs `Iterator::map`) and had
+niceties like implementing the `Parser` trait for tuples to sequence parsers.
 
-I decided to work to improve nom to unblock my work, using issues and minor
+I decided to help improve nom as my route to unblock my work.  I started with issues and minor
 contributions to feel out the process and priorities for nom with ideas like:
 - [Issue #1408: Reduce Syntactic Noise](https://github.com/rust-bakery/nom/issues/1408)
   - [Issue #1393: Consolidate parser variants using ranges (e.g. many0, many_m_n) ](https://github.com/rust-bakery/nom/issues/1393)
@@ -394,7 +394,7 @@ On a reddit thread, I came across [pori](https://crates.io/crates/pori) which im
 In working with this, I realized that there was still some unnecesaarry
 overhead from tracking the span as you parse. If you just add `Located`
 without capturing any spans, your parser slows down. I was able to rework this
-so there is no active bookkeeping, making the overhead negligable compared to a
+so there is no active bookkeeping, making the overhead negligible compared to a
 `Stateful<I, usize>`.
 
 For my experimentation with different location tracking styles,
