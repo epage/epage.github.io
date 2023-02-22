@@ -23,17 +23,17 @@ Probably the two most likely questions are:
 - Why was this needed?
 - Why not `<insert parsing approach here>`?
 
-I think that is best covered with by the journey to today
+I think answering these is best done by covering the journey to winnow.
 
 Steps:
-- [toml_edit and combine](#combine)
-- [toml_edit and Hand-written Parser](#hand)
-- [toml_edit and nom](#nom)
-- [A glance at chumsky](#chumsky)
-- [tonl_edit and winnow](#winnow)
+1. [toml_edit and combine](#combine)
+2. [toml_edit and Hand-written Parser](#hand)
+3. [toml_edit and nom](#nom)
+4. [A glance at chumsky](#chumsky)
+5. [tonl_edit and winnow](#winnow)
 
 <a id="combine"></a>
-## toml_edit and combine
+## 1. toml_edit and combine
 
 When I got involved with toml_edit, it had been using
 [combine](https://crates.io/crates/combine) for its parser combinator
@@ -85,7 +85,7 @@ version of combine as that was the only json parser I found and I didn't want
 to update it to the latest version.
 
 <a id="hand"></a>
-## toml_edit and Hand-written Parsers
+## 2. toml_edit and Hand-written Parsers
 
 In theory, combine parsers can be written without these macros but it looked
 to be a unwieldy undertaking on the level of switching to a different parser.
@@ -115,7 +115,7 @@ Or in other words, we do not want:
 [![XKCD: Dependency](https://imgs.xkcd.com/comics/dependency.png)](https://xkcd.com/2347/)
 
 <a id="nom"></a>
-## toml_edit and nom
+## 3. toml_edit and nom
 
 nom is a parsing library that I'm both familiar with and is highly respected,
 making it feel like a safe choice for replacing combine and its macros.
@@ -162,8 +162,9 @@ My attempt to contribute to nom spanned over a year:
   progress.  I was told this would align with nom v8 (despite few of my changes
   needing a breaking release) but that v8 was planned for May 2022 and should
   take about a week to do the release.  This comes and goes.
-- **July 2022:** I follow up on that "May" release and am told that we can sync up
-  in August 2022, after vacation is over.  This never happened.
+- **July 2022:** I followed up on v8 which had been planned for May and am told
+  that we can sync up in August 2022, after vacation is over.  This never
+  happened.
 - **September 2022:** My priority for toml_edit's build performance went up
   as I became the maintainer of toml with the plan to rewrite it
   in terms of toml_edit and didn't want to negatively impact the ecosystem.
@@ -186,7 +187,7 @@ Regardless of how the merging goes (see below), nom was not living up to the
 expectations for being a critical dependency.  I have had reassurances that
 this was a fluke and the maintainer will be more responsive going forward but
 the inherent trust from nom's status has been lost and it is too late to
-rebuild that trust; I need to move on.
+take the time to rebuild that trust; I need to move on.
 
 #### Ship of Theseus
 
@@ -202,18 +203,18 @@ This helps explain some of the delay above but is its own problem: how many
 dependencies do I need to pull in and how much do I need to directly replace to
 make nom functional?  At what point am I still really using nom vs
 maintaining my own library with hints of nom?  At what point is using nom
-no longer pulling its wait and and instead the dependencies and
+no longer pulling its weight and and instead the dependencies and
 re-implementations become a liability?
 
 Each dependency I pull in needs a string justification to keep the impaxt on my
 users small and to avoid
 [rust picking apart my dependencies](https://www.reddit.com/r/rust/comments/uymdcp/introducing_wax_portable_and_opinionated_globs/).
 
-Taking this to an extreme, To meet my parsing library ergonomic goals, I would
-basically be replacing all of the top layer of nom, only being able to reuse
-the core types, du
+Taking this to an extreme, to meet my parsing library ergonomic goals, I would
+basically be replacing the top layer of nom, only being able to reuse
+the core types.
 
-Except even the core types might not be enough.  When adding span support toG$aG$aG$aG$aG$a
+Except even the core types might not be enough.  When adding span support to
 toml_edit, I found just
 [increasing the size of my input-type made parsing take 30% longer](https://github.com/winnow-rs/winnow/issues/72).
 For toml_edits use in cargo, these numbers take a barely-acceptably-slow TOML
@@ -246,7 +247,7 @@ haven't always gone smoothly on first release, I feel like with
 people through a changing API.
 
 <a id="chumsky"></a>
-## A glance at chumsky
+## 4. A glance at chumsky
 
 During this process, [chumksy](https://crates.io/crates/chumsky) has matured
 some and I felt obligated to take a look.  The two red flags for me were:
@@ -258,7 +259,7 @@ some and I felt obligated to take a look.  The two red flags for me were:
 I decided that it was not worth further investigation at this time.
 
 <a id="winnow"></a>
-## toml_edit and winnow
+## 5. toml_edit and winnow
 
 Being unsatisfied with the options, it looks like I'm needing to go the "Build"
 route.  As I said, this doesn't mean I write something bespoke.  Overall, I
