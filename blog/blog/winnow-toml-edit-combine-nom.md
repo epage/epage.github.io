@@ -292,6 +292,103 @@ So what does winnow bring to the table?
 <a id="usage"></a>
 #### Clearer Usage
 
+nom's documentation is scattered across various loose markdown files and docs.rs, making it hard to find pertintent information. When exploring documentation options in clap, we found:
+- A lot of users want one place to go
+- Github is a poor place to store documentation because people naturally look
+  at `main` and not the version pertinent to them
+
+Like with clap, I've moved all the documentation to docs.rs and organized it
+along the [four types of documentation](https://documentation.divio.com/).
+
+Narrowing in on the documentation, a basic question is buried: how do I
+integrate this into my application.
+
+We switched the introductory example from calling the example parser as a
+building block to integrating it into `FromStr`:
+
+Before:
+```rust
+fn main() {
+  assert_eq!(hex_color("#2F14DF"), Ok(("", Color {
+    red: 47,
+    green: 20,
+    blue: 223,
+  })));
+}
+```
+After:
+```rust
+impl std::str::FromStr for Color {
+    // The error must be owned
+    type Err = winnow::error::Error<String>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        hex_color(s)
+            .finish()
+            .map_err(winnow::error::Error::into_owned)
+    }
+}
+```
+
+While improving documentation is good, we need to head off problems before
+people look to the documentation (if that even happens).
+
+Looking back at that previous example, can a reviewer tell whether it is safe
+to discard the `remainder` (`""`) from `hex_color`?  I feel like its just as
+bad if we use the trait method:
+```rust
+fn main() {
+  assert_eq!(hex_color.parse("#2F14DF"), Ok(("", Color {
+    red: 47,
+    green: 20,
+    blue: 223,
+  })));
+}
+```
+To draw attention to this, we've renamed `Parser::parse` to
+`Parser::parse_next`, shifting the assumption from "this parsed" to "this
+parsed a portion".
+```rust
+fn main() {
+  assert_eq!(hex_color.parse_next("#2F14DF"), Ok(("", Color {
+    red: 47,
+    green: 20,
+    blue: 223,
+  })));
+}
+```
+`Parser::parse_next` will also be more visible as we've shifted some
+combinators to be directly on the `Parser` trait and we are considering
+[switching built-in parsers to return `impl Parser` instead of `impl
+FnMut`](https://github.com/winnow-rs/winnow/issues/162), each forcing the use
+of `Parser::parse_next` over direct function calls.
+
+Consistent language can also prevent incorrect behavior.  Consider coming
+across `take_while_m_n` (consume `m..=n` tokens) as a reviewer:
+```rust
+    match input.position(|c| !cond(c)) {
+      Some(idx) => {
+        if idx >= m {
+          if idx <= n {
+            let res: IResult<_, _, Error> = if let Ok(index) = input.slice_index(idx) {
+              Ok(input.take_split(index))
+```
+And compare it to:
+```rust
+  match input.offset_for(|c| !list.contains_token(c)) {
+    Some(offset) => {
+      if offset >= m {
+        if offset <= n {
+          let res: IResult<_, _, Error> = if let Ok(offset) = input.offset_at(offset) {
+            Ok(input.next_slice(offset))
+```
+Without any other context, `input.offset_at(offset)` is likely to stand out.
+This would lead a reviewer to double check assumptions, the pertinent one being
+that byte offsets are not the same as token counts for `&str` (`offset_at`
+converts a token count to a byte offset).  Knowing this, another bug stands
+out: we are comparing byte offsets with token counts in `offset >= m` and
+`offset <= n`.
+
 <a id="simple"></a>
 #### Simpler, Easier API
 
