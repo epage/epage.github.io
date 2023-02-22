@@ -549,3 +549,10 @@ Some of the work is a bit more nebulous and I would love your input on it!
 
 I also expect people to bring a lot of other ideas to the table and look forward to
 [learning with you in how to further improve winnow](https://github.com/winnow-rs/winnow/discussions).
+
+Discuss on
+[reddit](https://www.reddit.com/r/rust/comments/1197es1/winnow_toml_edit_combine_nom/?)
+[discourse](https://users.rust-lang.org/t/announcing-winnow-toml-edit-combine-nom/89746)
+[mastadon](https://hachyderm.io/@epage/109909843656731429)
+
+*Thanks to [Muscraft](https://github.com/Muscraft) for the proof-reading*
