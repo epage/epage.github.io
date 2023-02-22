@@ -138,11 +138,11 @@ tuples to sequence parsers.
 
 I decided to work to improve nom to unblock my work, using issues and minor
 contributions to feel out the process and priorities for nom with ideas like:
-- [Issue #1408: Reduce Syntatic Noise](https://github.com/rust-bakery/nom/issues/1408)
+- [Issue #1408: Reduce Syntactic Noise](https://github.com/rust-bakery/nom/issues/1408)
   - [Issue #1393: Consolidate parser variants using ranges (e.g. many0, many_m_n) ](https://github.com/rust-bakery/nom/issues/1393)
   - [Issue #1417: impl Parser for tuples](https://github.com/rust-bakery/nom/issues/1417)
   - [Issue #1415: Update docs to point to Parser::map over nom::combinator::map. ](https://github.com/rust-bakery/nom/issues/1415)
-- [Issue #1414: Swap module heirarchy so `streaming`/`complete` are in the root](https://github.com/rust-bakery/nom/issues/1414)
+- [Issue #1414: Swap module hierarchy so `streaming`/`complete` are in the root](https://github.com/rust-bakery/nom/issues/1414)
 - [Issue #1416: Help people discover how to do take_while, et al, with parsers instead of predicates](https://github.com/rust-bakery/nom/issues/1416)
 - [Issue #1409: Support custom containers for many functions](https://github.com/rust-bakery/nom/issues/1409)
 
@@ -173,7 +173,7 @@ My attempt to contribute to nom spanned over a year:
   (1) all of this was throw-away work and would have to be re-implemented once
   toml used toml_edit
   and (2) the ramp up time on toml's hand-written parser would take me away from improving things.
-  More desparate, I created
+  More desperate, I created
   [nom8, a short-lived fork to
   experiment with my proposals for nom v8 and to use them immediately,
   without being blocked on nom](https://crates.io/crates/nom8).
