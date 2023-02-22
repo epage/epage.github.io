@@ -1,13 +1,13 @@
 ---
 title: winnow = toml_edit + combine + nom
+published_date: 2023-02-22 18:35:24 +0000
 layout: default.liquid
-is_draft: true
+is_draft: false
 data:
   tags:
-    - programming
-    - rust
+  - programming
+  - rust
 ---
-
 It is finally time to take the wraps off where I disappeared to over the
 last 6 months. Besides the family leave, I've mostly been chalking this up to
 working on
@@ -16,7 +16,11 @@ particular building block took up most of that time.
 
 I would like to introduce you to [winnow](https://crates.io/crates/winnow), a
 fork of the venerable [nom](https://crates.io/crates/nom) parser combinator
-library.
+library.  For those that want to skip all the details, you can checkout [the
+migration guide and
+changelog](https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#030---2023-02-22).
+
+I would link to the docs but [docs.rs seems to be backed up this morning](https://docs.rs/releases/queue).
 
 <!-- more -->
 
