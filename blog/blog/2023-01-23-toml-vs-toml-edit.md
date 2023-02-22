@@ -3,6 +3,10 @@ title: '`toml` vs `toml_edit`'
 published_date: 2023-01-23 20:09:26 +0000
 layout: default.liquid
 is_draft: false
+data:
+  tags:
+    - programming
+    - rust
 ---
 [`toml` v0.6](https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#060---2023-01-23)
 is now out with a new parser and renderer, addressing several existing issues
