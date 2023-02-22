@@ -216,7 +216,7 @@ This helps explain some of the delay above but is its own problem: how many
 dependencies do I need to pull in and how much do I need to directly replace to
 make nom functional? At what point am I still really using nom vs
 maintaining my own library with hints of nom? At what point is using nom
-no longer pulling its weight and and instead the dependencies and
+no longer pulling its weight and instead the dependencies and
 re-implementations become a liability?
 
 Each dependency I pull in needs a strong justification to keep the impact on my
@@ -551,8 +551,8 @@ I also expect people to bring a lot of other ideas to the table and look forward
 [learning with you in how to further improve winnow](https://github.com/winnow-rs/winnow/discussions).
 
 Discuss on
-[reddit](https://www.reddit.com/r/rust/comments/1197es1/winnow_toml_edit_combine_nom/?)
-[discourse](https://users.rust-lang.org/t/announcing-winnow-toml-edit-combine-nom/89746)
+[reddit](https://www.reddit.com/r/rust/comments/1197es1/winnow_toml_edit_combine_nom/?),
+[discourse](https://users.rust-lang.org/t/announcing-winnow-toml-edit-combine-nom/89746),
 [mastadon](https://hachyderm.io/@epage/109909843656731429)
 
 *Thanks to [Muscraft](https://github.com/Muscraft) for the proof-reading*
