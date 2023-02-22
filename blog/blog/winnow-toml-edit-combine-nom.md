@@ -9,7 +9,7 @@ data:
 ---
 
 It is finally time to take the wraps off where I've disappeared to over the
-last 6 months.  Besides the family leave, I've mostly been chalking this up to
+last 6 months. Besides the family leave, I've mostly been chalking this up to
 working on
 [toml_edit](https://epage.github.io/blog/2023/01/toml-vs-toml-edit/) but one
 particular building block took up most of that time.
@@ -37,7 +37,7 @@ Steps:
 
 When I got involved with toml_edit, it had been using
 [combine](https://crates.io/crates/combine) for its parser combinator
-library.  While I was more familiar with nom, having used it in my own
+library. While I was more familiar with nom, having used it in my own
 projects, I adapted.
 
 While working to get toml_edit into cargo, the two biggest problems I had were:
@@ -49,7 +49,7 @@ While working to get toml_edit into cargo, the two biggest problems I had were:
   nature of parsers describing how to parse, rather than directly parsing.
 
 Thankfully [Marwes](https://github.com/Marwes) was responsive and helped me
-through these challenges!  I got toml_edit of sufficient quality to merge it
+through these challenges! I got toml_edit of sufficient quality to merge it
 into cargo, allowing merging `cargo add` into cargo.
 
 I thought things were fine and had moved on until I got a ping from [nnethercote](https://nnethercote.github.io/):
@@ -61,24 +61,24 @@ I thought things were fine and had moved on until I got a ping from [nnethercote
 [Rust 1.60 was released](https://blog.rust-lang.org/2022/04/07/Rust-1.60.0.html)
 and included a new cargo feature to draw graphs of how long each crate took to
 compile and toml_edit was front and center for being slow in the 1.60
-announcement! And I had nnethercote knocking at my door about it!  I needed to
+announcement! And I had nnethercote knocking at my door about it! I needed to
 do something about this, but what?
 
-I started with nnethercote's question: macros.  The reason macros came up was
+I started with nnethercote's question: macros. The reason macros came up was
 they were in the middle of
 [investigating slow compiles due to macros](https://nnethercote.github.io/2022/04/12/how-to-speed-up-the-rust-compiler-in-april-2022.html)
 due to a technique called
 [tt-muncher](https://veykril.github.io/tlborm/decl-macros/patterns/tt-muncher.html)
-which is quadratic relative to the lengnth of the input.  *Every single parse
+which is quadratic relative to the lengnth of the input. *Every single parse
 function in toml_edit (with some quite large) was wrapped in a
 toml_edit-specific macro that wrapped a
 [tt-muncher from combine](https://docs.rs/combine/4.6.6/combine/macro.parser.html).*
 
 I first set out to test my theory that macros were the root cause by throwing
 together
-[parse-rosetta-rs](https://github.com/rosetta-rs/parse-rosetta-rs).  This added
+[parse-rosetta-rs](https://github.com/rosetta-rs/parse-rosetta-rs). This added
 more evidence to the theory that it was the macros as combines entry in the
-shootout didn't use them and compiled in reasonable times.  However, it wasn't
+shootout didn't use them and compiled in reasonable times. However, it wasn't
 completely conclusive because (1) something else could be going on in either
 parse-rosetta-rs or toml_edit and (2) parse-rosetta-rs was using an old
 version of combine as that was the only json parser I found and I didn't want
@@ -93,21 +93,21 @@ I have gotten opposing feedback that toml_edit should both use a
 hand-written parser *and* it was a positive sign to be using a parsing library.
 
 For myself, I felt hand-written parsers were harder to keep readable,
-maintainable, and adaptable for bug fixes and new features.  If this was a
+maintainable, and adaptable for bug fixes and new features. If this was a
 project with a larger contributor base with people specializing on just
-parsing, I could see this making sense.  With this just being 1-2 people
+parsing, I could see this making sense. With this just being 1-2 people
 occasionally dabbling with edits, this is less tenable.
 
 In the end, if I did something hand-written, it would end up looking much like
-a parser library.  Whether to go this route then gets into the "Build vs Buy"
-debate.  Relying on an existing library is convenient as it distributes the
-maintenance load, testing, bug finding, and fixing.  However, when parsing is
+a parser library. Whether to go this route then gets into the "Build vs Buy"
+debate. Relying on an existing library is convenient as it distributes the
+maintenance load, testing, bug finding, and fixing. However, when parsing is
 fundamental to toml_edit and depending on a parsing library ties my project
-to theirs.  For example, if we need an improvement or bug fix, we are beholden
+to theirs. For example, if we need an improvement or bug fix, we are beholden
 to the maintainer of the parsing library for if/when we get it merged *and* released.
 If we were talking about ancilary functionality, becoming dependent on
 another project isn't too big of an issue as we can more easily live without or
-change the dependency if needed.  Thankfully, Marwes was great to work with on
+change the dependency if needed. Thankfully, Marwes was great to work with on
 combine though it was time to move on.
 
 Or in other words, we do not want:
@@ -130,7 +130,7 @@ into the Lisp cult of parentheses.
 [![XKCD: Lisp](https://imgs.xkcd.com/comics/lisp_cycles.png)](https://xkcd.com/297/)
 
 In working on a large, readable parser, I felt switching to nom would be too
-large of a regression.  While I had been happy with nom before, my parsers
+large of a regression. While I had been happy with nom before, my parsers
 had been small and I didn't have the point of comparison of working with
 combine which focused more on trait functions (compare a standalone `map` vs
 `Iterator::map`) and had niceties like implementing the `Parser` trait for
@@ -146,7 +146,6 @@ contributions to feel out the process and priorities for nom with ideas like:
 - [Issue #1416: Help people discover how to do take_while, et al, with parsers instead of predicates](https://github.com/rust-bakery/nom/issues/1416)
 - [Issue #1409: Support custom containers for many functions](https://github.com/rust-bakery/nom/issues/1409)
 
-
 #### Lack of Responsiveness and Communication
 
 My attempt to contribute to nom spanned over a year:
@@ -155,20 +154,20 @@ My attempt to contribute to nom spanned over a year:
   reception, and moved forward slowly, with
   [a simple prepartory refactor PR](https://github.com/rust-bakery/nom/pull/1412).
   After a couple of weeks, I got push back and then never heard back again when
-  I asked a clarifying question.  As this wasn't a priority, I moved on.
-- **April 2022:** Rust 1.60 is released and nnethercote reached out to me.  As this
+  I asked a clarifying question. As this wasn't a priority, I moved on.
+- **April 2022:** Rust 1.60 is released and nnethercote reached out to me. As this
   felt important to resolve and my previous approach floundered, I reached out
   directly to try to come to an understanding to allow my work on nom to
-  progress.  I was told this would align with nom v8 (despite few of my changes
+  progress. I was told this would align with nom v8 (despite few of my changes
   needing a breaking release) but that v8 was planned for May 2022 and should
-  take about a week to do the release.  This comes and goes.
+  take about a week to do the release. This comes and goes.
 - **July 2022:** I followed up on v8 which had been planned for May and am told
-  that we can sync up in August 2022, after vacation is over.  This never
+  that we can sync up in August 2022, after vacation is over. This never
   happened.
 - **September 2022:** My priority for toml_edit's build performance went up
   as I became the maintainer of toml with the plan to rewrite it
   in terms of toml_edit and didn't want to negatively impact the ecosystem.
-  I reached out again and we finally synced up.  Then nothing again.
+  I reached out again and we finally synced up. Then nothing again.
 - **October 2022:** As users opened Issues and PRs for toml, I felt the pressure
   build as I didn't want to touch the existing code because of
   (1) all of this was throw-away work and would have to be re-implemented once
@@ -179,12 +178,12 @@ My attempt to contribute to nom spanned over a year:
   experiment with my proposals for nom v8 and to use them immediately,
   without being blocked on nom](https://crates.io/crates/nom8).
 - **December 2022:** After some delay due to family leave, nom8 is finally ready.
-  I received positive reception with the results!  This is also the first time
+  I received positive reception with the results! This is also the first time
   there was positive momentum on the nom repo; we were working to merge my
   PRs.
 
 Regardless of how the merging goes (see below), nom was not living up to the
-expectations for being a critical dependency.  I have had reassurances that
+expectations for being a critical dependency. I have had reassurances that
 this was a fluke and the maintainer will be more responsive going forward but
 the inherent trust from nom's status has been lost and it is too late to
 take the time to rebuild that trust; I need to move on.
@@ -195,14 +194,14 @@ While planning the merging of my work, things broke down. In large part this
 was due to different priorities.
 
 The first of these is that merging contributions is officially considered a low
-priority for the project.  An unspoken (as far as I can find) assumption in
+priority for the project. An unspoken (as far as I can find) assumption in
 nom is that it provides a "core" and people are to build or replace what they
 need on top, like [nom_locate](https://crates.io/crates/nom_locate).
 
 This helps explain some of the delay above but is its own problem: how many
 dependencies do I need to pull in and how much do I need to directly replace to
-make nom functional?  At what point am I still really using nom vs
-maintaining my own library with hints of nom?  At what point is using nom
+make nom functional? At what point am I still really using nom vs
+maintaining my own library with hints of nom? At what point is using nom
 no longer pulling its weight and and instead the dependencies and
 re-implementations become a liability?
 
@@ -214,7 +213,7 @@ Taking this to an extreme, to meet my parsing library ergonomic goals, I would
 basically be replacing the top layer of nom, only being able to reuse
 the core types.
 
-Except even the core types might not be enough.  When adding span support to
+Except even the core types might not be enough. When adding span support to
 toml_edit, I found just
 [increasing the size of my input-type made parsing take 30% longer](https://github.com/winnow-rs/winnow/issues/72).
 For toml_edits use in cargo, these numbers take a barely-acceptably-slow TOML
@@ -241,7 +240,7 @@ For me, the focus is on new users and the applications not-yet-written as I
 feel the Rust community is at an inflection point (which
 [matklad also spoke about](https://matklad.github.io/2023/01/25/next-rust-compiler.html)).
 
-This doesn't mean there is nothing we can do for existing users.  While things
+This doesn't mean there is nothing we can do for existing users. While things
 haven't always gone smoothly on first release, I feel like with
 [clap](https://crates.io/crates/clap), we've learned a lot about how to help
 people through a changing API.
@@ -250,7 +249,7 @@ people through a changing API.
 ## 4. A glance at chumsky
 
 During this process, [chumksy](https://crates.io/crates/chumsky) has matured
-some and I felt obligated to take a look.  The two red flags for me were:
+some and I felt obligated to take a look. The two red flags for me were:
 - They only compare performance with [pom](https://crates.io/crates/pom) and
   not nom and toml_edit can't take any more performance regressions
   ([they are improving this](https://github.com/zesterer/chumsky/pull/82)).
@@ -262,17 +261,17 @@ I decided that it was not worth further investigation at this time.
 ## 5. toml_edit and winnow
 
 Being unsatisfied with the options, it looks like I'm needing to go the "Build"
-route.  As I said, this doesn't mean I write something bespoke.  Overall, I
+route. As I said, this doesn't mean I write something bespoke. Overall, I
 find the approach nom takes to work well for me for writing parsers, so I
 decided to take my nom8 work and make that the base for my new parser, winnow.
 
 > For those unfamiliar, winnowing is the process for separating chaff from grain
 > by throwing them in the air and letting the breeze blow the chaff away, leaving
-> the grain to fall and be collected.  Thanks to
+> the grain to fall and be collected. Thanks to
 > [compenguy](https://github.com/compenguy) for the name!
 
 My aim is for winnow to be your "do everything" parser, much like people treat
-regular expressions.  To this end, the project's priorities are:
+regular expressions. To this end, the project's priorities are:
 1. Support writing parser declaratively while not getting in the way of imperative-style
    parsing when needed, working as an open-ended toolbox rather than a close-ended framework.
 2. Flexible enough to be used for any application, including parsing binary data, strings, or
@@ -302,11 +301,11 @@ Looking back over my parsers, I see I'm using a fraction of what `nom` offered m
 
 This matches my experience in using and now maintaining clap: the larger an API
 is, the less people are likely to discover what is available, lowering the
-value gained by each new API addition.
+value of each part of the API with each new API addition.
 
 The first area I focused on was trying to remove the distinction between
-"complete" and "streaming" parsers.  `nom` has a lot of parsers behave somewhat
-differently when the input isn't completely in-memory.  Currently, that is
+"complete" and "streaming" parsers. `nom` has a lot of parsers behave somewhat
+differently when the input isn't completely in-memory. Currently, that is
 handled by having parsers duplicated, like with
 `nom::bytes::complete::take_while` vs `nom::bytes::streaming::take_while`.
 
@@ -316,11 +315,11 @@ Problems with this:
 
 After [some experimentation](https://github.com/rust-bakery/nom/issues/1535), I
 found that we could tag the input type as being `Partial` and all of the
-parsers could switch their behavior.  The complete case (default) sees no
-overhead from this switching.  A `Partial` tag can be implemented that shows no
-overhead but I decided to make the default `Partial` support being able to
+parsers could switch their behavior. The complete case (default) sees no
+overhead from this switching. A user can implement a `Partial` tag that shows
+no overhead but I decided to make the default `Partial` support being able to
 switch to complete-parsing at runtime (e.g. the `Reader` reported the true
-end-of-input).  The overhead looks to mostly be from the larger input type
+end-of-input). The overhead looks to mostly be from the larger input type
 which should be reduced with
 [Issue #72: Improving performance for `Located`](https://github.com/winnow-rs/winnow/issues/72).
 
@@ -355,7 +354,7 @@ fn hexdigit(input: &str) -> IResult<&str, char> {
 }
 ```
 
-This let us also get the variations of `one_of`, like `satisfy`.  This also
+This let us also get the variations of `one_of`, like `satisfy`. This also
 applies to `take_while0` and related parsers, simplifying what we offer there
 as well.
 
@@ -364,7 +363,7 @@ as well.
 
 I felt the [nom-tracable](https://crates.io/crates/nom-tracable) crate was a
 great idea but never used it myself as I didn't want to pull in a dependency
-just for debugging and instead made one-off tracing combinators.  What if it
+just for debugging and instead made one-off tracing combinators. What if it
 was built-in and all of the built-in parsers supported it?
 
 This led to the `trace` combinator which does nothing in normal builds but will
@@ -382,7 +381,7 @@ to different parsing applications.
 <a id="stream"></a>
 #### `Located` and `Stateful`
 
-`toml` required `toml_edit` to track input spans of the TOML AST.  In `nom`, this is generally done with 
+`toml` required `toml_edit` to track input spans of the TOML AST. In `nom`, this is generally done with 
 [nom_locate](https://crates.io/crates/nom_locate) which never sat right with me due to:
 - Reporting the column [without regard for the inherent complexity](https://manishearth.github.io/blog/2017/01/14/stop-ascribing-meaning-to-unicode-code-points/)
 - Overhead from proactively tracking the line, rather than just the span
@@ -393,10 +392,15 @@ On a reddit thread, I came across [pori](https://crates.io/crates/pori) which im
 - `Located` only tracks the span, not lines or "columns"
 
 In working with this, I realized that there was still some unnecesaarry
-overhead from tracking the span as you parse.  If you just add `Located`
-without capturing any spans, your parser slows down.  I was able to rework this
+overhead from tracking the span as you parse. If you just add `Located`
+without capturing any spans, your parser slows down. I was able to rework this
 so there is no active bookkeeping, making the overhead negligable compared to a
 `Stateful<I, usize>`.
+
+For my experimentation with different location tracking styles,
+- [#61 Add Span Support](https://github.com/winnow-rs/winnow/pull/61)
+- [#63 pori](https://github.com/winnow-rs/winnow/pull/63)
+- [#64 nom_locate](https://github.com/winnow-rs/winnow/pull/64)
 
 <a id="future"></a>
 #### The Future
