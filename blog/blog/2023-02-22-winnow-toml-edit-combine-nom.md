@@ -16,11 +16,11 @@ particular building block took up most of that time.
 
 I would like to introduce you to [winnow](https://crates.io/crates/winnow), a
 fork of the venerable [nom](https://crates.io/crates/nom) parser combinator
-library.  For those that want to skip all the details, you can checkout [the
-migration guide and
-changelog](https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#030---2023-02-22).
+library.  For those that want to skip all the details, you can checkout
+[the documentation](https://docs.rs/winnow/latest/winnow/) and
+[the migration guide and changelog](https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#030---2023-02-22).
 
-I would link to the docs but [docs.rs seems to be backed up this morning](https://docs.rs/releases/queue).
+~~I would link to the docs but [docs.rs seems to be backed up this morning](https://docs.rs/releases/queue).~~
 
 <!-- more -->
 
@@ -320,7 +320,7 @@ Like with clap, I've moved all the documentation to docs.rs and organized it
 along the [four types of documentation](https://documentation.divio.com/).  I
 then integrated
 [nominomicon](https://tfpk.github.io/nominomicon/introduction.html) as the
-tutorial.
+[tutorial](https://docs.rs/winnow/latest/winnow/_tutorial/chapter_0/index.html).
 
 Narrowing in on the documentation, a basic question is buried: how do I
 integrate this into my application. To answer this, I switched the
@@ -358,7 +358,9 @@ When dealing with custom error handling and application integration, users had
 to deal with [`nom::Err`](https://docs.rs/nom/latest/nom/enum.Err.html) with
 its `Error` and `Fatal` variants.  Why this exists and how it works isn't too
 clear from the names and you have to read and grok the documentation.
-We've renamed `Err` to `ErrMode` with its `Backtrack` and `Cut` variants,
+We've renamed `Err` to
+[`ErrMode`](https://docs.rs/winnow/latest/winnow/error/enum.ErrMode.html)
+with its `Backtrack` and `Cut` variants,
 making it clear that this is adding parser modality information to your error, with one
 variant used for trying alternative parsers and the other for short-circuiting
 to the caller.
