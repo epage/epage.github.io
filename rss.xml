@@ -5,10 +5,10 @@ working on
 particular building block took up most of that time.</p>
 <p>I would like to introduce you to <a href="https://crates.io/crates/winnow">winnow</a>, a
 fork of the venerable <a href="https://crates.io/crates/nom">nom</a> parser combinator
-library.  For those that want to skip all the details, you can checkout <a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#030---2023-02-22">the
-migration guide and
-changelog</a>.</p>
-<p>I would link to the docs but <a href="https://docs.rs/releases/queue">docs.rs seems to be backed up this morning</a>.</p>
+library.  For those that want to skip all the details, you can checkout
+<a href="https://docs.rs/winnow/latest/winnow/">the documentation</a> and
+<a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#030---2023-02-22">the migration guide and changelog</a>.</p>
+<p><del>I would link to the docs but <a href="https://docs.rs/releases/queue">docs.rs seems to be backed up this morning</a>.</del></p>
 ]]></description><guid>https://epage.github.io/blog/2023/02/winnow-toml-edit-combine-nom/</guid><pubDate>Wed, 22 Feb 2023 18:35:24 +0000</pubDate></item><item><title>`toml` vs `toml_edit`</title><link>https://epage.github.io/blog/2023/01/toml-vs-toml-edit/</link><description><![CDATA[<p><a href="https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#060---2023-01-23"><code>toml</code> v0.6</a>
 is now out with a new parser and renderer, addressing several existing issues
 and ensuring compliance with the TOML 1.0 compliance tests.  This was done by

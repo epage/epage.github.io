@@ -24,10 +24,10 @@ working on
 particular building block took up most of that time.</p>
 <p>I would like to introduce you to <a href="https://crates.io/crates/winnow">winnow</a>, a
 fork of the venerable <a href="https://crates.io/crates/nom">nom</a> parser combinator
-library.  For those that want to skip all the details, you can checkout <a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#030---2023-02-22">the
-migration guide and
-changelog</a>.</p>
-<p>I would link to the docs but <a href="https://docs.rs/releases/queue">docs.rs seems to be backed up this morning</a>.</p>
+library.  For those that want to skip all the details, you can checkout
+<a href="https://docs.rs/winnow/latest/winnow/">the documentation</a> and
+<a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#030---2023-02-22">the migration guide and changelog</a>.</p>
+<p><del>I would link to the docs but <a href="https://docs.rs/releases/queue">docs.rs seems to be backed up this morning</a>.</del></p>
 <!-- more -->
 <p>Probably the two most likely questions are:</p>
 <ul>
@@ -297,7 +297,7 @@ at <code>main</code> and not the version pertinent to them</li>
 along the <a href="https://documentation.divio.com/">four types of documentation</a>.  I
 then integrated
 <a href="https://tfpk.github.io/nominomicon/introduction.html">nominomicon</a> as the
-tutorial.</p>
+<a href="https://docs.rs/winnow/latest/winnow/_tutorial/chapter_0/index.html">tutorial</a>.</p>
 <p>Narrowing in on the documentation, a basic question is buried: how do I
 integrate this into my application. To answer this, I switched the
 introductory example from calling the example parser as a building block to
@@ -331,7 +331,9 @@ people look to the documentation (if that even happens).</p>
 to deal with <a href="https://docs.rs/nom/latest/nom/enum.Err.html"><code>nom::Err</code></a> with
 its <code>Error</code> and <code>Fatal</code> variants.  Why this exists and how it works isn't too
 clear from the names and you have to read and grok the documentation.
-We've renamed <code>Err</code> to <code>ErrMode</code> with its <code>Backtrack</code> and <code>Cut</code> variants,
+We've renamed <code>Err</code> to
+<a href="https://docs.rs/winnow/latest/winnow/error/enum.ErrMode.html"><code>ErrMode</code></a>
+with its <code>Backtrack</code> and <code>Cut</code> variants,
 making it clear that this is adding parser modality information to your error, with one
 variant used for trying alternative parsers and the other for short-circuiting
 to the caller.</p>
