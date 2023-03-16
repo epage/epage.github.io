@@ -175,3 +175,7 @@ becomes relevant to when/if clap switches to `anstream`.
 I also see `clap` as a testing ground for further adoption in places like
 `env_logger`, dropping the bespoke styling API, or `cargo` which would make it
 easier nicer looking commands.
+
+Discuss on
+[reddit](https://www.reddit.com/r/rust/comments/11typlk/anstream_simplifying_terminal_styling/?)
+[mastadon](https://hachyderm.io/@epage/110039939242972078)
