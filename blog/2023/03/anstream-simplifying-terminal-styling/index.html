@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>anstream: simplifying terminal styling</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>anstream: simplifying terminal styling</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p><code>anstream</code> is a new take on terminal styling for Rust and will be used in the upcoming clap 4.2 release.</p>
+<p>Quick links</p>
+<ul>
+<li><a href="https://docs.rs/anstream/latest/anstream/">docs.rs</a></li>
+<li><a href="https://crates.io/crates/anstream">crates.io</a></li>
+<li><a href="https://github.com/epage/anstyle/tree/main/crates/anstream">repo</a></li>
+</ul>
+<!-- more -->
+<h2>Challenges with Terminal Styling</h2>
+<p>Much like with syntax highlighting with code, styling a CLI is a quick way to
+make the output more approachable and faster to scan.  Despite this, it took me
+several years to add color to my CLIs because of the initial hump to get
+started, having to answer questions like &quot;which styling crate should I use?&quot;.</p>
+<p>Initially, I took the cheap way out and used
+<a href="https://crates.io/crates/env_logger">env_logger</a> for all of my output,
+relying on the coloring of the log levels.  A problem I had is I wanted to
+customize the way the log levels looked but then they were no longer colored.
+Going back now, it appears that <code>env_logger</code> has a bespoke styling API but I
+never found it back then.</p>
+<p>Once my applications matured to the point where coloring was the next step, I
+finally sat down and dug into this.</p>
+<p><a href="https://crates.io/crates/termcolor">termcolor</a> is a safe choice, being used in
+applications like ripgrep.  The big selling point was support for older Windows
+versions but this came at a huge cost to ergonomics.  As is usual in open
+source, I decided to shortchange some Windows users for my own convenience and
+decided against <code>termcolor</code>.</p>
+<p>I ended up settling on <a href="https://crates.io/crates/yansi">yansi</a> because</p>
+<ul>
+<li>The documentation made me feel more comfortable that it would work well for
+<a href="https://rust-cli-recommendations.sunshowers.io/managing-colors-in-rust.html#the-stylesheet-approach">CLI stylesheets</a></li>
+<li>It worked with any <code>Display</code> type</li>
+<li>It handled global control over styling, meaning I didn't need to thread
+styling state through my application
+<ul>
+<li>While great, this is why I skipped
+<a href="https://crates.io/crates/owo-colors">owo-colors</a> which requires annotating
+every call with a is-supported check.</li>
+</ul>
+</li>
+<li>It supported nesting of styled values which seemed useful though I never ended up using this</li>
+</ul>
+<p><code>yansi</code>s global control didn't work as well as I had hoped and I ended up
+doing the bookkeeping myself using an experimental crate,
+<a href="https://crates.io/crates/concolor">concolor</a></p>
+<ul>
+<li>I wanted to initialize <code>yansi</code>'s global with various <a href="https://github.com/SergioBenitez/yansi/issues/18">best practices</a></li>
+<li><code>yansi</code>'s global is a simple <code>bool</code>, disallowing the caller to <a href="https://github.com/SergioBenitez/yansi/issues/17">track stdout and stderr separately</a> when manually implementing the above best practices.</li>
+<li><code>yansi</code> requires manual initialization which <a href="https://github.com/SergioBenitez/yansi/issues/20">doesn't work well in testing libraries</a></li>
+</ul>
+<p>As my use cases got more complicated, I found I wanted to abstract away the
+rendering code to make it more compoasable but it still had to know about the
+capabilities of what it was being written to (<code>stdout</code>, <code>stderr</code>, or a file),
+requiring that I hard code that or thread it through.
+This is a problem shared by <code>termcolor</code>, <code>yansi</code>, <code>owo-colors</code>, etc.</p>
+<p>The next challenge I ran into was supporting styling in library APIs in a semver-stable
+fashion.  For example, creating customized sections in clap's help output
+<a href="https://github.com/clap-rs/clap/issues/1433">stands out like a sore thumb as they can't be styled like the rest of the output</a>.
+The options for fixing this aren't great:</p>
+<ul>
+<li>Expose the internal styling library (<code>termcolor</code> in clap's case), tying our API version to theirs</li>
+<li>Wrapping the internal styling library with our own API, allowing us to change
+it as desired, at the cost of a bespoke API that won't ever be as good as a
+third-party because it isn't the focus of clap and increasing clap's API surface area dramatically.</li>
+</ul>
+<h2>Breaking the Gordian Knot with <code>anstream</code></h2>
+<p>Whenever I dig into a Rust project, the first thing I do is look for unfamiliar
+dependencies to see if there are knew gems to discover.  When browsing cargo's
+<code>Cargo.toml</code>, I found <a href="https://docs.rs/fwdansi">fwdansi</a>, a
+crate that allows you to convert ANSI escape codes into <code>termcolor</code> API calls.</p>
+<p>What if a terminal styling library's API was made of ANSI escape codes and the <code>std::io::Write</code> trait?</p>
+<ul>
+<li>Hiding stdout/stderr details being <code>std::io::Write</code> would allow the rendering code
+to be independent of what it is being output to</li>
+<li>ANSI escape codes are likely more stable than any crate API I'll come across</li>
+</ul>
+<p>Of course, you still need <em>something</em> for generating the ANSI escape codes.  So far, I've been using a mix of</p>
+<ul>
+<li><a href="https://crates.io/crates/anstyle">anstyle</a> for a simple API without bells and whistles</li>
+<li><a href="https://crates.io/crates/owo-colors">owo-colors</a> for ergonomics and <strong>because</strong> any conditional styling is opt-in (the very reason I previously avoided it) allowing me to avoid it</li>
+<li><a href="https://crates.io/crates/color-print">color-print</a> for styling at compile-time</li>
+</ul>
+<p>Now you can write code like:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">anstream::println;
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">owo_colors::OwoColorize as _;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#65737e;">// Foreground colors
+</span><span style="color:#c0c5ce;">println!(&quot;</span><span style="color:#a3be8c;">My number is </span><span style="color:#d08770;">{:#x}</span><span style="color:#a3be8c;">!</span><span style="color:#c0c5ce;">&quot;, </span><span style="color:#d08770;">10.</span><span style="color:#96b5b4;">green</span><span style="color:#c0c5ce;">());
+</span><span style="color:#65737e;">// Background colors
+</span><span style="color:#c0c5ce;">println!(&quot;</span><span style="color:#a3be8c;">My number is not </span><span style="color:#d08770;">{}</span><span style="color:#a3be8c;">!</span><span style="color:#c0c5ce;">&quot;, </span><span style="color:#d08770;">4.</span><span style="color:#96b5b4;">on_red</span><span style="color:#c0c5ce;">());
+</span></pre>
+<p>and <code>println</code> will handle</p>
+<ul>
+<li>Stripping ANSI escape codes when printing to a file, <code>TERM=dumb</code>, <code>NO_COLOR</code> is set, <code>CICOLOR=0</code> is set, or if disabled by the application like with <code>--color never</code></li>
+<li>Adapting ANSI escape codes to the wincon API for older Windows versions that don't support opting in to ANSI escape code support</li>
+<li>Passing through ANSI escape codes otherwise</li>
+</ul>
+<p>Of course, I thought this was ingenious of me but it turned out that I'm not the
+first person to think of this.  The python library
+<a href="https://pypi.org/project/colorama/">colorama</a> does just this and
+<a href="https://internals.rust-lang.org/t/terminal-platform-abstraction/6746/8?u=epage">burnntsushi just didn't want to put in the effort for parsing ANSI escape codes</a>
+(thankfully I was able to build on <a href="https://crates.io/crates/vte">the work</a> from Alacritty which came much later than <code>termcolor</code>).</p>
+<h3>Performance</h3>
+<p>Post-processing comes at a cost and if its too high, this whole effort is dead
+in the water.   Ironically, rendering of ANSI escape codes is the case with the
+lowest overhead (auto-detect and pass-through) but most likely it could take the
+performance hit since its being rendered to the screen which is already a
+relatively slow operation.</p>
+<p>Piping to a file is usually where people will care most about performance so I
+created a fast way to strip ANSI escape codes:</p>
+<table><thead><tr><th><code>linux $ rg -i linus</code></th><th>time</th></tr></thead><tbody>
+<tr><td><a href="https://crates.io/crates/strip-ansi-escapes">strip-ansi-escapes</a></td><td><code>[2.0897 ms 2.1009 ms 2.1129 ms]</code></td></tr>
+<tr><td><code>anstream::adapter::strip_str</code></td><td><code>[210.38 µs 211.53 µs 213.04 µs]</code></td></tr>
+<tr><td><code>ansdtream::adapter::strip_bytes</code></td><td><code>[238.22 µs 238.94 µs 239.66 µs]</code></td></tr>
+</tbody></table>
+<p><em>Note: <code>strip_bytes</code> is slower than <code>strip_str</code> because of some ambiguity
+between UTF-8 characters and some escape codes that goes away when we know the
+input is UTF-8</em></p>
+<p>I implemented support for <code>wincon</code> mostly because I felt it less effort than
+deciding whether it was still worthwhile or not to support and then try to
+convince any holdouts if it wasn't.  This was not the highest priority for
+optimizations.</p>
+<table><thead><tr><th><code>linux $ rg -i linus</code></th><th>time</th></tr></thead><tbody>
+<tr><td><code>anstream::adapter::wincon_bytes</code></td><td><code>[939.34 µs 942.79 µs 946.42 µs]</code></td></tr>
+</tbody></table>
+<p>For a real-world benchmark, I decided to check how much this slows down my
+source code spell checker, <a href="https://github.com/crate-ci/typos">typos</a>, on the
+Linux kernel.  As of f76da4d5ad51, <code>typos</code> v1.13.24 reported (in color) 176,210 possible misspellings across 71,530 files:</p>
+<table><thead><tr><th><code>linux $ typos &gt; /dev/null</code></th><th>time</th></tr></thead><tbody>
+<tr><td>v1.13.23</td><td>20.082 s ±  0.111 s</td></tr>
+<tr><td>v1.13.24</td><td>20.426 s ±  0.104 s</td></tr>
+</tbody></table>
+<p><em>Note: see the <a href="https://github.com/crate-ci/typos/pull/688">PR</a> for more details</em></p>
+<h3><code>anstream</code> and <code>clap</code></h3>
+<p>Supporting <code>anstream</code> in <code>clap</code> is
+<a href="https://github.com/clap-rs/clap/pull/4765">ready to go</a> but it is a big
+commitment in a highly visible crate like <code>clap</code> to change from the
+tried-and-true <code>termcolor</code> to a crate that has only existed for 9 days
+(starting its life under the <code>anstyle-stream</code> name) and is reliant on complex
+parsers doing the right thing, no matter how well tested.</p>
+<p>My plan is to let the above PR sit for a little bit as I get more experience
+with <code>anstream</code> in my other crates and in case any feedback from this post
+becomes relevant to when/if clap switches to <code>anstream</code>.</p>
+<blockquote>
+<p>Aside: some clap users might be surprised by this effort as
+<a href="https://github.com/clap-rs/clap/issues/3234">theming support</a> is the top priority.
+The plan for theming support is to use
+<a href="https://crates.io/crates/anstyle">anstyle</a> in clap's API once it hits 1.0 but feedback on the
+<code>anstyle</code>s API has been slow.  Work on <code>anstream</code> was a way for me to get some more
+practical experience with <code>anstyle</code> to vet its API and make improvements.</p>
+</blockquote>
+<p>I also see <code>clap</code> as a testing ground for further adoption in places like
+<code>env_logger</code>, dropping the bespoke styling API, or <code>cargo</code> which would make it
+easier nicer looking commands.</p>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
