@@ -17,7 +17,7 @@
 			</ul>
 		</nav>
 		<main class="container">
-			<p><a href="https://docs.rs/clap/latest/clap/">clap</a> v4.2.0 is now out with styling of
+			<p><a href="https://docs.rs/clap/4.2.0/clap/">clap</a> v4.2.0 is now out with styling of
 help descriptions!  See the
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">changelog</a> for more
 details.</p>
@@ -45,7 +45,7 @@ your choice.  For example, with the
 </span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
 </span></pre>
 <p>To know if ANSI escape codes will be handled properly, look for builder methods that accept 
-<a href="https://docs.rs/clap/latest/clap/builder/struct.StyledStr.html"><code>StyledStr</code></a>.</p>
+<a href="https://docs.rs/clap/4.2.0/clap/builder/struct.StyledStr.html"><code>StyledStr</code></a>.</p>
 <h3>Further Error Tweaks</h3>
 <p>In clap v4.1, we
 <a href="https://epage.github.io/blog/2023/01/clap-v4-1/">changed error messages</a>.
@@ -121,7 +121,7 @@ gets built in parallel to <code>clap_builder</code>s code-gen</li>
 <p>For more numbers, see <a href="https://github.com/rosetta-rs/argparse-rosetta-rs">argparse-rosetta-rs</a>.</p>
 <h3>Deriving <code>ArgGroup</code></h3>
 <p>In clap v4.0.0, we automatically generate an
-<a href="https://docs.rs/clap/latest/clap/struct.ArgGroup.html"><code>ArgGroup</code></a> for each
+<a href="https://docs.rs/clap/4.2.0/clap/struct.ArgGroup.html"><code>ArgGroup</code></a> for each
 derived <code>Args</code> but there was no way to customize the <code>ArgGroup</code>, requiring
 people to still manually create them in some cases:</p>
 <pre style="background-color:#2b303b;">
@@ -154,9 +154,9 @@ people to still manually create them in some cases:</p>
 </span><span style="color:#c0c5ce;">}
 </span></pre>
 <p>We now support <code>#[group]</code>
-<a href="https://docs.rs/clap/latest/clap/_derive/index.html#terminology">raw attributes</a>,
+<a href="https://docs.rs/clap/4.2.0/clap/_derive/index.html#terminology">raw attributes</a>,
 allowing
-<a href="https://docs.rs/clap/latest/clap/struct.ArgGroup.html">any <code>ArgGroup</code> builder method</a>
+<a href="https://docs.rs/clap/4.2.0/clap/struct.ArgGroup.html">any <code>ArgGroup</code> builder method</a>
 to be used:</p>
 <pre style="background-color:#2b303b;">
 <span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]

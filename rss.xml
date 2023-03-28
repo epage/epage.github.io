@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap v4.2, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2023/03/clap-v4-2/</link><description><![CDATA[<p><a href="https://docs.rs/clap/latest/clap/">clap</a> v4.2.0 is now out with styling of
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>clap v4.2, a Rust CLI argument parser</title><link>https://epage.github.io/blog/2023/03/clap-v4-2/</link><description><![CDATA[<p><a href="https://docs.rs/clap/4.2.0/clap/">clap</a> v4.2.0 is now out with styling of
 help descriptions!  See the
 <a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">changelog</a> for more
 details.</p>
