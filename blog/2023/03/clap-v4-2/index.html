@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clap v4.2, a Rust CLI argument parser</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>clap v4.2, a Rust CLI argument parser</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p><a href="https://docs.rs/clap/latest/clap/">clap</a> v4.2.0 is now out!  See the
+<a href="https://github.com/clap-rs/clap/blob/master/CHANGELOG.md">changelog</a> for more
+details.</p>
+<!-- more -->
+<h2>What Changed in v4.2.0</h2>
+<h3>User styling</h3>
+<p>By default, clap will style the output of <code>--help</code> but there wasn't a way for
+users to do the same, whether to emphasize something or for a custom section,
+like &quot;Examples&quot;.</p>
+<p>As
+<a href="https://epage.github.io/blog/2023/03/anstream-simplifying-terminal-styling/">previously discussed</a>,
+we settled on using ANSI escape codes for this so you can use the library of
+your choice.  For example, with the
+<a href="https://crates.io/crates/color-print">color-print</a> crate, you can now do:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#65737e;">// `cstr!` converts tags to ANSI codes
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> after_help: &amp;</span><span style="color:#b48ead;">&#39;static str </span><span style="color:#c0c5ce;">= color_print::cstr!(
+</span><span style="color:#b48ead;">r</span><span style="color:#c0c5ce;">#</span><span style="color:#a3be8c;">&quot;&lt;bold&gt;&lt;underline&gt;Examples&lt;/underline&gt;&lt;/bold&gt;
+</span><span style="color:#a3be8c;">
+</span><span style="color:#a3be8c;">  &lt;dim&gt;$&lt;/dim&gt; &lt;bold&gt;mybin --input file.toml&lt;/bold&gt;
+</span><span style="color:#c0c5ce;">&quot;#);
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = clap::Command::new(&quot;</span><span style="color:#a3be8c;">mybin</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">after_help</span><span style="color:#c0c5ce;">(after_help)  </span><span style="color:#65737e;">// The `&amp;str` gets converted into a `StyledStr`
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span></pre>
+<p>To know if ANSI escape codes will be handled properly, look for builder methods that accept 
+<a href="https://docs.rs/clap/latest/clap/builder/struct.StyledStr.html"><code>StyledStr</code></a>.</p>
+<h3>Further Error Tweaks</h3>
+<p>In clap v4.1, we
+<a href="https://epage.github.io/blog/2023/01/clap-v4-1/">changed error messages</a>.
+This release further iterates on them based on
+<a href="https://github.com/clap-rs/clap/issues/4638">feedback we received</a>.</p>
+<p>clap v4.0:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">error: Found argument &#39;--optio&#39; which wasn&#39;t expected, or isn&#39;t valid in this context
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">  Did you mean &#39;--option&#39;?
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">For more information try &#39;--help&#39;
+</span></pre>
+<p>clap v4.1:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">  note: argument &#39;--option&#39; exists
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">For more information, try &#39;--help&#39;.
+</span></pre>
+<p>clap v4.2:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">  tip: a similar argument exists: &#39;--option&#39;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">For more information, try &#39;--help&#39;.
+</span></pre>
+<p>I'm sure there is room for improvement.  We welcome further discussion
+on this on
+[#4638](<a href="https://github.com/clap-rs/clap/issues/4638">feedback we received</a>.</p>
+<h3>Removed <code>unstable-replace</code></h3>
+<p>We've had
+<a href="https://docs.rs/clap/4.1.3/clap/builder/struct.Command.html#method.replace"><code>Command::replace</code></a>
+being the <code>unstable-replace</code> feature flag since 3.0.0 but there has been little
+interest expressed in it and the design doesn't align well with the rest of
+clap, so we've removed it.</p>
+<p>As alternatives</p>
+<ul>
+<li>For commands that are meant to expand to nexted subcommands, we recommend
+just creating a <code>Command</code> for it and having it reuse the relevant args and
+help.</li>
+<li>For args implying other args, we hope to solve this with <a href="https://github.com/clap-rs/clap/issues/4793">#4793</a>.</li>
+</ul>
+<p>If you have any feedback on this decision, we welcome it at <a href="https://github.com/clap-rs/clap/issues/2836">#2836</a>.</p>
+<h2>What Changed in v4.1.x</h2>
+<p>While minor releases get a lot more attention, there is still a lot of
+interesting work done in patch releases that deserve being highlighted.</p>
+<h3>Build Times</h3>
+<p>We've seen several different build-time improvements including</p>
+<ul>
+<li>Speed up of the <code>arg!</code> macro</li>
+<li>Split out a <code>clap_builder</code> crate to parallelize its build with <code>clap_derive</code>
+<ul>
+<li>Builder users should not notice the difference because the <code>clap</code> facade
+gets built in paralel to <code>clap_builder</code>s code-gen</li>
+</ul>
+</li>
+<li>Removed some dependencies including <code>proc-macro-error</code> (derive-specific)</li>
+</ul>
+<p>For very unscientific numbers:</p>
+<table><thead><tr><th></th><th>v4.1.0</th><th>v4.2.0</th></tr></thead><tbody>
+<tr><td><code>clap $ cargo build</code></td><td>4.250s</td><td>3.923s</td></tr>
+<tr><td><code>clap $ cargo build -F derive</code></td><td>6.419s</td><td>4.602s</td></tr>
+</tbody></table>
+<p>For more numbers, see <a href="https://github.com/rosetta-rs/argparse-rosetta-rs">argparse-rosetta-rs</a>.</p>
+<h3>Deriving <code>ArgGroup</code></h3>
+<p>In clap v4.0.0, we automatically generate an
+<a href="https://docs.rs/clap/latest/clap/struct.ArgGroup.html"><code>ArgGroup</code></a> for each
+derived <code>Args</code> but there was no way to customize the <code>ArgGroup</code>, requiring people to still manually create them:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">command</span><span style="color:#c0c5ce;">(</span><span style="color:#8fa1b3;">group</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">            ArgGroup::</span><span style="color:#8fa1b3;">new</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">vers</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#c0c5ce;">                .</span><span style="color:#8fa1b3;">required</span><span style="color:#c0c5ce;">(true)
+</span><span style="color:#c0c5ce;">                .</span><span style="color:#8fa1b3;">args</span><span style="color:#c0c5ce;">([&quot;</span><span style="color:#a3be8c;">set_ver</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">major</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">minor</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">patch</span><span style="color:#c0c5ce;">&quot;]),
+</span><span style="color:#c0c5ce;">        ))]
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Cli {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// set version manually
+</span><span style="color:#c0c5ce;">    #[arg(long, value_name = &quot;VER&quot;)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">set_ver</span><span style="color:#c0c5ce;">: Option&lt;String&gt;,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// auto inc major
+</span><span style="color:#c0c5ce;">    #[arg(long)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">major</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// auto inc minor
+</span><span style="color:#c0c5ce;">    #[arg(long)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">minor</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// auto inc patch
+</span><span style="color:#c0c5ce;">    #[arg(long)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">patch</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// some regular input
+</span><span style="color:#c0c5ce;">    #[arg(group = &quot;input&quot;)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">input_file</span><span style="color:#c0c5ce;">: Option&lt;String&gt;,
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>We now support <code>#[group]</code>
+<a href="https://docs.rs/clap/latest/clap/_derive/index.html#terminology">raw attributes</a>,
+allowing any <code>ArgGroup</code> builder method to be used:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">command</span><span style="color:#c0c5ce;">(author, version, about, long_about = None)]
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Cli {
+</span><span style="color:#c0c5ce;">    #[command(flatten)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">vers</span><span style="color:#c0c5ce;">: Vers,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// some regular input
+</span><span style="color:#c0c5ce;">    #[arg(group = &quot;input&quot;)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">input_file</span><span style="color:#c0c5ce;">: Option&lt;String&gt;,
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Args)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">group</span><span style="color:#c0c5ce;">(required = true, multiple = false)]
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Vers {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// set version manually
+</span><span style="color:#c0c5ce;">    #[arg(long, value_name = &quot;VER&quot;)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">set_ver</span><span style="color:#c0c5ce;">: Option&lt;String&gt;,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// auto inc major
+</span><span style="color:#c0c5ce;">    #[arg(long)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">major</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// auto inc minor
+</span><span style="color:#c0c5ce;">    #[arg(long)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">minor</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">/// auto inc patch
+</span><span style="color:#c0c5ce;">    #[arg(long)]
+</span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">patch</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
+</span><span style="color:#c0c5ce;">}
+</span></pre>
+<p>Granted, the above would be better expressed as an <code>enum</code> which we are tracking
+in <a href="https://github.com/clap-rs/clap/issues/2621">#2621</a>.</p>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
