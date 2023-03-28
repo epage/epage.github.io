@@ -82,7 +82,7 @@ This release further iterates on them based on
 </span></pre>
 <p>I'm sure there is room for improvement.  We welcome further discussion
 on this on
-[#4638](<a href="https://github.com/clap-rs/clap/issues/4638">feedback we received</a>.</p>
+<a href="https://github.com/clap-rs/clap/issues/4638">#4638</a>.</p>
 <h3>Removed <code>unstable-replace</code></h3>
 <p>We've had
 <a href="https://docs.rs/clap/4.1.3/clap/builder/struct.Command.html#method.replace"><code>Command::replace</code></a>
@@ -121,7 +121,8 @@ gets built in parallel to <code>clap_builder</code>s code-gen</li>
 <h3>Deriving <code>ArgGroup</code></h3>
 <p>In clap v4.0.0, we automatically generate an
 <a href="https://docs.rs/clap/latest/clap/struct.ArgGroup.html"><code>ArgGroup</code></a> for each
-derived <code>Args</code> but there was no way to customize the <code>ArgGroup</code>, requiring people to still manually create them:</p>
+derived <code>Args</code> but there was no way to customize the <code>ArgGroup</code>, requiring
+people to still manually create them in some cases:</p>
 <pre style="background-color:#2b303b;">
 <span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">command</span><span style="color:#c0c5ce;">(</span><span style="color:#8fa1b3;">group</span><span style="color:#c0c5ce;">(
