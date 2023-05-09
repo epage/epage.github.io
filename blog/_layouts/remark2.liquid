@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ page.title }}</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/talks/remark_theme_orange_standard.css"/>
+  </head>
+  <body>
+    <textarea id="source">
+{{ page.content }}
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+        var slideshow = remark.create({
+        highlightLines: true,
+        });
+    </script>
+  </body>
+</html>
