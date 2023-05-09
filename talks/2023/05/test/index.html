@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/talks/remark_theme_orange_standard.css"/>
+  </head>
+  <body>
+    <textarea id="source">
+class: title
+
+# Testing My Patience
+
+## An exploration of testing in rust
+
+???
+One of the strengths of Rust is that all of the basics are readily available, from dependency management, to documentation, to testing.
+
+So let's explore the history of Rust testing.
+
+---
+name: history 
+## In the beginning...
+
+```rust
+#[test]
+fn some_case() {
+    assert_eq!(1, 2);
+}
+```
+
+```console
+awesomeness-rs/
+  Cargo.toml
+*  src/          # whitebox tests go here
+    lib.rs
+    submodule.rs
+    submodule/
+      tests.rs
+*  tests/        # blackbox tests go here
+    is_awesome.rs
+```
+
+???
+There is little ceremony to testing; just drop an annotated function in the relevant file
+
+---
+## In the beginning...
+
+```rust
+#[test]
+fn some_case() {
+    assert_eq!(1, 2);
+}
+```
+```console
+$ cargo test
+running 1 test
+test some_case ... FAILED
+
+failures:
+
+---- some_case stdout ----
+thread 'some_case' panicked at 'assertion failed: `(left == right)`
+  left: `1`,
+ right: `2`', /home/epage/src/personal/dump/example.rs:9:5
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    some_case
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin example`
+```
+
+???
+And things haven't really changed since then.
+
+Which isn't necessarily bad; simplicity can be a strength
+- Value-to-ceremony ratio is very high
+- Defaulting to parallel tests puts pressure on scaling
+- Being a de-factor standard makes it easy to jump between projects
+
+---
+name: pain
+## Pain point: compile times
+
+```console
+  $ ls tests/
+  action.rs                derive_order.rs      hidden_args.rs           require.rs
+  app_settings.rs          display_order.rs     ignore_errors.rs         subcommands.rs
+  arg_aliases.rs           double_require.rs    indices.rs               template_help.rs
+  arg_aliases_short.rs     empty_values.rs                               tests.rs
+  arg_matches.rs           env.rs               multiple_occurrences.rs  unicode.rs
+  borrowed.rs              error.rs             multiple_values.rs       unique_args.rs
+  cargo.rs                 flag_subcommands.rs  occurrences.rs           utf16.rs
+  command.rs               flags.rs             opts.rs                  utf8.rs
+  conflicts.rs             global_args.rs       positionals.rs           utils.rs
+  default_missing_vals.rs  groups.rs            posix_compatible.rs      version.rs
+  default_vals.rs          help.rs              possible_values.rs
+  delimiters.rs            help_env.rs          propagate_globals.rs
+```
+
+???
+Each file you see becomes a distinct test binary that needs to be linked.
+
+---
+count: false
+## Pain point: compile times
+
+```console
+* $ ls tests/builder/
+  action.rs                derive_order.rs      hidden_args.rs           require.rs
+  app_settings.rs          display_order.rs     ignore_errors.rs         subcommands.rs
+  arg_aliases.rs           double_require.rs    indices.rs               template_help.rs
+* arg_aliases_short.rs     empty_values.rs      main.rs                  tests.rs
+  arg_matches.rs           env.rs               multiple_occurrences.rs  unicode.rs
+  borrowed.rs              error.rs             multiple_values.rs       unique_args.rs
+  cargo.rs                 flag_subcommands.rs  occurrences.rs           utf16.rs
+  command.rs               flags.rs             opts.rs                  utf8.rs
+  conflicts.rs             global_args.rs       positionals.rs           utils.rs
+  default_missing_vals.rs  groups.rs            posix_compatible.rs      version.rs
+  default_vals.rs          help.rs              possible_values.rs
+  delimiters.rs            help_env.rs          propagate_globals.rs
+```
+
+???
+By merging the test binaries, we only have to link once
+
+But
+- The `[TESTNAME]` experience isn't as nice as `--test <bin>`
+- We have to remember to register our test files in `main.rs`
+- Adds extra nesting
+
+---
+## Pain point: non-optimal CPU usage
+
+| Project         | Test count | cargo test (s) | nextest (s) | Improvement |
+| --------------- | ---------: | -------------: | ----------: | ----------: |
+| mdBook        | 199        | 3.85           | 1.66        | 2.31×       |
+| meilisearch   | 721        | 57.04          | 28.99       | 1.96×       |
+| reqwest       | 113        | 5.57           | 2.26        | 2.48×       |
+| ring          | 179        | 13.12          | 9.40        | 1.39×       |
+| tokio         | 1138       | 24.27          | 11.60       | 2.09×       |
+
+???
+- Tests aren't run until all binaries are built, letting CPUs go idle as compilation winds down
+- Test binaries are serialized, letting CPUs go idle as they wind down
+
+`cargo nextest` is a way around this but it has its own trade offs that we'll get to
+
+---
+## Pain point: conditional tests
+
+```rust
+#[test]
+fn simple_hg() {
+
+
+
+
+    // ...
+}
+```
+```cosole
+$ cargo test
+   Compiling cargo v0.72.0
+    Finished test [unoptimized + debuginfo] target(s) in 0.62s
+     Running  /home/epage/src/cargo/tests/testsuites/main.rs
+
+  running 1 test
+* test new::simple_hg ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
+
+???
+Awesome, our test passes!
+
+---
+count: false
+## Pain point: conditional tests
+
+```rust
+#[test]
+fn simple_hg() {
+*   if !has_command("hg") {
+*       return;
+*   }
+
+    // ...
+}
+```
+```cosole
+$ cargo test
+   Compiling cargo v0.72.0
+    Finished test [unoptimized + debuginfo] target(s) in 0.62s
+     Running  /home/epage/src/cargo/tests/testsuites/main.rs
+
+  running 1 test
+* test new::simple_hg ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
+
+???
+Yes, if you are watching your coverage closely enough, you might identify this
+sooner
+
+---
+## Pain point: lack of fixtures
+
+```rust
+fn cargo_add_lockfile_updated() {
+*   let scratch = tempfile::tempdir::new().unwrap();
+
+    // ...
+
+
+}
+```
+
+???
+Why do we need fixtures when we have RAII?
+
+---
+count: false
+## Pain point: lack of fixtures
+
+```rust
+fn cargo_add_lockfile_updated() {
+*   let scratch = tempfile::tempdir::new().unwrap();
+
+    // ...
+
+*   scratch.close().unwrap();
+}
+```
+
+???
+The error being ignored on implicit close actually masked errors in some of my tests on Windows.
+
+But how do we access to debug failures?
+- Its cleaned up
+- The name is not predictable
+
+Cargo instead only cleans up their temp directory fixture on the next run but
+that leads to a different problem: CI failing due to storage limits.  So how do
+we identify which tests are taking up too much space?
+
+---
+## Pain point: lack of context
+
+```rust
+#[test]
+fn some_case() {
+
+
+*   assert_eq!(1, 2);
+}
+```
+```console
+$ cargo test
+running 1 test
+test some_case ... FAILED
+
+failures:
+
+---- some_case stdout ----
+thread 'some_case' panicked at 'assertion failed: `(left == right)`
+*   left: `1`,
+*  right: `2`', /home/epage/src/personal/dump/example.rs:9:5
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+???
+It is great that `assert_eq` gives context on what failed
+
+---
+count: false
+## Pain point: lack of context
+
+```rust
+#[test]
+fn some_case() {
+    let expected = 1;
+    let actual = 2;
+*   assert_eq!(expected, actual);
+}
+```
+```console
+$ cargo test
+running 1 test
+test some_case ... FAILED
+
+failures:
+
+---- some_case stdout ----
+thread 'some_case' panicked at 'assertion failed: `(left == right)`
+*   left: `1`,
+*  right: `2`', /home/epage/src/personal/dump/example.rs:9:5
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+???
+But we aren't showing all of the available context
+
+---
+count: false
+## Pain point: lack of context
+
+```rust
+#[test]
+fn some_case() {
+    let expected = 1;
+
+*   assert!(matches!(expected, 2));
+}
+```
+```console
+$ cargo test
+running 1 test
+test some_case ... FAILED
+
+failures:
+
+---- some_case stdout ----
+*thread 'some_case' panicked at 'assertion failed: matches!(expected, 2)', /home/epage/src/personal/dump/example.rs:9:5
+```
+
+???
+And its very easy for even that level of context to be lost
+
+---
+## Pain point: lack of test generation
+
+```rust
+#[test]
+fn integers() {
+    let cases = [
+        ("+99", 99),
+        ("42", 42),
+        ("0", 0),
+        ("-17", -17),
+        ("1_2_3_4_5", 1_2_3_4_5),
+        ("0xF", 15),
+        ("0o0_755", 493),
+        ("0b1_0_1", 5),
+        (&std::i64::MIN.to_string()[..], std::i64::MIN),
+        (&std::i64::MAX.to_string()[..], std::i64::MAX),
+    ];
+    for &(input, expected) in &cases {
+        let parsed = integer.parse(new_input(input));
+        assert_eq!(parsed, Ok(expected));
+    }
+}
+```
+
+???
+Data driven tests are an easy way to cover a lot of cases (granted, property testing is even better)
+
+Alternatively
+- you could write a test per case, calling a shared function
+- you could write a macro to generate a test per case
+
+Another version of this is criterion with its bench groups
+
+However,
+- You don't get context on `input`
+- You have to fix them in-order, requiring careful ordering of the cases
+- You don't get the bigger picture of whats working and failing
+- You can't select a specific case to run / debug
+- Debug output will be flooded from prior cases
+
+---
+## Pain point: lack of test generation (part 2)
+
+```rust
+#[test]
+fn ui() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/ui/*.rs");
+}
+```
+
+.image-middle[![trybuild output](https://user-images.githubusercontent.com/1940490/57186576-7b0b5200-6e96-11e9-8bfd-2de705125108.png)]
+
+???
+Some projects help simplify large, complex test generation, including
+- trybuild
+- trycmd
+- libtest-mimic
+
+First, it takes a lot before its worth writing your own thing with something
+like libtest-mimic.  One place I do is with `toml` / `toml_edit` to test them
+against the official TOML compliance suite.
+
+Once you get past that point, the experience still isn't ideal.  These need to
+be in separate binaries and all have varying levels of support for the test
+binary API.  For example, `cargo nextest` sees trybuild and trycmd as a single
+test, making the content all-or-nothing.
+
+---
+## Pain point: scaling up
+
+```rust
+#[cargo_test(requires_git)]
+fn use_the_cli() {
+    // ...
+}
+```
+```rust
+#[test]
+fn ui() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/ui/*.rs");
+}
+```
+```rust
+#[test]
+fn cli_tests() {
+    trycmd::TestCases::new()
+        .case("tests/cmd/*.toml")
+        .case("README.md");
+}
+```
+
+???
+While this wasn't even exhaustive from my own experience, I think a common
+thread through this is "scaling up".
+
+After enough pain and with enough contributors, projects will work around these
+these problems, like cargo having its own `cargo_test` macro with
+fixtures coupled tightly to that macro.  This takes a toll on those projects
+until they say enough is enough.  This also means they are each solving these
+problems in different ways, losing that transferability of experience that was
+one of the highlights of Rust's test experience.
+
+---
+name: fixes
+## How do we fix this?
+
+---
+## How do we fix this?
+
+Stendahl's three rules of religious understanding:
+
+Rule 1: When you are trying to understand another religion, you should ask the adherents of that religion and not its enemies.
+
+Rule 2: Don't compare your best to their worst.
+
+**Rule 3: Leave room for "holy envy."**
+
+???
+A Church of Sweden Bishop came up with these rules which I feel apply in a variety of situations.
+
+The only community's test ecosystem I have fostered "holy envy" for is Python.
+
+If you know of others, I would love to hear of why you feel "holy envy" for them.
+
+---
+## How do we fix this?
+
+```python
+def pytest_addoption(parser):
+*   parser.addoption(
+        "--can-in-interface", default="None",
+        action="store",
+        help="The CAN interface to use with the tests")
+
+*@pytest.fixture
+ def can_in_interface(request):
+    interface = request.config.getoption("--can-in-interface")
+    if interface.lower() == "none":
+*       pytest.skip("Test requires a CAN board")
+    return interface
+
+*@pytest.mark.integration
+def test_wait_for_intf_communicating(can_in_interface):
+    # ...
+```
+
+???
+
+So many features here, its hard to give each of them their due.
+
+A lot of this comes from
+- Use of exceptions
+- Dynamic nature of Python
+- Decorators having a lower barrier of entry to build or use than proc macros
+- Being third-party, it is easier to experiment and iterate
+
+---
+## How do we fix this?
+
+```rust
+#[rstest]
+fn should_terminate(
+    #[values(State::Init, State::Start, State::Processing)]
+    state: State,
+    #[values(Event::Error, Event::Fatal)]
+    event: Event
+) {
+    assert_eq!(State::Terminated, state.process(event))
+}
+```
+
+???
+
+We have libraries like `rstest` that push the boundary of what can be done
+within libtest but it is stuck with libtest's weakness, of everything being
+determined at compile time.
+
+Side note: `rstest` alternatives
+- https://crates.io/crates/test-context
+- https://crates.io/crates/test-case
+- https://crates.io/crates/ntest
+
+---
+## How do we fix this?
+
+.image-middle[![cargo nextest output](https://nexte.st/static/cover.png)]
+
+???
+
+`cargo nextest` is great!  It improves a lot of the testing experience but is
+also limited by also working from the outside.
+For example, we can't use `cargo nextest` on
+cargo itself because it runs tests in separate processes and `#[cargo_test]`
+has shared state to help support the tempdir fixture.
+
+---
+## How do we fix this, really?
+
+### Milestones
+
+1. libtest2-mimic
+2. libtest2
+3. pytest
+4. criterion, trybuild, etc
+5. Merge libtest2 into libtest?
+6. Re-examine cargo / libtest relationship
+
+See github.com/epage/pytest-rs
+
+???
+
+Key assumptions
+- A pytest-like API would give us the extensibility needed for cover all of the
+  custom test harness use cases I know of.
+- We just need to prove pytest functionality can be built on top, allowing a smaller core API for easier stablizing
+- By designing libtest output formatters to be built on the JSON output format, we can more quickly stablize json output
+- By stablizing json output, cargo can orchestrate running tests in parallel and we can more easily iterate on richer output formats
+
+See also [custom test harness](https://github.com/rust-lang/rust/issues/50297).
+
+[RFC 2011](https://github.com/rust-lang/rust/issues/44838) for nicer asserts
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+        var slideshow = remark.create({
+        highlightLines: true,
+        });
+    </script>
+  </body>
+</html>
