@@ -4,6 +4,22 @@
     <title>Test</title>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="/talks/remark_theme_orange_standard.css"/>
+    <style>
+@page {
+  size: 1210px 681px;
+  margin: 0;
+}
+
+@media print {
+  .remark-slide-scaler {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1) !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}
+    </style>
   </head>
   <body>
     <textarea id="source">
@@ -21,9 +37,9 @@ name: history
 ## In the beginning...
 
 ```rust
-#[test]
+*#[test]
 fn some_case() {
-    assert_eq!(1, 2);
+*   assert_eq!(1, 2);
 }
 ```
 
@@ -46,7 +62,7 @@ And things haven't really changed since then.
 
 Which isn't necessarily bad; simplicity can be a strength
 - High value-to-ceremony ratio
-- Exclusively running tests in Parallel puts pressure on tests being scalable
+- Exclusively running tests in Parallel puts pressure on tests being scaleable
 - Being the standard way to test makes it easy to jump between projects
 
 ---
@@ -131,7 +147,7 @@ fn simple_hg() {
     // ...
 }
 ```
-```console
+```cosole
 $ cargo test
    Compiling cargo v0.72.0
     Finished test [unoptimized + debuginfo] target(s) in 0.62s
@@ -160,7 +176,7 @@ fn simple_hg() {
     // ...
 }
 ```
-```console
+```cosole
 $ cargo test
    Compiling cargo v0.72.0
     Finished test [unoptimized + debuginfo] target(s) in 0.62s
@@ -386,7 +402,7 @@ class: title
 I feel a pytest-like API would give us the extensibility needed to cover all of the
 custom test harness use cases I know of.
 
-The biggest issue is that this is a lot to stabilize for libtest.
+The biggest issue is that this is a lot to stablize for libtest.
 
 The approach I'm taking is to develop the user-facing "pytest" features in an
 external crate, experimenting with what extension points a "libtest2" would
@@ -404,7 +420,9 @@ need.
 5. Merge libtest2 into libtest?
 
 ???
-At minimum, my hope is that we'll have
+I'm trying to break this down into smaller milestones to help vet the design as we go.
+
+My minimum expectations for this effort are:
 - A first-in-class external test harness to integrate around
 - A stablized json output to improve `cargo test` / `libtest` interactions
   - I'm dogfooding the json format by implementing all other output formats in terms of it
