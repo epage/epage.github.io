@@ -62,7 +62,7 @@ And things haven't really changed since then.
 
 Which isn't necessarily bad; simplicity can be a strength
 - High value-to-ceremony ratio
-- Exclusively running tests in Parallel puts pressure on tests being scaleable
+- Exclusively running tests in Parallel puts pressure on tests being scalable
 - Being the standard way to test makes it easy to jump between projects
 
 ---
@@ -147,7 +147,7 @@ fn simple_hg() {
     // ...
 }
 ```
-```cosole
+```console
 $ cargo test
    Compiling cargo v0.72.0
     Finished test [unoptimized + debuginfo] target(s) in 0.62s
@@ -176,7 +176,7 @@ fn simple_hg() {
     // ...
 }
 ```
-```cosole
+```console
 $ cargo test
    Compiling cargo v0.72.0
     Finished test [unoptimized + debuginfo] target(s) in 0.62s
@@ -402,7 +402,7 @@ class: title
 I feel a pytest-like API would give us the extensibility needed to cover all of the
 custom test harness use cases I know of.
 
-The biggest issue is that this is a lot to stablize for libtest.
+The biggest issue is that this is a lot to stabilize for libtest.
 
 The approach I'm taking is to develop the user-facing "pytest" features in an
 external crate, experimenting with what extension points a "libtest2" would
