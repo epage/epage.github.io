@@ -544,8 +544,19 @@ See also [rust-lang/rust#90785](https://github.com/rust-lang/rust/issues/90785).
 ### Next Steps
 
 Now is where you can help.
-This is too much for one person and is spread across rust language design, rust compiler, the standard library, and cargo.
-This will also take time to go through the RFC process for each part of this so the sooner we start on these, the better.
+
+This, unfortunately, isn't my highest priority because I don't want want to
+leave a trail of incomplete projects.
+I've previously committed to
+[MSRV](https://github.com/rust-lang/cargo/issues/9930),
+[`[lints]`](https://github.com/rust-lang/cargo/issues/12115),
+[`cargo script`](https://github.com/rust-lang/cargo/issues/12207),
+and [keeping up with my crates](https://crates.io/users/epage?sort=recent-downloads).
+Even if this was my highest priority, this is too much for one person and is
+spread across rust language design, rust compiler, the standard library, and
+cargo.
+This will also take time to go through the RFC process for each part of this so
+the sooner we start on these, the better.
 
 But I don't think that means we should give up.
 
@@ -563,3 +574,6 @@ These are roughly in priority order based on a mixture of
 - The time it will take before its usable
 - How confident I am that it can be solved
 - The pay off from solving it, whether because its more generally useful or a higher pain point to not have (e.g. `distributed_slice` in both cases)
+
+Alternatively, if your interests align with one of my higher priorities, I
+welcome the help with them so more of us can focus on this problem.
