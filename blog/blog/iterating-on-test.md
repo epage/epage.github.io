@@ -432,6 +432,7 @@ terse and, junit) on top of the structures used for json output, helping to
 further refine its design and making sure its sufficient for `cargo test` to
 create the desired UX.
 
+<a id="libs"></a>
 ### Libs team meeting
 
 After presenting on this at [RustNL 2023](https://2023.rustnl.0org)
