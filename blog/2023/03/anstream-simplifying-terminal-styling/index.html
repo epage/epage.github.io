@@ -100,14 +100,14 @@ to be independent of what it is being output to</li>
 </ul>
 <p>Now you can write code like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">anstream::println;
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">anstream::println;
 </span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">owo_colors::OwoColorize as _;
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#65737e;">// Foreground colors
 </span><span style="color:#c0c5ce;">println!(&quot;</span><span style="color:#a3be8c;">My number is </span><span style="color:#d08770;">{:#x}</span><span style="color:#a3be8c;">!</span><span style="color:#c0c5ce;">&quot;, </span><span style="color:#d08770;">10.</span><span style="color:#96b5b4;">green</span><span style="color:#c0c5ce;">());
 </span><span style="color:#65737e;">// Background colors
 </span><span style="color:#c0c5ce;">println!(&quot;</span><span style="color:#a3be8c;">My number is not </span><span style="color:#d08770;">{}</span><span style="color:#a3be8c;">!</span><span style="color:#c0c5ce;">&quot;, </span><span style="color:#d08770;">4.</span><span style="color:#96b5b4;">on_red</span><span style="color:#c0c5ce;">());
-</span></pre>
+</span></code></pre>
 <p>and <code>println</code> will handle</p>
 <ul>
 <li>Stripping ANSI escape codes when printing to a file, <code>TERM=dumb</code>, <code>NO_COLOR</code> is set, <code>CICOLOR=0</code> is set, or if disabled by the application like with <code>--color never</code></li>

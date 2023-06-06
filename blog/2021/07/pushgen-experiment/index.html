@@ -60,7 +60,7 @@ identifier into individual words (e.g. <code>PascalCase</code> -&gt; <code>Pasca
 <h2>Architecture of <code>typos</code></h2>
 <p>In pseudo-code, <code>typos</code> looks like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">walk_path</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">repo</span><span style="color:#c0c5ce;">):
+<code><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">walk_path</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">repo</span><span style="color:#c0c5ce;">):
 </span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">path </span><span style="color:#b48ead;">in </span><span style="color:#c0c5ce;">repo:
 </span><span style="color:#c0c5ce;">        </span><span style="color:#8fa1b3;">check_file</span><span style="color:#c0c5ce;">(path)
 </span><span style="color:#c0c5ce;">
@@ -101,7 +101,7 @@ identifier into individual words (e.g. <code>PascalCase</code> -&gt; <code>Pasca
 </span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">else</span><span style="color:#c0c5ce;">:
 </span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">identifier </span><span style="color:#b48ead;">in </span><span style="color:#8fa1b3;">unicode_parser</span><span style="color:#c0c5ce;">(buffer):
 </span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">yield </span><span style="color:#c0c5ce;">identifier
-</span></pre>
+</span></code></pre>
 <p>Key takeaways:</p>
 <ul>
 <li>Starting with <code>check_bytes</code>, everything is composed of iterators nested in
@@ -120,7 +120,7 @@ running in WSL on a laptop that is plugged in with most applications closed.  I
 didn't spend much time making the environment less jittery.</p>
 <p>With that said, <code>try_for_each</code> seems to have slowed down <code>check_file</code> more than that jitter:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">check_file/Typos/code   time:   [147.52 us 150.23 us 153.51 us]
+<code><span style="color:#c0c5ce;">check_file/Typos/code   time:   [147.52 us 150.23 us 153.51 us]
 </span><span style="color:#c0c5ce;">                        thrpt:  [1.8886 MiB/s 1.9298 MiB/s 1.9653 MiB/s]
 </span><span style="color:#c0c5ce;">                 change:
 </span><span style="color:#c0c5ce;">                        time:   [+26.226% +29.951% +34.477%] (p = 0.00 &lt; 0.05)
@@ -139,7 +139,7 @@ didn't spend much time making the environment less jittery.</p>
 </span><span style="color:#c0c5ce;">Found 10 outliers among 100 measurements (10.00%)
 </span><span style="color:#c0c5ce;">  6 (6.00%) high mild
 </span><span style="color:#c0c5ce;">  4 (4.00%) high severe
-</span></pre>
+</span></code></pre>
 <p>Remember: <code>check_file</code> is doing a lot more than running iterators, like IO.</p>
 <p>One thing hurting <code>try_for_each</code> is that iterator authors can't provide
 their own optimized implementation yet because the
@@ -158,7 +158,7 @@ of this increases the friction for taking advantage of <code>try_for_each</code>
 <h2>Performance of <code>pushgen</code></h2>
 <p>For <code>pushgen</code>, the improvements from lowering iteration overhead are not noticeable compared to everything else, like IO:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">check_file/Typos/code   time:   [113.92 us 115.85 us 118.02 us]
+<code><span style="color:#c0c5ce;">check_file/Typos/code   time:   [113.92 us 115.85 us 118.02 us]
 </span><span style="color:#c0c5ce;">                        thrpt:  [2.4566 MiB/s 2.5025 MiB/s 2.5449 MiB/s]
 </span><span style="color:#c0c5ce;">                 change:
 </span><span style="color:#c0c5ce;">                        time:   [-1.1247% +1.7826% +4.7350%] (p = 0.21 &gt; 0.05)
@@ -177,10 +177,10 @@ of this increases the friction for taking advantage of <code>try_for_each</code>
 </span><span style="color:#c0c5ce;">Found 9 outliers among 100 measurements (9.00%)
 </span><span style="color:#c0c5ce;">  5 (5.00%) high mild
 </span><span style="color:#c0c5ce;">  4 (4.00%) high severe
-</span></pre>
+</span></code></pre>
 <p>When breaking out just parsing, we do see decent improvements, for example:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">parse_str/unicode/code  time:   [13.505 us 13.705 us 13.909 us]
+<code><span style="color:#c0c5ce;">parse_str/unicode/code  time:   [13.505 us 13.705 us 13.909 us]
 </span><span style="color:#c0c5ce;">                        thrpt:  [20.844 MiB/s 21.153 MiB/s 21.468 MiB/s]
 </span><span style="color:#c0c5ce;">                 change:
 </span><span style="color:#c0c5ce;">                        time:   [-19.030% -16.653% -14.273%] (p = 0.00 &lt; 0.05)
@@ -199,10 +199,10 @@ of this increases the friction for taking advantage of <code>try_for_each</code>
 </span><span style="color:#c0c5ce;">Found 5 outliers among 100 measurements (5.00%)
 </span><span style="color:#c0c5ce;">  4 (4.00%) high mild
 </span><span style="color:#c0c5ce;">  1 (1.00%) high severe
-</span></pre>
+</span></code></pre>
 <p>And the overhead for adapting word-splitting into a <code>pushgen::Generator</code> was minimal:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">split/words/code        time:   [1.4384 us 1.4654 us 1.4973 us]
+<code><span style="color:#c0c5ce;">split/words/code        time:   [1.4384 us 1.4654 us 1.4973 us]
 </span><span style="color:#c0c5ce;">                        thrpt:  [193.63 MiB/s 197.84 MiB/s 201.56 MiB/s]
 </span><span style="color:#c0c5ce;">                 change:
 </span><span style="color:#c0c5ce;">                        time:   [-1.9718% +2.1027% +5.9130%] (p = 0.29 &gt; 0.05)
@@ -220,7 +220,7 @@ of this increases the friction for taking advantage of <code>try_for_each</code>
 </span><span style="color:#c0c5ce;">Found 8 outliers among 100 measurements (8.00%)
 </span><span style="color:#c0c5ce;">  6 (6.00%) high mild
 </span><span style="color:#c0c5ce;">  2 (2.00%) high severe
-</span></pre>
+</span></code></pre>
 <p><code>pushgen</code> won't be a magic bullet to improve performance but it might help with
 specific hot-loops.  Let profilers and benchmarks be your guide.</p>
 <h2>Porting to <code>pushgen</code></h2>

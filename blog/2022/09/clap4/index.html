@@ -229,7 +229,7 @@ a pager to help output</a>.</li>
 <p>We've added support for new derive attributes, deprecating the old ones.</p>
 <p>Before:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#65737e;">/// Simple program to greet a person
+<code><span style="color:#65737e;">/// Simple program to greet a person
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser, Debug)]
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">clap</span><span style="color:#c0c5ce;">(author, version, about, long_about = None)]
 </span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Args {
@@ -241,10 +241,10 @@ a pager to help output</a>.</li>
 </span><span style="color:#c0c5ce;">    #[clap(short, long, value_parser, default_value_t = 1)]
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">count</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>After:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#65737e;">/// Simple program to greet a person
+<code><span style="color:#65737e;">/// Simple program to greet a person
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser, Debug)]
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">command</span><span style="color:#c0c5ce;">(author, version, about, long_about = None)]
 </span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Args {
@@ -256,7 +256,7 @@ a pager to help output</a>.</li>
 </span><span style="color:#c0c5ce;">    #[arg(short, long, default_value_t = 1)]
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">count</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>As we look forward to some planned <code>clap_derive</code> features (e.g.
 <a href="https://github.com/clap-rs/clap/issues/1807">#1807</a>,
 <a href="https://github.com/clap-rs/clap/issues/1553">#1553</a>
@@ -288,7 +288,7 @@ either way.</p>
 <h3><code>num_args</code></h3>
 <p>The new <code>num_args</code> defines how many command-line arguments should be consumed as values, per occurrence:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">et cmd = Command::new(&quot;</span><span style="color:#a3be8c;">prog</span><span style="color:#c0c5ce;">&quot;)
+<code><span style="color:#c0c5ce;">et cmd = Command::new(&quot;</span><span style="color:#a3be8c;">prog</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">   .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(Arg::new(&quot;</span><span style="color:#a3be8c;">file</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">       .</span><span style="color:#96b5b4;">action</span><span style="color:#c0c5ce;">(ArgAction::Set)
 </span><span style="color:#c0c5ce;">       .</span><span style="color:#96b5b4;">num_args</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">2</span><span style="color:#c0c5ce;">)  </span><span style="color:#65737e;">// single value
@@ -298,7 +298,7 @@ either way.</p>
 </span><span style="color:#c0c5ce;">        .</span><span style="color:#96b5b4;">num_args</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">..=</span><span style="color:#d08770;">1</span><span style="color:#c0c5ce;">))  </span><span style="color:#65737e;">// range of values
 </span><span style="color:#c0c5ce;">        .</span><span style="color:#96b5b4;">default_value</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">plaid</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">        .</span><span style="color:#96b5b4;">default_missing_value</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">slow</span><span style="color:#c0c5ce;">&quot;);
-</span></pre>
+</span></code></pre>
 <p>Previously, clap has had several ways for controlling how many values will be captured
 without always being clear on how they interacted, including</p>
 <ul>
@@ -566,7 +566,7 @@ work mentioned earlier.  See the lifetime-removal work for metrics.</p>
 <p>Sometimes you want a flag to convey something more specific than
 <code>true</code>/<code>false</code>, like a <code>--https</code> flag tracking the relevant port:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = Command::new(&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;)
+<code><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = Command::new(&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        Arg::new(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">https</span><span style="color:#c0c5ce;">&quot;)
@@ -582,7 +582,7 @@ work mentioned earlier.  See the lifetime-removal work for metrics.</p>
 </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> matches = cmd.</span><span style="color:#96b5b4;">get_matches_from</span><span style="color:#c0c5ce;">([&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">--https</span><span style="color:#c0c5ce;">&quot;]);
 </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> port = matches.get_one::&lt;</span><span style="color:#b48ead;">usize</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">copied</span><span style="color:#c0c5ce;">();
 </span><span style="color:#c0c5ce;">assert_eq!(port, Some(</span><span style="color:#d08770;">443</span><span style="color:#c0c5ce;">));
-</span></pre>
+</span></code></pre>
 <p>Originally, this was possible in <code>clap_derive</code> but not with the builder API.
 While the <code>value_parser</code> / <code>ArgAction</code> APIs brought a lot of features from
 <code>clap_derive</code> to the builder API, this is one area where it regressed.</p>

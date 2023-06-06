@@ -82,17 +82,17 @@ API.</p>
 </ul>
 <p>An example of a template backtrace:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Error: liquid: Expected whole number, found `fractional number`
+<code><span style="color:#c0c5ce;">Error: liquid: Expected whole number, found `fractional number`
 </span><span style="color:#c0c5ce;">  with:
 </span><span style="color:#c0c5ce;">    end=10.5
 </span><span style="color:#c0c5ce;">from: {% for i in (1..max) reversed %}
 </span><span style="color:#c0c5ce;">from: {% if &quot;blue skies&quot; == var %}
 </span><span style="color:#c0c5ce;">  with:
 </span><span style="color:#c0c5ce;">    var=10
-</span></pre>
+</span></code></pre>
 <p>Here is a rough sketch of <code>liquid</code>s errors:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Fail, Debug)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Fail, Debug)]
 </span><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">Error {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">inner</span><span style="color:#c0c5ce;">: Box&lt;InnerError&gt;,
 </span><span style="color:#c0c5ce;">}
@@ -109,10 +109,10 @@ API.</p>
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">trace</span><span style="color:#c0c5ce;">: Option&lt;String&gt;,
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">context</span><span style="color:#c0c5ce;">: Vec&lt;(borrow::Cow&lt;</span><span style="color:#b48ead;">&#39;static</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">&gt;, String)&gt;,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>I've created various &quot;ResultExt&quot; traits to make it some-what ergonomic to create:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> value = value
+<code><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> value = value
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">as_scalar</span><span style="color:#c0c5ce;">()
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">and_then</span><span style="color:#c0c5ce;">(Scalar::to_integer)
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">ok_or_else</span><span style="color:#c0c5ce;">(|| Error::with_msg(format!(&quot;</span><span style="color:#a3be8c;">Expected whole number, found `</span><span style="color:#d08770;">{}</span><span style="color:#a3be8c;">`</span><span style="color:#c0c5ce;">&quot;, expected, value.</span><span style="color:#96b5b4;">type_name</span><span style="color:#c0c5ce;">()))
@@ -121,7 +121,7 @@ API.</p>
 </span><span style="color:#b48ead;">let mut</span><span style="color:#c0c5ce;"> range = </span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">.range
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">evaluate</span><span style="color:#c0c5ce;">(context)
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">trace_with</span><span style="color:#c0c5ce;">(|| </span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">.</span><span style="color:#96b5b4;">trace</span><span style="color:#c0c5ce;">().</span><span style="color:#96b5b4;">into</span><span style="color:#c0c5ce;">())?;
-</span></pre>
+</span></code></pre>
 <p>While the context API needs some work, the overall approach worked great and
 provides very help error messages to the user.</p>
 <h3><code>assert_cli</code></h3>
@@ -161,7 +161,7 @@ greatly simplified by leveraging <code>failure::Context</code> and <a href="http
 idiom</a>.</p>
 <p>This is what it looks like, in Rust pseudo-code:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Copy, Clone, Eq, PartialEq, Debug, Fail)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Copy, Clone, Eq, PartialEq, Debug, Fail)]
 </span><span style="color:#b48ead;">pub enum </span><span style="color:#c0c5ce;">AssertionKind {
 </span><span style="color:#c0c5ce;">    #[</span><span style="color:#bf616a;">fail</span><span style="color:#c0c5ce;">(display = &quot;</span><span style="color:#a3be8c;">Spawn failed.</span><span style="color:#c0c5ce;">&quot;)] Spawn,
 </span><span style="color:#c0c5ce;">    #[</span><span style="color:#bf616a;">fail</span><span style="color:#c0c5ce;">(display = &quot;</span><span style="color:#a3be8c;">Status mismatch.</span><span style="color:#c0c5ce;">&quot;)] StatusMismatch,
@@ -173,7 +173,7 @@ idiom</a>.</p>
 </span><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">AssertionError {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">inner</span><span style="color:#c0c5ce;">: failure::Context&lt;AssertionKind&gt;,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>Most of the rest of this post goes into my initial experience in converting over to this.</p>
 <h2>Feedback on <code>failure::Context</code></h2>
 <p><code>error-chain</code> and friends have been around for a while and given us different
@@ -192,8 +192,8 @@ error of from any piece of data they have and there isn't need for another
 <p>The problem is in the details.</p>
 <p>Say my errors are wrapped like this:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Context -&gt; Context -&gt; AssertionError -&gt; io::Error
-</span></pre>
+<code><span style="color:#c0c5ce;">Context -&gt; Context -&gt; AssertionError -&gt; io::Error
+</span></code></pre>
 <p>(remember: <code>Context</code> is a <code>Fail</code>)</p>
 <ul>
 <li>Which <code>Fail</code>s' <code>Termination</code> trait should be respected for <a href="https://github.com/rust-lang/rfcs/blob/master/text/1937-ques-in-main.md"><code>?</code> in
@@ -218,22 +218,22 @@ like <code>backtrace</code> and <code>cause</code>.</li>
 <p>Because <code>Context</code> generically wraps a <code>failure::Error</code>, the ordering is inverted when rendering an error for a user.</p>
 <p>If I were to naively switch <code>liquid</code> to <code>failure</code> my errors would change from</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Error: liquid: Expected whole number, found `fractional number`
+<code><span style="color:#c0c5ce;">Error: liquid: Expected whole number, found `fractional number`
 </span><span style="color:#c0c5ce;">  with:
 </span><span style="color:#c0c5ce;">    end=10.5
 </span><span style="color:#c0c5ce;">from: {% for i in (1..max) reversed %}
 </span><span style="color:#c0c5ce;">from: {% if &quot;blue skies&quot; == var %}
 </span><span style="color:#c0c5ce;">  with:
 </span><span style="color:#c0c5ce;">    var=10
-</span></pre>
+</span></code></pre>
 <p>to</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">end=10.5
+<code><span style="color:#c0c5ce;">end=10.5
 </span><span style="color:#c0c5ce;">cause: Error: liquid: Expected whole number, found `fractional number`
 </span><span style="color:#c0c5ce;">cause: {% for i in (1..max) reversed %}
 </span><span style="color:#c0c5ce;">cause: var=10
 </span><span style="color:#c0c5ce;">cause: {% if &quot;blue skies&quot; == var %}
-</span></pre>
+</span></code></pre>
 <p>Suggestion:</p>
 <ul>
 <li>Associate contexts with an error by, again, moving the <code>Context</code> from an error
@@ -269,7 +269,7 @@ and inspect the output.</p>
 great when you want to dump strings but has limitations for my more common
 cases:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#65737e;">// Good: failure::Context works well in this case
+<code><span style="color:#65737e;">// Good: failure::Context works well in this case
 </span><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">context</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">expected to contain</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#65737e;">// Bad: failure::Context loses the context in this case
@@ -280,23 +280,23 @@ cases:</p>
 </span><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">context_with</span><span style="color:#c0c5ce;">(|| format!(&quot;</span><span style="color:#a3be8c;">needle: </span><span style="color:#d08770;">{}</span><span style="color:#c0c5ce;">&quot;, needle))
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">context_with</span><span style="color:#c0c5ce;">(|| format!(&quot;</span><span style="color:#a3be8c;">haystack: </span><span style="color:#d08770;">{}</span><span style="color:#c0c5ce;">&quot;, haystack))
-</span></pre>
+</span></code></pre>
 <p>So I added this:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Debug)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Debug)]
 </span><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">ContextPair
 </span><span style="color:#c0c5ce;">{
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">key</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">&#39;static str</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">context</span><span style="color:#c0c5ce;">: impl Display,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>which can be used like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
+<code><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">Err(AssertionError::new(AssertionKind::OutputMismatch))
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">context</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">expected to contain</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">context</span><span style="color:#c0c5ce;">(ContextPair(&quot;</span><span style="color:#a3be8c;">needle</span><span style="color:#c0c5ce;">&quot;, needle.</span><span style="color:#96b5b4;">to_owned</span><span style="color:#c0c5ce;">()))
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">context</span><span style="color:#c0c5ce;">(ContextPair(&quot;</span><span style="color:#a3be8c;">haystack</span><span style="color:#c0c5ce;">&quot;, haystack.</span><span style="color:#96b5b4;">to_owned</span><span style="color:#c0c5ce;">()));
-</span></pre>
+</span></code></pre>
 <p>Suggestion:</p>
 <ul>
 <li>Provide something <em>like</em> <code>ContextPair</code> so <code>failure</code> can help developers fall
@@ -355,7 +355,7 @@ provide a lot of guidance to help people get out of situations you couldn't
 predict. We consider good errors essential for our users.</p>
 <p>The user-form of our errors look like (translated to Rust pseudo-code):</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Fail, Debug, Copy, Clone, ...)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Fail, Debug, Copy, Clone, ...)]
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">repr</span><span style="color:#c0c5ce;">(C)]
 </span><span style="color:#b48ead;">pub enum </span><span style="color:#c0c5ce;">ErrorKind {
 </span><span style="color:#c0c5ce;">    ...
@@ -366,10 +366,10 @@ predict. We consider good errors essential for our users.</p>
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">kind</span><span style="color:#c0c5ce;">: ErrorKind,
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">context</span><span style="color:#c0c5ce;">: String,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>and the internal-form of our errors look like (translated to Rust pseudo-code):</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Fail, Debug, Copy, Clone, ...)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Fail, Debug, Copy, Clone, ...)]
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">repr</span><span style="color:#c0c5ce;">(C)]
 </span><span style="color:#b48ead;">enum </span><span style="color:#c0c5ce;">ContextKind {
 </span><span style="color:#c0c5ce;">    ...
@@ -384,7 +384,7 @@ predict. We consider good errors essential for our users.</p>
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">kind</span><span style="color:#c0c5ce;">: ErrorKind,
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">context</span><span style="color:#c0c5ce;">: Option&lt;Box&lt;Context&gt;&gt;,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>Things of note:</p>
 <ul>
 <li><code>InternalError</code> has a way of localizing and formatting <code>Context</code> into the <code>PublicError::context</code>.</li>

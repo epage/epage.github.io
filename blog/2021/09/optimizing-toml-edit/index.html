@@ -127,11 +127,11 @@ Most keys are relatively short and people don't tend to use a lot of
 whitespace.  We can use a technique called small-string optimization which
 looks roughly like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">enum </span><span style="color:#c0c5ce;">String {
+<code><span style="color:#b48ead;">enum </span><span style="color:#c0c5ce;">String {
 </span><span style="color:#c0c5ce;">    Inline([</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">; </span><span style="color:#d08770;">24</span><span style="color:#c0c5ce;">]),
 </span><span style="color:#c0c5ce;">    Normal(String),
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>This removes the need for allocations and we avoid an indirection to reference the allocation.</p>
 <p>I chose <a href="https://docs.rs/kstring"><code>kstring</code></a> over</p>
 <ul>
@@ -174,13 +174,13 @@ can easily hide a lot of costs.</p>
 <h4>Unnecessary Allocations</h4>
 <p>The first is in allocations.  Say you want to parse a number, it could be easy to write</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">many0</span><span style="color:#c0c5ce;">(digit),
 </span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">: Vec&lt;</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt;| String::from_iter(c).</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(),
 </span><span style="color:#c0c5ce;">    )(input)
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>We are</p>
 <ul>
 <li>Allocating all <code>char</code>s into a <code>Vec</code></li>
@@ -189,14 +189,14 @@ can easily hide a lot of costs.</p>
 <p>While this example is artificial, cases like this existed in <code>toml_edit</code> and I
 had to find them and replace them with operations like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">many0_count</span><span style="color:#c0c5ce;">(digit)),
 </span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">| s.</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(),
 </span><span style="color:#c0c5ce;">    )
 </span><span style="color:#c0c5ce;">    )(input)
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>This uses <code>many0_count</code> as a way of repeating a parser, without allocating, and
 then uses <code>recognize</code> to take the parsed region and turn it into a <code>&amp;str</code>.  No
 allocations!</p>
@@ -205,7 +205,7 @@ allocations!</p>
 need to convert escape sequences (like <code>&quot;\t&quot;</code>) to their actual value.  For
 example, a (simplified) TOML grammar might look like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_content</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, String&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_content</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, String&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">many0</span><span style="color:#c0c5ce;">(string_char),
 </span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">: Vec&lt;</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt;| String::from_iter(c),
@@ -226,11 +226,11 @@ example, a (simplified) TOML grammar might look like:</p>
 </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_escaped</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    ...
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>Rather than adding a <code>char</code> at a time to a <code>String</code>, we can do it in batches,
 reducing the number of allocations and reducing the size of the hot loop:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_content</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, String&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_content</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, String&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">many0</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">            </span><span style="color:#96b5b4;">alt</span><span style="color:#c0c5ce;">((
@@ -249,7 +249,7 @@ reducing the number of allocations and reducing the size of the hot loop:</p>
 </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">string_escaped</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    ...
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>This optimizes the common case (characters) at the cost of an uncommon case
 (escape sequences).</p>
 <p>It looks like this dropped parse time by about 2%.  Not as much of a win as I was hoping.</p>
@@ -272,17 +272,17 @@ verify the string is valid UTF-8.  Can we bypass this?</p>
 like numbers and dates.  In these cases, we know the validation isn't required.</p>
 <p>So we can take</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">many0_count</span><span style="color:#c0c5ce;">(digit)),
 </span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">| s.</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(),
 </span><span style="color:#c0c5ce;">    )
 </span><span style="color:#c0c5ce;">    )(input)
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>and speed it up by switching to:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">]) -&gt; IResult&lt;&amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">], </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">number</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">]) -&gt; IResult&lt;&amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">], </span><span style="color:#b48ead;">u32</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">map_res</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">many0_count</span><span style="color:#c0c5ce;">(digit)),
 </span><span style="color:#c0c5ce;">        |</span><span style="color:#bf616a;">b</span><span style="color:#c0c5ce;">: &amp;[</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">]| {
@@ -304,7 +304,7 @@ like numbers and dates.  In these cases, we know the validation isn't required.<
 </span><span style="color:#c0c5ce;">        std::str::from_utf8_unchecked(bytes)
 </span><span style="color:#c0c5ce;">    }
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>In switching to byte parsing, this still leaves us calling
 <code>std::str::from_utf8</code> for comments and quoted strings.  If we only allow
 end-users to pass in <code>&amp;str</code>, we know the original string was valid.  Our
@@ -327,7 +327,7 @@ instruction count, so I decided it wasn't worth it at this time.</p>
 <code>combine</code> (I'm just more familiar with <code>nom</code> and prefer the API).</p>
 <p>One feature of <code>combine</code> is built-in support for creating great errors.  For example, when parsing a TOML value, the code might look like</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#65737e;">// val = string / boolean / array / inline-table / date-time / float / integer
+<code><span style="color:#65737e;">// val = string / boolean / array / inline-table / date-time / float / integer
 </span><span style="color:#c0c5ce;">parse!(</span><span style="color:#96b5b4;">value</span><span style="color:#c0c5ce;">() -&gt; v::Value, {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">recognize_with_value</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">choice</span><span style="color:#c0c5ce;">((
 </span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">string</span><span style="color:#c0c5ce;">()
@@ -350,11 +350,11 @@ instruction count, so I decided it wasn't worth it at this time.</p>
 </span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(v::Value::from),
 </span><span style="color:#c0c5ce;">    ))).</span><span style="color:#96b5b4;">map</span><span style="color:#c0c5ce;">(|(</span><span style="color:#bf616a;">raw</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">value</span><span style="color:#c0c5ce;">)| </span><span style="color:#96b5b4;">apply_raw</span><span style="color:#c0c5ce;">(value, raw))
 </span><span style="color:#c0c5ce;">});
-</span></pre>
+</span></code></pre>
 <p>Say you have a syntax error, like</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">key = invalid-value
-</span></pre>
+<code><span style="color:#c0c5ce;">key = invalid-value
+</span></code></pre>
 <p><code>combine</code> will check each <code>choice</code> and merge the errors.  It gives preference
 to the error that occurs earliest in the string and combines errors that happen
 at the same point.  For <code>invalid-value</code>, every value-type parser will fail at
@@ -378,7 +378,7 @@ would offer the most performance (hitting every case) while <code>dispatch!</cod
 require playing whack-a-mole and could easily regress in the future.</p>
 <p>With that said, I went ahead with <code>dispatch!</code> because it was quick to try:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#65737e;">// val = string / boolean / array / inline-table / date-time / float / integer
+<code><span style="color:#65737e;">// val = string / boolean / array / inline-table / date-time / float / integer
 </span><span style="color:#c0c5ce;">parse!(</span><span style="color:#96b5b4;">value</span><span style="color:#c0c5ce;">() -&gt; v::Value, {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">recognize_with_value</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">look_ahead</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">any</span><span style="color:#c0c5ce;">()).</span><span style="color:#96b5b4;">then</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">e</span><span style="color:#c0c5ce;">| {
 </span><span style="color:#c0c5ce;">        dispatch!(e;
@@ -404,7 +404,7 @@ require playing whack-a-mole and could easily regress in the future.</p>
 </span><span style="color:#c0c5ce;">        )
 </span><span style="color:#c0c5ce;">    })).</span><span style="color:#96b5b4;">and_then</span><span style="color:#c0c5ce;">(|(</span><span style="color:#bf616a;">raw</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">value</span><span style="color:#c0c5ce;">)| </span><span style="color:#96b5b4;">apply_raw</span><span style="color:#c0c5ce;">(value, raw))
 </span><span style="color:#c0c5ce;">});
-</span></pre>
+</span></code></pre>
 <p>Sprinkling a few <code>dispatch!</code>s through the code took our larger benchmark case
 from 182us to 160us!</p>
 <p><em>See the <a href="https://github.com/ordian/toml_edit/pull/222">PR</a></em></p>
@@ -421,10 +421,10 @@ date.  Files without a <code>Datetime</code> must pay the price for it existing.
 of that, we might misinterpret a user's string as a <code>Datetime</code>.</p>
 <p>I decided to copy <code>toml-rs</code> and deserialize using a proprietary format sort-of like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">DatetimeSerde {
+<code><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">DatetimeSerde {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">field</span><span style="color:#c0c5ce;">: String,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>This cut our parse time from 602us to 484us!</p>
 <p><em>See the <a href="https://github.com/ordian/toml_edit/pull/226">PR</a></em></p>
 <h4>Untagged Enums</h4>
@@ -433,7 +433,7 @@ formatting of errors and allocations, particularly for <code>Value</code>.  This
 strange, because no user-facing errors were occurring.  Deja vu.</p>
 <p>I decided to inspect the code that <code>#[derive(serde::Deserialize)]</code> was generating with <code>cargo expand</code>:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">automatically_derived</span><span style="color:#c0c5ce;">]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">automatically_derived</span><span style="color:#c0c5ce;">]
 </span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; _serde::Deserialize&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Value {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">deserialize</span><span style="color:#c0c5ce;">&lt;__D&gt;(</span><span style="color:#bf616a;">__deserializer</span><span style="color:#c0c5ce;">: __D)
 </span><span style="color:#c0c5ce;">     -&gt; _serde::__private::Result&lt;</span><span style="color:#b48ead;">Self</span><span style="color:#c0c5ce;">, __D::Error&gt; </span><span style="color:#b48ead;">where
@@ -470,19 +470,19 @@ strange, because no user-facing errors were occurring.  Deja vu.</p>
 </span><span style="color:#c0c5ce;">        _serde::__private::Err(_serde::de::Error::custom(&quot;</span><span style="color:#a3be8c;">data did not match any variant of untagged enum Value</span><span style="color:#c0c5ce;">&quot;))
 </span><span style="color:#c0c5ce;">    }
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>It is trying to deserialize each variant of the <code>enum</code> one after the other.
 Most values are <code>String</code>, <code>Table</code>, and <code>Array</code>, so it has to try <code>Integer</code>,
 <code>Float</code>, <code>Boolean</code>, and <code>Datetime</code> first.  For each error, it calls:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cold</span><span style="color:#c0c5ce;">]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cold</span><span style="color:#c0c5ce;">]
 </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">invalid_type</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">unexp</span><span style="color:#c0c5ce;">: Unexpected, </span><span style="color:#bf616a;">exp</span><span style="color:#c0c5ce;">: &amp;Expected) -&gt; </span><span style="color:#b48ead;">Self </span><span style="color:#c0c5ce;">{
 </span><span style="color:#c0c5ce;">    Error::custom(format_args!(&quot;</span><span style="color:#a3be8c;">invalid type: {}, expected {}</span><span style="color:#c0c5ce;">&quot;, unexp, exp))
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>Since nearly every variant has a unique type, we can use serde's data model to dispatch for us:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">impl</span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; serde::de::Deserialize&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Value {
+<code><span style="color:#b48ead;">impl</span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; serde::de::Deserialize&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Value {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">deserialize</span><span style="color:#c0c5ce;">&lt;D&gt;(</span><span style="color:#bf616a;">deserializer</span><span style="color:#c0c5ce;">: D) -&gt; Result&lt;Value, </span><span style="color:#b48ead;">D::</span><span style="color:#c0c5ce;">Error&gt;
 </span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">where
 </span><span style="color:#c0c5ce;">        D: serde::de::Deserializer&lt;</span><span style="color:#b48ead;">&#39;de</span><span style="color:#c0c5ce;">&gt;,
@@ -510,7 +510,7 @@ Most values are <code>String</code>, <code>Table</code>, and <code>Array</code>,
 </span><span style="color:#c0c5ce;">        deserializer.</span><span style="color:#96b5b4;">deserialize_any</span><span style="color:#c0c5ce;">(ValueVisitor)
 </span><span style="color:#c0c5ce;">    }
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>I feel like this happens enough, it'd be nice if <code>serde</code> offered an attribute
 that let you tell it what type to deserialize as so it has smaller <code>if-else</code>
 ladders</p>

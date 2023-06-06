@@ -304,17 +304,17 @@ introductory example from calling the example parser as a building block to
 integrating it into <code>FromStr</code>:</p>
 <p>Before:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span style="color:#c0c5ce;">() {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span style="color:#c0c5ce;">() {
 </span><span style="color:#c0c5ce;">  assert_eq!(</span><span style="color:#96b5b4;">hex_color</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">#2F14DF</span><span style="color:#c0c5ce;">&quot;), Ok((&quot;&quot;, Color {
 </span><span style="color:#c0c5ce;">    red: </span><span style="color:#d08770;">47</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">    green: </span><span style="color:#d08770;">20</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">    blue: </span><span style="color:#d08770;">223</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">  })));
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>After:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">std::str::FromStr </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Color {
+<code><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">std::str::FromStr </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Color {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// The error must be owned
 </span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">type </span><span style="color:#c0c5ce;">Err = winnow::error::Error&lt;String&gt;;
 </span><span style="color:#c0c5ce;">
@@ -324,7 +324,7 @@ integrating it into <code>FromStr</code>:</p>
 </span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map_err</span><span style="color:#c0c5ce;">(winnow::error::Error::into_owned)
 </span><span style="color:#c0c5ce;">    }
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>While improving documentation is good, we need to head off problems before
 people look to the documentation (if that even happens).</p>
 <p>When dealing with custom error handling and application integration, users had
@@ -341,26 +341,26 @@ to the caller.</p>
 to discard the <code>remainder</code> (<code>&quot;&quot;</code>) from <code>hex_color</code>?  I feel like its just as
 bad if we use the trait method:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span style="color:#c0c5ce;">() {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span style="color:#c0c5ce;">() {
 </span><span style="color:#c0c5ce;">  assert_eq!(hex_color.</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">#2F14DF</span><span style="color:#c0c5ce;">&quot;), Ok((&quot;&quot;, Color {
 </span><span style="color:#c0c5ce;">    red: </span><span style="color:#d08770;">47</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">    green: </span><span style="color:#d08770;">20</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">    blue: </span><span style="color:#d08770;">223</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">  })));
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>To draw attention to this, I've renamed <code>Parser::parse</code> to
 <code>Parser::parse_next</code>, adding nuance to &quot;this parsed&quot; by conveying &quot;this
 parsed a portion&quot;.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span style="color:#c0c5ce;">() {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span style="color:#c0c5ce;">() {
 </span><span style="color:#c0c5ce;">  assert_eq!(hex_color.</span><span style="color:#96b5b4;">parse_next</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">#2F14DF</span><span style="color:#c0c5ce;">&quot;), Ok((&quot;&quot;, Color {
 </span><span style="color:#c0c5ce;">    red: </span><span style="color:#d08770;">47</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">    green: </span><span style="color:#d08770;">20</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">    blue: </span><span style="color:#d08770;">223</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">  })));
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p><code>Parser::parse_next</code> will also be more visible as I've shifted some
 combinators to be directly on the <code>Parser</code> trait and I am considering
 <a href="https://github.com/winnow-rs/winnow/issues/162">switching built-in parsers to return <code>impl Parser</code> instead of <code>impl FnMut</code></a>, each forcing the use
@@ -368,22 +368,22 @@ of <code>Parser::parse_next</code> over direct function calls.</p>
 <p>Consistent language can also prevent incorrect behavior.  Consider coming
 across <code>take_while_m_n</code> (consume <code>m..=n</code> tokens) as a reviewer:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">match</span><span style="color:#c0c5ce;"> input.</span><span style="color:#96b5b4;">position</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">| !</span><span style="color:#96b5b4;">cond</span><span style="color:#c0c5ce;">(c)) {
+<code><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">match</span><span style="color:#c0c5ce;"> input.</span><span style="color:#96b5b4;">position</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">| !</span><span style="color:#96b5b4;">cond</span><span style="color:#c0c5ce;">(c)) {
 </span><span style="color:#c0c5ce;">      Some(idx) =&gt; {
 </span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">if</span><span style="color:#c0c5ce;"> idx &gt;= m {
 </span><span style="color:#c0c5ce;">          </span><span style="color:#b48ead;">if</span><span style="color:#c0c5ce;"> idx &lt;= n {
 </span><span style="color:#c0c5ce;">            </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> res: IResult&lt;_, _, Error&gt; = </span><span style="color:#b48ead;">if let </span><span style="color:#c0c5ce;">Ok(index) = input.</span><span style="color:#96b5b4;">slice_index</span><span style="color:#c0c5ce;">(idx) {
 </span><span style="color:#c0c5ce;">              Ok(input.</span><span style="color:#96b5b4;">take_split</span><span style="color:#c0c5ce;">(index))
-</span></pre>
+</span></code></pre>
 <p>And compare it to:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">  </span><span style="color:#b48ead;">match</span><span style="color:#c0c5ce;"> input.</span><span style="color:#96b5b4;">offset_for</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">| !list.</span><span style="color:#96b5b4;">contains_token</span><span style="color:#c0c5ce;">(c)) {
+<code><span style="color:#c0c5ce;">  </span><span style="color:#b48ead;">match</span><span style="color:#c0c5ce;"> input.</span><span style="color:#96b5b4;">offset_for</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">| !list.</span><span style="color:#96b5b4;">contains_token</span><span style="color:#c0c5ce;">(c)) {
 </span><span style="color:#c0c5ce;">    Some(offset) =&gt; {
 </span><span style="color:#c0c5ce;">      </span><span style="color:#b48ead;">if</span><span style="color:#c0c5ce;"> offset &gt;= m {
 </span><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">if</span><span style="color:#c0c5ce;"> offset &lt;= n {
 </span><span style="color:#c0c5ce;">          </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> res: IResult&lt;_, _, Error&gt; = </span><span style="color:#b48ead;">if let </span><span style="color:#c0c5ce;">Ok(offset) = input.</span><span style="color:#96b5b4;">offset_at</span><span style="color:#c0c5ce;">(offset) {
 </span><span style="color:#c0c5ce;">            Ok(input.</span><span style="color:#96b5b4;">next_slice</span><span style="color:#c0c5ce;">(offset))
-</span></pre>
+</span></code></pre>
 <p>Without any other context, <code>input.offset_at(offset)</code> is likely to stand out.
 This would lead a reviewer to double check assumptions, the pertinent one being
 that byte offsets are not the same as token counts for <code>&amp;str</code> (<code>offset_at</code>
@@ -427,12 +427,12 @@ which should be reduced with
 </ul>
 <p>For example, before:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#96b5b4;">delimited</span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">(</span><span style="color:#c0c5ce;">&#39;), number, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">)</span><span style="color:#c0c5ce;">&#39;))
-</span></pre>
+<code><span style="color:#96b5b4;">delimited</span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">(</span><span style="color:#c0c5ce;">&#39;), number, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">)</span><span style="color:#c0c5ce;">&#39;))
+</span></code></pre>
 <p>After</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#96b5b4;">delimited</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">(</span><span style="color:#c0c5ce;">&#39;, number, &#39;</span><span style="color:#a3be8c;">)</span><span style="color:#c0c5ce;">&#39;)
-</span></pre>
+<code><span style="color:#96b5b4;">delimited</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">(</span><span style="color:#c0c5ce;">&#39;, number, &#39;</span><span style="color:#a3be8c;">)</span><span style="color:#c0c5ce;">&#39;)
+</span></code></pre>
 <p>We can also extend this to defining character classes with <code>one_of</code>:</p>
 <ul>
 <li><code>&amp;str</code>, <code>&amp;[]</code>, and ranges (<code>0..=9</code>) as sets of characters</li>
@@ -441,16 +441,16 @@ which should be reduced with
 </ul>
 <p>For example, before:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hexdigit</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hexdigit</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">one_of</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">0123456789abcdefgABCDEFG</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>After</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hexdigit</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hexdigit</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">&gt; {
 </span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">one_of</span><span style="color:#c0c5ce;">((&#39;</span><span style="color:#a3be8c;">0</span><span style="color:#c0c5ce;">&#39;..=&#39;</span><span style="color:#a3be8c;">9</span><span style="color:#c0c5ce;">&#39;, &#39;</span><span style="color:#a3be8c;">a</span><span style="color:#c0c5ce;">&#39;..=&#39;</span><span style="color:#a3be8c;">f</span><span style="color:#c0c5ce;">&#39;, &#39;</span><span style="color:#a3be8c;">A</span><span style="color:#c0c5ce;">&#39;..=&#39;</span><span style="color:#a3be8c;">F</span><span style="color:#c0c5ce;">&#39;))
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>This let us consolidate variations of <code>one_of</code>, like <code>satisfy</code>. This also
 applies to <code>take_while0</code> and related parsers, simplifying what we offer there
 as well.</p>

@@ -49,7 +49,7 @@ ported some of the built-in validators to this new API, added new ones, and
 made it convenient to lookup the best value parser for a given type.  For
 example:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = clap::Command::new(&quot;</span><span style="color:#a3be8c;">raw</span><span style="color:#c0c5ce;">&quot;)
+<code><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = clap::Command::new(&quot;</span><span style="color:#a3be8c;">raw</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        clap::Arg::new(&quot;</span><span style="color:#a3be8c;">color</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">color</span><span style="color:#c0c5ce;">&quot;)
@@ -83,7 +83,7 @@ example:</p>
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> port: </span><span style="color:#b48ead;">u16 </span><span style="color:#c0c5ce;">= *m.</span><span style="color:#96b5b4;">get_one</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">port</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">required</span><span style="color:#c0c5ce;">&quot;);
 </span><span style="color:#c0c5ce;">assert_eq!(port, </span><span style="color:#d08770;">3001</span><span style="color:#c0c5ce;">);
-</span></pre>
+</span></code></pre>
 <p>While updating the <code>ArgMatches</code> API for this, we took the time to make other improvements:</p>
 <ul>
 <li>Not-present values are represented with an <code>Option</code> while before some calls
@@ -110,7 +110,7 @@ as-if the user specified them on the command-line, allowing them to interact
 with the rest of clap's API without special casing.</p>
 <p>For example:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = Command::new(&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;)
+<code><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = Command::new(&quot;</span><span style="color:#a3be8c;">mycmd</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">arg</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">        Arg::new(&quot;</span><span style="color:#a3be8c;">quiet</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">long</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">quiet</span><span style="color:#c0c5ce;">&quot;)
@@ -133,7 +133,7 @@ with the rest of clap's API without special casing.</p>
 </span><span style="color:#c0c5ce;">    *matches.get_one::&lt;</span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">&gt;(&quot;</span><span style="color:#a3be8c;">verbose</span><span style="color:#c0c5ce;">&quot;).</span><span style="color:#96b5b4;">expect</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">defaulted by clap</span><span style="color:#c0c5ce;">&quot;),
 </span><span style="color:#c0c5ce;">    Some(</span><span style="color:#d08770;">3</span><span style="color:#c0c5ce;">)
 </span><span style="color:#c0c5ce;">);
-</span></pre>
+</span></code></pre>
 <p>In working on actions, we realized we could simplify things if we made
 <code>Command::args_override_self</code> the default and used actions to decide whether
 each new occurrence overrode prior occurrences (<code>ArgAction::Set</code>) or appended

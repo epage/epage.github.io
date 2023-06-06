@@ -26,9 +26,9 @@ details.</p>
 <h3>Stablized Occurrences</h3>
 <p>Typically, your application wants to parse the arguments the same way between these two styles:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">$ cargo build --features one,two --features three,four
+<code><span style="color:#c0c5ce;">$ cargo build --features one,two --features three,four
 </span><span style="color:#c0c5ce;">$ cargo build --features one,two,three,four
-</span></pre>
+</span></code></pre>
 <p>However, there are times you need to differentiate between each occurrence of
 an argument which we now support with <code>ArgMatches::get_occurrences</code>.</p>
 <p>For our derive users, support for this is behind the <code>unstable-v5</code> feature flag
@@ -40,24 +40,24 @@ inferred behavior from types in the future.</strong></p>
 <h3>Error Message Improvements</h3>
 <p>Before:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">error: Found argument &#39;--optio&#39; which wasn&#39;t expected, or isn&#39;t valid in this context
+<code><span style="color:#c0c5ce;">error: Found argument &#39;--optio&#39; which wasn&#39;t expected, or isn&#39;t valid in this context
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">  Did you mean &#39;--option&#39;?
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">For more information try &#39;--help&#39;
-</span></pre>
+</span></code></pre>
 <p>After:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
+<code><span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">  note: argument &#39;--option&#39; exists
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">For more information, try &#39;--help&#39;.
-</span></pre>
+</span></code></pre>
 <p>clap has not had a style guide and has generally been inconsistent in error
 messages.  While we've worked to make them more consistent, having a stated
 goal of what we want to be consistent with would help.  As an experiment, we've
@@ -65,7 +65,7 @@ adopted the
 <a href="https://rustc-dev-guide.rust-lang.org/diagnostics.html#suggestion-style-guide">rustc diagnostic style guide</a>.</p>
 <p>Example rustc error:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">error[E0425]: cannot find value `arg1` in this scope
+<code><span style="color:#c0c5ce;">error[E0425]: cannot find value `arg1` in this scope
 </span><span style="color:#c0c5ce;">    --&gt; src/builder/command.rs:4249:23
 </span><span style="color:#c0c5ce;">     |
 </span><span style="color:#c0c5ce;">4249 |                 arg = arg1.help(&quot;Print help&quot;);
@@ -73,7 +73,7 @@ adopted the
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">For more information about this error, try `rustc --explain E0425`.
 </span><span style="color:#c0c5ce;">error: could not compile `clap` due to previous error
-</span></pre>
+</span></code></pre>
 <p>While changing errors, this gave us an opportunity to do some wordsmithing on
 the errors to make the problem easier to scan for by</p>
 <ul>

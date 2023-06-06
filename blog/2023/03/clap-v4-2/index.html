@@ -33,7 +33,7 @@ we settled on using ANSI escape codes for this so you can use the library of
 your choice.  For example, with the
 <a href="https://crates.io/crates/color-print">color-print</a> crate, you can now do:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#65737e;">// `cstr!` converts tags to ANSI codes
+<code><span style="color:#65737e;">// `cstr!` converts tags to ANSI codes
 </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> after_help: &amp;</span><span style="color:#b48ead;">&#39;static str </span><span style="color:#c0c5ce;">= color_print::cstr!(
 </span><span style="color:#b48ead;">r</span><span style="color:#c0c5ce;">#</span><span style="color:#a3be8c;">&quot;&lt;bold&gt;&lt;underline&gt;Examples&lt;/underline&gt;&lt;/bold&gt;
 </span><span style="color:#a3be8c;">
@@ -43,7 +43,7 @@ your choice.  For example, with the
 </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> cmd = clap::Command::new(&quot;</span><span style="color:#a3be8c;">mybin</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">    .</span><span style="color:#96b5b4;">after_help</span><span style="color:#c0c5ce;">(after_help)  </span><span style="color:#65737e;">// The `&amp;str` gets converted into a `StyledStr`
 </span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
-</span></pre>
+</span></code></pre>
 <p>To know if ANSI escape codes will be handled properly, look for builder methods that accept 
 <a href="https://docs.rs/clap/4.2.0/clap/builder/struct.StyledStr.html"><code>StyledStr</code></a>.</p>
 <h3>Further Error Tweaks</h3>
@@ -53,34 +53,34 @@ This release further iterates on them based on
 <a href="https://github.com/clap-rs/clap/issues/4638">feedback we received</a>.</p>
 <p>clap v4.0:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">error: Found argument &#39;--optio&#39; which wasn&#39;t expected, or isn&#39;t valid in this context
+<code><span style="color:#c0c5ce;">error: Found argument &#39;--optio&#39; which wasn&#39;t expected, or isn&#39;t valid in this context
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">  Did you mean &#39;--option&#39;?
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">For more information try &#39;--help&#39;
-</span></pre>
+</span></code></pre>
 <p>clap v4.1:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
+<code><span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">  note: argument &#39;--option&#39; exists
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">For more information, try &#39;--help&#39;.
-</span></pre>
+</span></code></pre>
 <p>clap v4.2:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
+<code><span style="color:#c0c5ce;">error: unexpected argument &#39;--optio&#39;
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">  tip: a similar argument exists: &#39;--option&#39;
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">Usage: clap-test --option &lt;opt&gt;... [positional] [positional2] [positional3]...
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">For more information, try &#39;--help&#39;.
-</span></pre>
+</span></code></pre>
 <p>I'm sure there is room for improvement.  We welcome further discussion
 on this on
 <a href="https://github.com/clap-rs/clap/issues/4638">#4638</a>.</p>
@@ -125,7 +125,7 @@ gets built in parallel to <code>clap_builder</code>s code-gen</li>
 derived <code>Args</code> but there was no way to customize the <code>ArgGroup</code>, requiring
 people to still manually create them in some cases:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">command</span><span style="color:#c0c5ce;">(</span><span style="color:#8fa1b3;">group</span><span style="color:#c0c5ce;">(
 </span><span style="color:#c0c5ce;">            ArgGroup::</span><span style="color:#8fa1b3;">new</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">vers</span><span style="color:#c0c5ce;">&quot;)
 </span><span style="color:#c0c5ce;">                .</span><span style="color:#8fa1b3;">required</span><span style="color:#c0c5ce;">(true)
@@ -152,14 +152,14 @@ people to still manually create them in some cases:</p>
 </span><span style="color:#c0c5ce;">    #[arg(group = &quot;input&quot;)]
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">input_file</span><span style="color:#c0c5ce;">: Option&lt;String&gt;,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>We now support <code>#[group]</code>
 <a href="https://docs.rs/clap/4.2.0/clap/_derive/index.html#terminology">raw attributes</a>,
 allowing
 <a href="https://docs.rs/clap/4.2.0/clap/struct.ArgGroup.html">any <code>ArgGroup</code> builder method</a>
 to be used:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Parser)]
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">command</span><span style="color:#c0c5ce;">(author, version, about, long_about = None)]
 </span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Cli {
 </span><span style="color:#c0c5ce;">    #[command(flatten)]
@@ -189,7 +189,7 @@ to be used:</p>
 </span><span style="color:#c0c5ce;">    #[arg(long)]
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">patch</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>Granted, the above would be better expressed as an <code>enum</code> which we are tracking
 in <a href="https://github.com/clap-rs/clap/issues/2621">#2621</a>.</p>
 <p>Discuss on

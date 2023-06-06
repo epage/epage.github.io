@@ -99,9 +99,9 @@ container.</p>
 internals</a>
 and I feel this is the way to go. I feel we should have something that looks like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Debug. anyhow::Error, derive_more::Display, derive_more::From)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Debug. anyhow::Error, derive_more::Display, derive_more::From)]
 </span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">BoxError(Box&lt;Box&lt;dync Error + Send + Sync + </span><span style="color:#b48ead;">&#39;static</span><span style="color:#c0c5ce;">&gt;&gt;);
-</span></pre>
+</span></code></pre>
 <p>This does not solve cloning, serialization, localization, or a host of other
 issues, however.</p>
 <p>For me, the main open questions before putting this in the <strong>stdlib</strong> are:</p>
@@ -187,7 +187,7 @@ runtime-generated data.</p>
 <p><code>Status</code> grows from your prototype to a mature library.</p>
 <p>A prototype might look like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::path::Path;
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::path::Path;
 </span><span style="color:#b48ead;">type </span><span style="color:#c0c5ce;">Status = status::Status;
 </span><span style="color:#b48ead;">type </span><span style="color:#c0c5ce;">Result&lt;T, E = Status&gt; = std::result::Result&lt;T, E&gt;;
 </span><span style="color:#c0c5ce;">
@@ -205,17 +205,17 @@ runtime-generated data.</p>
 </span><span style="color:#c0c5ce;">    println!(&quot;</span><span style="color:#d08770;">{}</span><span style="color:#c0c5ce;">&quot;, content);
 </span><span style="color:#c0c5ce;">    Ok(())
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>The <code>TerminatingStatus</code> provides a <code>Debug</code> that produces user-visible data and
 will print chained error messages, so the output will looks something like:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Failed to read file
+<code><span style="color:#c0c5ce;">Failed to read file
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#c0c5ce;">Expected value: 5
-</span></pre>
+</span></code></pre>
 <p>You can then customize the <code>Kind</code> and <code>Context</code> used.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::path::Path;
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::path::Path;
 </span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Copy, Clone, Debug, derive_more::Display)]
 </span><span style="color:#b48ead;">enum </span><span style="color:#c0c5ce;">ErrorKind {
 </span><span style="color:#c0c5ce;">  #[</span><span style="color:#bf616a;">display</span><span style="color:#c0c5ce;">(fmt = &quot;</span><span style="color:#a3be8c;">Failed to read file</span><span style="color:#c0c5ce;">&quot;)]
@@ -233,7 +233,7 @@ will print chained error messages, so the output will looks something like:</p>
 </span><span style="color:#c0c5ce;">                .</span><span style="color:#96b5b4;">context_with</span><span style="color:#c0c5ce;">(|</span><span style="color:#bf616a;">c</span><span style="color:#c0c5ce;">| c.</span><span style="color:#96b5b4;">insert</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Expected value</span><span style="color:#c0c5ce;">&quot;, </span><span style="color:#d08770;">5</span><span style="color:#c0c5ce;">))
 </span><span style="color:#c0c5ce;">        })
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p><em>(custom <code>Context</code> not shown)</em></p>
 <p>For more, check out <a href="https://docs.rs/status/">the docs</a> and <a href="https://github.com/epage/status/issues">the
 issues</a>. Like I said, this is a

@@ -57,16 +57,16 @@ community's overall maintenance burden by combining efforts and code.</p>
 </ul>
 <p>Error information also improved, most notably the error messages are changing from the old</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">invalid type: string &quot;a&quot;, expected isize\nin `foo.bar`
-</span></pre>
+<code><span style="color:#c0c5ce;">invalid type: string &quot;a&quot;, expected isize\nin `foo.bar`
+</span></code></pre>
 <p>to <code>toml_edit</code>'s</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">TOML parse error at line 2, column 7
+<code><span style="color:#c0c5ce;">TOML parse error at line 2, column 7
 </span><span style="color:#c0c5ce;">  |
 </span><span style="color:#c0c5ce;">2 | bar = &quot;a&quot;
 </span><span style="color:#c0c5ce;">  |       ^^^
 </span><span style="color:#c0c5ce;">invalid type: string &quot;a&quot;, expected isize
-</span></pre>
+</span></code></pre>
 <p>Callers can also render the errors as they wish, like with
 <a href="https://crates.io/crates/ariadne">ariadne</a>.
 We also improved the quality of the span information being reported.</p>

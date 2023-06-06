@@ -90,7 +90,7 @@ argparse.  One of the aspects I always missed was being able to categorize the
 help so I can highlight the important arguments and shove into a corner the
 unimportant.  clap finally has this feature!</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Debug, Clone, Parser)]
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Debug, Clone, Parser)]
 </span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">Cli {
 </span><span style="color:#c0c5ce;">    #[clap(long, help_heading = &quot;CONFIG&quot;)]
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">isolated</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
@@ -101,10 +101,10 @@ unimportant.  clap finally has this feature!</p>
 </span><span style="color:#c0c5ce;">    #[clap(short, long, help_heading = &quot;DEBUG&quot;)]
 </span><span style="color:#c0c5ce;">    </span><span style="color:#bf616a;">verbose</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">bool</span><span style="color:#c0c5ce;">,
 </span><span style="color:#c0c5ce;">}
-</span></pre>
+</span></code></pre>
 <p>which produces</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#8fa1b3;">$</span><span style="color:#c0c5ce;"> cargo run -- --help
+<code><span style="color:#8fa1b3;">$</span><span style="color:#c0c5ce;"> cargo run -- --help
 </span><span style="color:#8fa1b3;">test-clap 
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#8fa1b3;">USAGE:
@@ -119,7 +119,7 @@ unimportant.  clap finally has this feature!</p>
 </span><span style="color:#c0c5ce;">
 </span><span style="color:#8fa1b3;">DEBUG:
 </span><span style="color:#c0c5ce;">    </span><span style="color:#8fa1b3;">-v,</span><span style="color:#bf616a;"> --verbose
-</span></pre>
+</span></code></pre>
 <h2>Lessons Learned</h2>
 <p>I feel like a 4 year release cycle can't be passed up without talking about
 what could be improved.  I can't speak for all of the other maintainer's along
