@@ -11,7 +11,7 @@ data:
 With the release of rust 1.70, there was
 [some surprise and annoyance](https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/)
 that
-[unstable `test` features now require nightly](https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html#enforced-stability-in-the-test-cli)
+[unstable `test` features now require nightly](https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html#enforced-stability-in-the-test-cli),
 like all other unstable features in Rust.
 One of the features most affected is `--format json` which has been in
 [limbo for 5 years](https://github.com/rust-lang/rust/issues/49359).
@@ -65,6 +65,10 @@ fn some_case() {
     assert_eq!(1, 2);
 }
 ```
+
+And that is basically it.
+There are a couple more details (doc tests, other attributes) but testing is
+relatively simple in Rust.
 
 ## Strengths
 
@@ -242,7 +246,7 @@ Custom harnesses are a second class experience
 
 ### Test Initialization and Cleanup
 
-When talking about this, people generally think of the classic JUnit setup with its own pros and cons:
+When talking about this, people generally think of the classic JUnit setup with its own downsides:
 ```java
 public class JUnitTestCase extends TestCase {
     @Override
@@ -272,7 +276,7 @@ fn cargo_add_lockfile_updated() {
 }
 ```
 
-Though this has its own limitations, like some teardown errors being ignored.
+This has its own limitations, like some teardown errors being ignored.
 I've had bugs masked by this on Windows, requiring manual cleanup to catch these errors:
 ```rust
 fn cargo_add_lockfile_updated() {
@@ -284,14 +288,15 @@ fn cargo_add_lockfile_updated() {
 }
 ```
 
-Or within cargo, we intentionally leak the temp directories, only cleaning them
+Sometimes generic libraries like `tempfile` aren't sufficient.
+within cargo, we intentionally leak the temp directories, only cleaning them
 up on the next run so people can debug failures.
-This is also provided by `#[cargo_test_support]`.
+This is also provided by `#[cargo_test]`.
 However, We have regularly hit CI storage limits and it would help to track the size of
 these directories, much like tracking test times.
 
 Cargo also has a lot of fixture initialization coupled to the directory managed
-by `cargo_test_support`, requiring a package to buy-in to the whole system
+by `#[cargo_test]`, requiring a package to buy-in to the whole system
 to just use a little portion of it.
 
 Sometimes a fixture is expensive to create and you want to be able to share it.  For example in cargo,
@@ -356,8 +361,8 @@ current workflow.
 However, `cargo nextest` is working within the limitations of the existing system.
 What would normally be attributes on the test function in other language's test
 libraries, you have to specify in a separate config file.
-While it has benefits, I'm concerned about what we'd lose by running
-every test in its own process.
+`cargo nextest` also switches does process isolation for tests.
+While it has benefits, I'm concerned about what by making this the default workflow.
 For example, you can't run `cargo nextest` on cargo today because of shared
 state between tests, in particular the creation of short identifiers for temp
 directories which allows us to have a stable set of directories to use and
@@ -365,7 +370,7 @@ clean up from.
 Process isolation also gets in the way of trying to support shared fixtures in
 the future.
 
-Going back over our backlog, we've got:
+Going back over our backlog, we've problems related to `cargo test` and libtest's interactions include:
 - [Wanting to run test binaries in parallel](https://github.com/rust-lang/cargo/issues/5609), like `cargo nextest`
 - [Lack of summary across all binaries](https://github.com/rust-lang/cargo/issues/4324)
 - [Noisy test output](https://github.com/rust-lang/cargo/issues/2832) (see also [#5089](https://github.com/rust-lang/cargo/issues/5089))
