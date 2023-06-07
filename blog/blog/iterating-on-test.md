@@ -15,7 +15,8 @@ that
 like all other unstable features in Rust.
 One of the features most affected is `--format json` which has been in
 [limbo for 5 years](https://github.com/rust-lang/rust/issues/49359).
-I've already been feeling like the testing story in Rust has been stagnating and this helped raise the visisilbity of that.
+This drew attention to a feeling I've had: the testing story in Rust has been
+stagnating.
 I've been gathering my thoughts on this for the last 3 months and recently had
 some downtime between tasks so I've started to look further into this.
 
@@ -67,8 +68,8 @@ fn some_case() {
 
 ## Strengths
 
-Before anything else, we should recognize the strengths we have today; what we
-should make sure we protect.
+Before anything else, we should recognize the strengths of the existing story
+around testing; what we should make sure we protect.
 Scouring forums, some points I saw called out include:
 - Low friction for getting tests up and running
 - Being the standard way to test makes it easy to jump between projects
@@ -89,7 +90,7 @@ key pieces:
 
 libtest is static.
 If you `#[ignore]` a test, that is it.
-You can make a test conditoned on a platform or the presence of feature flags, like `#[cfg_attr(windows, ignore)]`.
+You can make a test conditioned on a platform or the presence of feature flags, like `#[cfg_attr(windows, ignore)]`.
 However, you can't ignore tests based on runtime conditions.
 
 In cargo, we have tests that require installed software.
@@ -136,7 +137,7 @@ test init::simple_hg::case ... ignored, hg not installed
 test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.10s
 ```
 
-Having to wrap `#[test]` isn't ideal and you have to bake in every runtime
+Having to wrap `#[test]` isn't ideal and requires you to bake in every runtime
 condition into your macro.
 This also then does't compose with other solutions.
 
@@ -352,9 +353,9 @@ There are also problems with test running and reporting.
 I think [cargo nextest](https://nexte.st/) has helped highlight gaps in the
 current workflow.
 However, `cargo nextest` is working within the limitations of the existing system.
-You have to specify in a separate config file parts that would be added as
-attribute on the test in other language's testing libraries, like test groupings.
-While it has benefits, I'm concerned about what we'd lose by running forcing
+What would normally be attributes on the test function in other language's test
+libraries, you have to specify in a separate config file.
+While it has benefits, I'm concerned about what we'd lose by running
 every test in its own process.
 For example, you can't run `cargo nextest` on cargo today because of shared
 state between tests, in particular the creation of short identifiers for temp
