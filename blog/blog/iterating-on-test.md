@@ -90,7 +90,8 @@ key pieces:
 
 libtest is static.
 If you `#[ignore]` a test, that is it.
-You can make a test conditioned on a platform or the presence of feature flags, like `#[cfg_attr(windows, ignore)]`.
+You can make a test conditioned on a platform or the presence of feature flags,
+like `#[cfg_attr(windows, ignore)]`.
 However, you can't ignore tests based on runtime conditions.
 
 In cargo, we have tests that require installed software.
@@ -139,7 +140,7 @@ test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; fini
 
 Having to wrap `#[test]` isn't ideal and requires you to bake in every runtime
 condition into your macro.
-This also then does't compose with other solutions.
+This also then doesn't compose with other solutions.
 
 Cargo is also unlikely to be able to recognize that it needs to recompile tests
 when the conditions change.
@@ -438,13 +439,14 @@ create the desired UX.
 
 After presenting on this at [RustNL 2023](https://2023.rustnl.0org)
 ([video](https://www.youtube.com/watch?v=3aLPewRSiK8), [slides](https://epage.github.io/talks/2023/05/test/#p1)),
-I had the opportunity to attend an in-person libs team meeting to discuss parts of this with them
+I had the opportunity to attend an in-person libs team meeting to discuss parts
+of this with them
 (along with [OsStr](https://github.com/rust-lang/rust/pull/109698)).
 
 **Question: how much of this work will make it into libtest?**
 
-I went in with the audacious goal of "everything", one day with the plan to be
-to stabilize extension points in libtest while we iterate on a "pytest"-like
+I went in with the audacious goal of "everything", initially working on
+extension points to allow out-of-tree experiments on a "pytest"-like
 API and then slowly pull pieces of that into libtest.
 
 We also discussed experimenting with unstable features by publishing libtest to
@@ -471,8 +473,8 @@ Previously
 laid out a plan for rust to still own the `#[test]` macro and test enumeration
 but be accessible from custom test harnesses.
 For the cases I've enumerated and my gut feeling when prototyping, my
-susicion is that I'll be wanting to allow custom `#[test]` macros so my test
-harness can control what code gets generated and can directly have other
+suspicion is that I'll be wanting to allow custom `#[test]` macros so my test
+harness can control what code gets generated and can have nested
 attributes (like `#[test(exclusive)]`) rather than repeating our existing
 pattern of separate macros (e.g. `#[ignore]`).
 
@@ -487,7 +489,7 @@ Plus a low ceremony way to opt-in to all of this (like
 [rust-lang/cargo#6945](https://github.com/rust-lang/cargo/issues/6945)
 ).
 
-We didn't covery everything but we made enough progress to feel happy with this plan
+We didn't cover everything but we made enough progress to feel happy with this plan
 
 **Question: how will we do test enumeration?**
 
@@ -495,19 +497,19 @@ I had hoped that
 [inventory](https://docs.rs/inventory/latest/inventory/)
 or
 [linkme](https://docs.rs/linkme/latest/linkme/)
-could be used for this but there was concerned about supporting these across
-platforms without hicups, including from dtolnay who is the maintainer of
-these.
+could be used for this but there was concern about supporting these across
+platforms without hiccups, including from dtolnay who is the maintainer of
+them.
 
 Instead, we are looking at introducing a new language feature to replace
 libtest's use of internal compiler features.
 This would most likely be a
 [`#[distributed_slice]`](https://internals.rust-lang.org/t/from-life-before-main-to-common-life-in-main/16006/25?u=dtolnay)
-though we didn't hash this out in the meeting.
+though we didn't hash out further details in the meeting.
 
 **Question: how will we capture `println`?**
 
-Its great that when a test fails, the output is captured and reported back from
+When a test fails, its great that the output is captured and reported back from
 `println`, `dbg`, and panic messages (like from `assert`).
 
 How does it work though?
@@ -515,7 +517,7 @@ I'm sorry you asked.
 At the start of a test, a buffer is passed to
 [set_output_capture](https://github.com/rust-lang/rust/blob/master/library/std/src/io/stdio.rs#L979)
 which puts it into thread-local storage.
-When you call [println, print, eprintln, and eprint](https://github.com/rust-lang/rust/blob/master/library/std/src/macros.rs#L132),
+When you call [println, print, eprintln, or eprint](https://github.com/rust-lang/rust/blob/master/library/std/src/macros.rs#L132),
 they call
 [_print and _eprint](https://github.com/rust-lang/rust/blob/master/library/std/src/io/stdio.rs#L1094)
 which calls [print_to](https://github.com/rust-lang/rust/blob/master/library/std/src/io/stdio.rs#L1009),
@@ -526,14 +528,14 @@ printing to `stdout` / `stderr`.
 This means
 - If you write directly to `stdout`, `stderr`, use libc, or have C code using libc, it will not be captured
 - If the test launches a thread, its output will not be captured (as far as I can tell)
-- This can only be done in nightly code, like in the stdlib and libtest
+- This API is only available in nightly (which libtest has special access to on stable)
 
 Previously, this
 [whole process was more more reusable but more complex](https://github.com/rust-lang/rust/pull/78714)
 and there is hesitance to go back in this direction.
 For this to be stabilized, this also needs to be more general
 This needs to cover `std::io::stdout` / `std::io::stderr` and likely libc.
-This needs to be more reslient, capturing across all threads or inherited when
+This needs to be more resilient, capturing across all threads or inherited when
 new threads are spawned.
 Then there is `async` where its not about what thread you are running on.
 
@@ -555,9 +557,9 @@ I've previously committed to
 [`cargo script`](https://github.com/rust-lang/cargo/issues/12207),
 and [keeping up with my crates](https://crates.io/users/epage?sort=recent-downloads).
 Even if this was my highest priority, this is too much for one person and is
-spread across rust language design, rust compiler, the standard library, and
+spread across rust language design, the rust compiler, the standard library, and
 cargo.
-This will also take time to go through the RFC process for each part of this so
+This will also take time to go through the RFC process for each part so
 the sooner we start on these, the better.
 
 But I don't think that means we should give up.
