@@ -543,6 +543,10 @@ This needs to cover `std::io::stdout` / `std::io::stderr` and likely libc.
 This needs to be more resilient, capturing across all threads or inherited when
 new threads are spawned.
 Then there is `async` where its not about what thread you are running on.
+Implicit
+[contexts](https://tmandry.gitlab.io/blog/posts/2021-12-21-context-capabilities/)
+for `stdout` and `stderr` would cover most needs but that I'm doubt we'll get
+that any time soon, if ever.
 
 So we don't have a plan that can meet these needs yet.
 We can workaround this by running each test in its own process but that comes
