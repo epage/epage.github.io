@@ -9,7 +9,7 @@ data:
 ---
 
 With the release of rust 1.70, there was
-[some surprise and annoyance](https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/)
+[some surprise and frustation](https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/)
 that
 [unstable `test` features now require nightly](https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html#enforced-stability-in-the-test-cli),
 like all other unstable features in Rust.
@@ -180,13 +180,15 @@ fn integers() {
 However,
 - You don't know which `input` was being processed on failure (without extra steps)
   - Any debug output from prior iterations will flood the display when analyzing a failure
-- A broken case prevents other cases from running, requiring careful ordering
+- Its "fail-fast": a broken case prevents other cases from running, requiring careful ordering
   to ensure the more general case is first
 - You don't get the bigger picture of whats working and or not by seeing all of the failures at once
 - You can't select a specific case to run / debug
 
-Sometimes bespoke macros are created so you get a `#[test]` per data point.
-When this happens frequently enough, people will write their own libraries to automate this, including:
+Some projects will create bespoke macros are created so you get a `#[test]` per
+data point.
+When this happens frequently enough across projects, people will write their
+own libraries to automate this, including:
 - [trybuild](https://docs.rs/trybuild/latest/trybuild/)
 - [trycmd](https://docs.rs/trycmd/latest/trycmd/)
 - [toml-test](https://docs.rs/toml-test/latest/toml_test/)
@@ -277,7 +279,7 @@ fn cargo_add_lockfile_updated() {
 ```
 
 This has its own limitations, like some teardown errors being ignored.
-I've had bugs masked by this on Windows, requiring manual cleanup to catch these errors:
+I've had bugs masked by this on Windows, requiring manual cleanup to catch them:
 ```rust
 fn cargo_add_lockfile_updated() {
     let scratch = tempfile::tempdir::new().unwrap();
@@ -289,11 +291,12 @@ fn cargo_add_lockfile_updated() {
 ```
 
 Sometimes generic libraries like `tempfile` aren't sufficient.
-within cargo, we intentionally leak the temp directories, only cleaning them
+Within cargo, we intentionally leak the temp directories, only cleaning them
 up on the next run so people can debug failures.
 This is also provided by `#[cargo_test]`.
-However, We have regularly hit CI storage limits and it would help to track the size of
-these directories, much like tracking test times.
+However, we have regularly hit CI storage limits and it would be a big help if
+the fixture tracked the size of these directories, much like tracking test
+times.
 
 Cargo also has a lot of fixture initialization coupled to the directory managed
 by `#[cargo_test]`, requiring a package to buy-in to the whole system
@@ -304,16 +307,16 @@ Sometimes a fixture is expensive to create and you want to be able to share it. 
 running into similar problems as we do with the lack of test generation.
 
 The counter argument could be made that we just aren't composing things right.
-That is likely the case but we've optimized all of this for the cargo project
-and it would make the experience worst for the cargo project to make this all
-generic in the usual fashion.
+That is likely the case but I feel this organic growth is the natural outcome
+of not having better supporting tools and needing to prioritize our own
+development.
 
 Having composable fixtures would go a long way towards making test code more reusable.
 Take for instance [pytest](https://pytest.org/).
 In a previous part of my career, I made a Python API for hardware that
 interacted with the
 [CAN bus](https://en.wikipedia.org/wiki/CAN_bus).
-This had to be tested at the system level which required having access to hardware.
+This had to be tested at the system level and required access to hardware.
 With pytest, I could specify that a
 [test required a can_in_interface resource](https://github.com/ni/nixnet-python/blob/main/tests/test_session_j1939.py).
 [can_in_interface is a fixture](https://github.com/ni/nixnet-python/blob/main/tests/conftest.py#L30)
@@ -359,10 +362,10 @@ There are also problems with test running and reporting.
 I think [cargo nextest](https://nexte.st/) has helped highlight gaps in the
 current workflow.
 However, `cargo nextest` is working within the limitations of the existing system.
-What would normally be attributes on the test function in other language's test
+For example, what would normally be attributes on the test function in other language's test
 libraries, you have to specify in a separate config file.
-`cargo nextest` also switches does process isolation for tests.
-While it has benefits, I'm concerned about what by making this the default workflow.
+`cargo nextest` also does process isolation for tests.
+While it has benefits, I'm concerned about what would lose by making this the default workflow.
 For example, you can't run `cargo nextest` on cargo today because of shared
 state between tests, in particular the creation of short identifiers for temp
 directories which allows us to have a stable set of directories to use and
@@ -531,9 +534,9 @@ At the end of the test, `set_output_capture` is called again to restore
 printing to `stdout` / `stderr`.
 
 This means
-- If you write directly to `stdout`, `stderr`, use libc, or have C code using libc, it will not be captured
+- If you write directly to `std::io::{stdout,stderr}`, use libc, or have C code using libc, it will not be captured
 - If the test launches a thread, its output will not be captured (as far as I can tell)
-- This API is only available in nightly (which libtest has special access to on stable)
+- This API is only available in nightly which libtest has special access to on stable and custom test harnesses do not
 
 Previously, this
 [whole process was more more reusable but more complex](https://github.com/rust-lang/rust/pull/78714)
@@ -546,11 +549,12 @@ Then there is `async` where its not about what thread you are running on.
 Implicit
 [contexts](https://tmandry.gitlab.io/blog/posts/2021-12-21-context-capabilities/)
 for `stdout` and `stderr` would cover most needs but that I'm doubt we'll get
-that any time soon, if ever.
+that any time soon, if ever (no matter how much I love the *idea* of it).
+
+We could workaround this by running each test in its own process but that comes
+with its own downsides as already mentioned.
 
 So we don't have a plan that can meet these needs yet.
-We can workaround this by running each test in its own process but that comes
-with its own downsides.
 
 See also [rust-lang/rust#90785](https://github.com/rust-lang/rust/issues/90785).
 
@@ -580,7 +584,7 @@ For anyone who would like to help out, the parts I see that are unblocked includ
 2. Finish up what can be done on the [prototype](https://github.com/epage/pytest-rs/) for further json output feedback
 3. Design a low ceremony way to opt-in to all of this (like [rust-lang/cargo#6945](https://github.com/rust-lang/cargo/issues/6945))
 4. Sketching out ideas how we might disable the existing `#[test]` macro
-5. Researching where custom preludes are out and see what might be able to move forward so we can pull in the `#[test]` macro
+5. Researching where custom preludes are at and see what might be able to move forward so we can pull in the `#[test]` macro
 6. Similarly, researching the possibility of pulling in `main` from a dependency
 
 These are roughly in priority order based on a mixture of
