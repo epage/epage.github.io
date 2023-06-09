@@ -21,6 +21,38 @@
 <article>
 	<nav>
 		<ul><li>
+			<h2><a href="/blog/2023/06/iterating-on-test/">Iterating on Test</a></h2>
+		</li></ul>
+		<ul><li>
+			<i class="fa fa-calendar"></i> <time pubdate="pubdate">Fri&nbsp;09&nbsp;Jun&nbsp;'23</time>
+			
+			<br/><i class="fa fa-tags"></i> programming, rust
+			
+		</li></ul>
+	</nav>
+	
+	<p><p>With the release of rust 1.70, there was
+<a href="https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/">some surprise and frustation</a>
+that
+<a href="https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html#enforced-stability-in-the-test-cli">unstable <code>test</code> features now require nightly</a>,
+like all other unstable features in Rust.
+One of the features most affected is <code>--format json</code> which has been in
+<a href="https://github.com/rust-lang/rust/issues/49359">limbo for 5 years</a>.
+This drew attention to a feeling I've had: the testing story in Rust has been
+stagnating.
+I've been gathering my thoughts on this for the last 3 months and recently had
+some downtime between tasks so I've started to look further into this.</p>
+<p>The tl;dr is to think of this as finding right abstractions to stabilize parts
+of
+<a href="https://doc.crates.io/contrib/tests/writing.html#cargo_test-attribute">cargo_test_support</a>
+and <a href="https://nexte.st/"><code>cargo nextest</code></a>.</p>
+</p>
+	
+</article>
+
+<article>
+	<nav>
+		<ul><li>
 			<h2><a href="/blog/2023/03/clap-v4-2/">clap v4.2, a Rust CLI argument parser</a></h2>
 		</li></ul>
 		<ul><li>
