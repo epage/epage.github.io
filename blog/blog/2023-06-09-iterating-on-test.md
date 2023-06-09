@@ -608,7 +608,7 @@ For anyone who would like to help out, the parts I see that are unblocked includ
 1. Preparing a
   [`#[distributed_slice]`](https://internals.rust-lang.org/t/from-life-before-main-to-common-life-in-main/16006/25?u=dtolnay)
   Pre-RFC and moving that forward so we have test enumeration
-2. Finish up what can be done on the [prototype](https://github.com/epage/pytest-rs/) for further json output feedback
+2. Finish up what can be done on the [prototype](https://github.com/epage/pytest-rs/issues) for further json output feedback
 3. Design a low ceremony way to opt-in to all of this (like [rust-lang/cargo#6945](https://github.com/rust-lang/cargo/issues/6945))
 4. Sketching out ideas how we might disable the existing `#[test]` macro
 5. Researching where custom preludes are at and see what might be able to move forward so we can pull in the `#[test]` macro
