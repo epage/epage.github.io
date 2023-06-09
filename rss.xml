@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Iterating on Test</title><link>https://epage.github.io/blog/2023/06/iterating-on-test/</link><description><![CDATA[<p>With the release of rust 1.70, there was
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Iterating on Testing in Rust</title><link>https://epage.github.io/blog/2023/06/iterating-on-test/</link><description><![CDATA[<p>With the release of rust 1.70, there was
 <a href="https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/">some surprise and frustation</a>
 that
 <a href="https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html#enforced-stability-in-the-test-cli">unstable <code>test</code> features now require nightly</a>,
