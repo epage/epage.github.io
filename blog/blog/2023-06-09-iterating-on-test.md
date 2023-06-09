@@ -1,13 +1,13 @@
 ---
 title: Iterating on Test
+published_date: 2023-06-09 19:41:08.801406524 +0000
 layout: default.liquid
-is_draft: true
+is_draft: false
 data:
   tags:
   - programming
   - rust
 ---
-
 With the release of rust 1.70, there was
 [some surprise and frustation](https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/)
 that
@@ -441,6 +441,33 @@ I even went a step further and implemented all other output formats (pretty,
 terse and, junit) on top of the structures used for json output, helping to
 further refine its design and making sure its sufficient for `cargo test` to
 create the desired UX.
+
+This prototype is still fairly early; we don't even have full parity with
+[libtest-mimic](https://docs.rs/libtest-mimic/0.6.0/libtest_mimic/).
+For this reason, none of the crates have been published yet.
+
+The basis for the design is "what if this could replace the original libtest?".
+Even if we this does not become the basis for libtest, my hope is that core
+parts of the code can be shared to ensure consistent behavior, like serde types and the CLI.
+
+So this is why I made
+[yet another argument parser](https://github.com/epage/pytest-rs/tree/main/crates/lexarg).
+I enjoy [clap](https://docs.rs/clap) and generally recommend it to people (which is why I've taken on maintaining it).
+When someone needs something more lightweight, I generally point them to
+[lexopt](https://docs.rs/lexopt/latest/lexopt/)
+due to the simpleness of the design.
+
+But.
+
+When designing this prototype, I wanted to design-in support
+for users to extend the command-line like you can in pytest.
+This means it needs to be pluggable.
+If this were exposed in libtest's API, then it can't break compatibility.
+The easiest way to do this is to have as simple of an API as possible.
+Clap's API is too big.
+I was concerned even about the amount of policy in lexopt.
+I don't know if `lexarg` will go anywhere but it allowed me to get an idea of
+how a perma-1.0 test library could possibly have an extensible CLI.
 
 <a id="libs"></a>
 ### Libs team meeting
