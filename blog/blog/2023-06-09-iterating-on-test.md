@@ -621,3 +621,7 @@ These are roughly in priority order based on a mixture of
 
 Alternatively, if your interests align with one of my higher priorities, I
 welcome the help with them so more of us can focus on this problem.
+
+Discuss on
+[reddit](https://www.reddit.com/r/rust/comments/145f9gi/iterating_on_testing_in_rust/?)
+[mastadon](https://hachyderm.io/@epage/110516052624823067)
