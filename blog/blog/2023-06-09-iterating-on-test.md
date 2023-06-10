@@ -472,7 +472,7 @@ how a perma-1.0 test library could possibly have an extensible CLI.
 <a id="libs"></a>
 ### Libs team meeting
 
-After presenting on this at [RustNL 2023](https://2023.rustnl.0org)
+After presenting on this at [RustNL 2023](https://2023.rustnl.org)
 ([video](https://www.youtube.com/watch?v=3aLPewRSiK8), [slides](https://epage.github.io/talks/2023/05/test/#p1)),
 I had the opportunity to attend an in-person libs team meeting to discuss parts
 of this with them
