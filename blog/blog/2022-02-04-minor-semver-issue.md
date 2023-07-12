@@ -90,7 +90,7 @@ For most of my projects, I release on every user-contributed user-facing PR.
 Releasing this often makes my users more efficient because they had a need
 driving their change and makes them happier not having to wait.  This works
 because I aim for a high confidence in my architecture and tests to ensure
-quality.  Even without when that is lacking, I know that the testing of
+quality.  Even when that is lacking, I know that the testing of
 unreleased code will be nearly non-existent while smaller releases will act as
 a form of rolling release and it gives users the granularity to isolate the
 problem and get the most benefit while they wait for a fix.  I also try to
@@ -99,7 +99,7 @@ are ready.  With [cargo release](https://github.com/sunng87/cargo-release),
 there is little friction in publishing a new release.
 
 I'll be honest, I do miss the splashy marketing of having larger releases.  If
-I published every release, I would end up spamming reddit with multiple
+I advertized every release, I would end up spamming reddit with multiple
 releases each day.
 
 With this continuous release model, what value am I providing users by bumping
