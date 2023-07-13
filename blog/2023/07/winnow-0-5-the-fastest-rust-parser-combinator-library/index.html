@@ -362,7 +362,9 @@ I should look into icount benchmarks...</p>
 <ul>
 <li>The hassle of running benchmarks can lead to blindspots.
 I tended to focus on the performance impact to a Winnow benchmark and a <code>toml_edit</code> benchmark.
-Winnow uses lower level parsers to better line the code up with the TOML BNF grammar and I was able to catch most performance regressions there.
+Winnow uses lower level parsers to better line the code up with the TOML BNF
+grammar and I was able to catch most performance regressions there.
+Similarly, we fixed all reported regressions and yet they didn't affect the json bench list above.
 Even if I ran all of the benchmarks, I was unlikely to catch some of these problems.
 Switching to icount benchmarks with a benchmark CI service would be a big help.</li>
 <li>Seemingly minor refactors can have big affects.
