@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Winnow 0.5: The Fastest Rust Parser-Combinator Library?</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>Winnow 0.5: The Fastest Rust Parser-Combinator Library?</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p><a href="https://crates.io/crates/winnow">Winnow</a> is a parser-combinator library for Rust and
+<a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#050---2023-07-13">0.5</a>
+is now out.
+I <a href="/blog/2023/02/winnow-toml-edit-combine-nom/#winnow">last wrote</a> about the 0.3.0 release, so I'll be covering all of the releases between.</p>
+<!-- more -->
+<h2>What is Winnow?</h2>
+<p>To recap <a href="/blog/2023/02/winnow-toml-edit-combine-nom/#winnow">my last post</a>,
+you can think of Winnow as a parser toolbox, making it easier to get up and
+running with your parser without getting in the way of hand-writing the
+trickier parts.
+My hope is that this can serve as a &quot;do anything parser&quot; much like how people
+treat regex.</p>
+<p>Winnow started as a fork of <a href="https://crates.io/crates/nom">nom</a> as I had found
+its toolbox model of parsers worked much better for me than the framework model
+other parser libraries used like <a href="https://docs.rs/combine/latest/combine/">combine</a>.
+The original goals for the fork were to improve the developer experience and <a href="https://github.com/winnow-rs/winnow/issues/72">to remove a
+corner case that had a performance cliff you could fall off
+of</a>.</p>
+<p>Being the fastest was a non-goal of the fork as that is a competition I didn't want to get distracted by
+and felt there were some optimizations that ran counter to my goals.
+Specifically, chumsky uses GATs to allow the calling parser to communicate to
+sub-parsers if there were steps that could be discarded (see niko's post
+<a href="https://www.smallcultfollowing.com/babysteps/blog/2022/06/27/many-modes-a-gats-pattern/">&quot;Many modes: a GATs pattern&quot;</a>).
+This works well for the framework model as you put together the building blocks
+and the framework takes care of the rest.
+The problem when applying GATs to the toolbox model is that hand-written
+parsers are a black box to the system and refactor a parser to be hand-written
+could mysteriously lead to a dramatic drop in performance.
+If/when a user is aware of this, to workaround it requires writing some fairly
+advanced Rust code with a decent amount of boilerplate.</p>
+<h2>What changed since 0.3.0...</h2>
+<p>Jump to the <a href="#numbers">bottom</a> if you just want to see performance numbers.</p>
+<p>And checkout the <a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#050---2023-07-13">changelog</a>
+for more details.</p>
+<h3>Usability: Improving type inference</h3>
+<p>One area of weakness for Winnow was that type inference didn't work as often as I felt it should.
+We had code that looked roughly like:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">pub trait </span><span style="color:#c0c5ce;">Parser&lt;I, O, E&gt; {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">parse_next</span><span style="color:#c0c5ce;">(&amp;</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: I) -&gt; IResult&lt;I, V, E&gt; {
+</span><span style="color:#c0c5ce;">        </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl</span><span style="color:#c0c5ce;">&lt;E&gt; Parser&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">, E&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">char {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">parse_next</span><span style="color:#c0c5ce;">(&amp;</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">, </span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: I) -&gt; IResult&lt;I, O, E&gt; {
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">one_of</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">).</span><span style="color:#96b5b4;">parse_next</span><span style="color:#c0c5ce;">(input)
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>This allows <code>delimited('(', expr, ')')</code> to be a short-hand for <code>delimited(one_of('('), expr, one_of(')'))</code>.</p>
+<p>However, there are many parser combinators directly on the <code>Parser</code> trait, much
+like <code>Iterator</code>, and type inference would fail for these, like
+<code>'n'.value('\n')</code>.</p>
+<p>I had hoped that
+<a href="https://github.com/winnow-rs/winnow/issues/163">using associated types</a> would
+help but that had its own complexity and downsides.
+In the end, I found that we were assuming Rust would be able to infer types
+between the calls to <code>Value::parse_next</code> and <code>Parser::value</code> when it wouldn't.
+Instead, we could use
+<a href="https://doc.rust-lang.org/std/marker/struct.PhantomData.html"><code>PhantomData</code></a>
+to do this bookkeeping for Rust to make type inference work.</p>
+<p><a href="https://github.com/winnow-rs/winnow/pull/222">#222</a> was released in 0.4.0.</p>
+<h3>Usability: Clearer top-level parser</h3>
+<p>In 0.3, we renamed nom's <code>Parser::parse</code> to <code>Parser::parse_next</code> to make it
+more obvious that this is an incremental step and parsing isn't finished
+(I've personally ran into problems with this in some of my projects).</p>
+<p><code>Parser::parse_next</code> left people with <code>(rest_input, output ErrMode&lt;Error&gt;)</code> and they needed to:</p>
+<ul>
+<li>Ensure <code>rest_input</code> is empty and discard it (easy to overlook)</li>
+<li>Unify <code>ErrMode::Backtrack</code> and <code>ErrMode::Cut</code> variants</li>
+</ul>
+<p>In Winnow 0.3, we provided <code>FinishIResult::finish</code>:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">std::str::FromStr </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Color {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// The error must be owned
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">type </span><span style="color:#c0c5ce;">Err = winnow::error::Error&lt;String&gt;;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from_str</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; Result&lt;</span><span style="color:#b48ead;">Self</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">Self::</span><span style="color:#c0c5ce;">Err&gt; {
+</span><span style="color:#c0c5ce;">        hex_color
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">parse_next</span><span style="color:#c0c5ce;">(s)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">finish</span><span style="color:#c0c5ce;">()
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map_err</span><span style="color:#c0c5ce;">(winnow::error::Error::into_owned)
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>The main problem with using an extension trait is discoverability.
+Effectively, the only real option is hope people read the right part of the docs to discover it.</p>
+<p>We moved the logic from <code>FinishIResultExt::finish</code> to <code>Parser::parse</code> now that the name was available:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">std::str::FromStr </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Color {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// The error must be owned
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">type </span><span style="color:#c0c5ce;">Err = winnow::error::Error&lt;String&gt;;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from_str</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; Result&lt;</span><span style="color:#b48ead;">Self</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">Self::</span><span style="color:#c0c5ce;">Err&gt; {
+</span><span style="color:#c0c5ce;">        hex_color
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">parse</span><span style="color:#c0c5ce;">(s)
+</span><span style="color:#c0c5ce;">            .</span><span style="color:#96b5b4;">map_err</span><span style="color:#c0c5ce;">(winnow::error::Error::into_owned)
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p><a href="https://github.com/winnow-rs/winnow/pull/2">#221</a> was released in 0.4.0.</p>
+<h3>Usability: Naming and organization</h3>
+<p>I've found that nom's naming was confusing and parsers were spread across so
+may <code>mod</code>s that it was hard to find what you were looking for as you were
+always looking through a pinhole view of the API
+<a href="https://github.com/winnow-rs/winnow/discussions/95">#95</a>.</p>
+<p>While I don't think we are at a perfect state, I think things are getting better.</p>
+<p>For the module hierarchy, we decided to focus on the high level need, so instead of </p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">bits;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">branch;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">bytes;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">character;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">combinator;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">multi;  </span><span style="color:#65737e;">// a couple of parsers are almost exclusively for binary data
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">number;  </span><span style="color:#65737e;">// a mix of ASCII and binary parsers
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">sequence;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">trace;
+</span></code></pre>
+<p>we now have:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">ascii;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">binary;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">combinator;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">token;
+</span><span style="color:#b48ead;">pub mod </span><span style="color:#c0c5ce;">trace;  </span><span style="color:#65737e;">// probably should just be folded into `combinator`
+</span></code></pre>
+<p>Always open to <a href="https://github.com/winnow-rs/winnow/discussions/95">people's ideas</a> for how to further improve discoverability and clarity of parser code.</p>
+<p><a href="https://github.com/winnow-rs/winnow/pull/239">#239</a>,
+<a href="https://github.com/winnow-rs/winnow/pull/240">#240</a>
+were released in 0.4.0.</p>
+<h3>Usability: Ranged parsers</h3>
+<p>Are <code>take_while_m_n</code> and <code>repeat_m_n</code> inclusive or exclusive for <code>m</code> and <code>n</code>?
+In Rust parlance, I <em>think</em> its <code>m..=n</code> but I don't even remember for sure.</p>
+<p>We provide <code>repeat0</code>, <code>repeat1</code>, and <code>repeat_m_n</code>, so if you need <code>repeat5</code>,
+might not immediately think to wrap <code>repeat_m_n</code>.</p>
+<p>And for myself, I think it'd be nice to reduce the redundancy of those parsers
+so we have a less overwhelming
+<a href="https://docs.rs/winnow/0.3.0/winnow/combinator/index.html">list of parsers</a>.</p>
+<p>So we switched from having separate <code>0..</code>, <code>1..</code>, and <code>m..=n</code> parsers to a single version that takes in an
+<a href="https://docs.rs/winnow/latest/winnow/stream/struct.Range.html"><code>impl Into&lt;Range&gt;</code></a>,
+replacing</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#96b5b4;">repeat0</span><span style="color:#c0c5ce;">(parser::key_value).</span><span style="color:#96b5b4;">parse_next</span><span style="color:#c0c5ce;">(i)
+</span></code></pre>
+<p>with</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#96b5b4;">repeat</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">.., parser::key_value).</span><span style="color:#96b5b4;">parse_next</span><span style="color:#c0c5ce;">(i)
+</span></code></pre>
+<p>In contrast, chumsky takes the approach of:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">key_value.</span><span style="color:#96b5b4;">repeated</span><span style="color:#c0c5ce;">()
+</span></code></pre>
+<p>with <a href="https://docs.rs/chumsky/latest/chumsky/combinator/struct.Repeated.html">additional functions for controlling the range</a>.
+I felt that within a parser's grammar, the fact that it is repeating is
+important information that I wanted it more obvious by leading with it.</p>
+<p>I had hoped that we could do</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">(Repeat(</span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">..) * parser::key_value).</span><span style="color:#96b5b4;">parse_next</span><span style="color:#c0c5ce;">(i)
+</span></code></pre>
+<p>but <a href="https://docs.rs/chumsky/latest/chumsky/combinator/struct.Repeated.html">I ran into issues</a>.</p>
+<p><a href="https://github.com/winnow-rs/winnow/pull/241">#241</a> was released in 0.4.2
+and <a href="https://github.com/winnow-rs/winnow/pull/247">#247</a> was released in 0.4.6.</p>
+<h3>Usability: Better out-of-the-box errors</h3>
+<p><code>IResult</code> defaulted the <code>E</code> generic parameter to <code>InputError</code> but I found that was rarely useful
+(<a href="https://github.com/winnow-rs/winnow/issues/103">#103</a>) with the output being:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">error OneOf at:
+</span><span style="color:#c0c5ce;">name = &quot;foo&quot;
+</span></code></pre>
+<ul>
+<li>This characterized the error by the <code>ErrorKind</code> which is debug information at best</li>
+<li>This dumped all of the output from where the failure started to occur (in this case, there was a missing <code>]</code> before a newline)</li>
+<li>We could not add additional context.  For example, with <code>combine</code> my errors would list what tokens were expected</li>
+</ul>
+<p>So I took the error I made from <code>toml_edit</code> and pulled it in as <code>ContextError</code>:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">parse error at line 1, column 9
+</span><span style="color:#c0c5ce;">  |
+</span><span style="color:#c0c5ce;">1 | [package
+</span><span style="color:#c0c5ce;">  |         ^
+</span><span style="color:#c0c5ce;">invalid table
+</span><span style="color:#c0c5ce;">expected &#39;]&#39;
+</span></code></pre>
+<p>In providing this new, rich error that is nearly as fast as no-op errors,
+I went ahead and removed <code>VerboseError</code> which makes parsing json take twice as
+long by itself.  This is a case where GATs would likely remove that overhead.</p>
+<p><a href="https://github.com/winnow-rs/winnow/pull/282">#282</a> was released in 0.5.0.</p>
+<h3>Performance: Inlining</h3>
+<p>As I mentioned, being the absolute fastest parser-combinator library is not our goal.
+We fell into being one of the fastest by happenstance.
+When working on API cleanups after the fork from nom, I sprinkled some
+<code>#[inline]</code>s where they intuitively made sense and things got faster.
+I initially didn't advertise this performance gain because I hadn't fully
+characterized it and didn't know how much of a fluke it was, because my attention was elsewhere.</p>
+<p>Since then, we've found some other places where sprinkling around <code>#[inline]</code>
+made a big difference.
+Rather than trying to take the time to characterize each set of changes we
+made, I'll leave that for the performance numbers at <a href="#numbers">the end</a>.</p>
+<h3>Performance: Direct people to the happy path</h3>
+<p><a href="https://docs.rs/nom/latest/nom/character/complete/fn.one_of.html"><code>nom::one_of</code></a>
+would match a token from a set:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hexadecimal</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">  </span><span style="color:#96b5b4;">preceded</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">alt</span><span style="color:#c0c5ce;">((</span><span style="color:#96b5b4;">tag</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">0x</span><span style="color:#c0c5ce;">&quot;), </span><span style="color:#96b5b4;">tag</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">0X</span><span style="color:#c0c5ce;">&quot;))),
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">      </span><span style="color:#96b5b4;">many1</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">terminated</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">one_of</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">0123456789abcdefABCDEF</span><span style="color:#c0c5ce;">&quot;), </span><span style="color:#96b5b4;">many0</span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">(&#39;</span><span style="color:#a3be8c;">_</span><span style="color:#c0c5ce;">&#39;)))
+</span><span style="color:#c0c5ce;">      )
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">  )(input)
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>We carried this behavior forward and generalized to also accepts ranges of
+tokens (<code>'a'..='z'</code>) and tuples of token sets (<code>('a'..='z', 'A'..='Z')</code>).</p>
+<p>However, when trying to find the root cause of a performance regression, we
+found that using <code>&amp;str</code> as a set of <code>char</code> tokens was 7x slower than other
+methods in micro-benchmarks, likely due to unpacking variable-length UTF-8
+bytes into a <code>char</code>
+(<a href="https://github.com/winnow-rs/winnow/issues/226">#226</a>).</p>
+<p>So we decided to remove the trait impl that allowed <code>&amp;str</code> to serve as a token set
+to avoid people accidentally taking this performance hit.</p>
+<p>So instead our parser would look like:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hexadecimal</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; IResult&lt;&amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">, &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">&gt; {
+</span><span style="color:#c0c5ce;">  </span><span style="color:#96b5b4;">preceded</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">alt</span><span style="color:#c0c5ce;">((&quot;</span><span style="color:#a3be8c;">0x</span><span style="color:#c0c5ce;">&quot;, &quot;</span><span style="color:#a3be8c;">0X</span><span style="color:#c0c5ce;">&quot;)),
+</span><span style="color:#c0c5ce;">    </span><span style="color:#96b5b4;">recognize</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">      </span><span style="color:#96b5b4;">repeat</span><span style="color:#c0c5ce;">(
+</span><span style="color:#c0c5ce;">        </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">..,
+</span><span style="color:#c0c5ce;">        </span><span style="color:#96b5b4;">terminated</span><span style="color:#c0c5ce;">(</span><span style="color:#96b5b4;">one_of</span><span style="color:#c0c5ce;">((&#39;</span><span style="color:#a3be8c;">0</span><span style="color:#c0c5ce;">&#39;..=&#39;</span><span style="color:#a3be8c;">9</span><span style="color:#c0c5ce;">&#39;, &#39;</span><span style="color:#a3be8c;">a</span><span style="color:#c0c5ce;">&#39;..=&#39;</span><span style="color:#a3be8c;">f</span><span style="color:#c0c5ce;">&#39;, &#39;</span><span style="color:#a3be8c;">A</span><span style="color:#c0c5ce;">&#39;..=&#39;</span><span style="color:#a3be8c;">F</span><span style="color:#c0c5ce;">&#39;)), </span><span style="color:#96b5b4;">repeat</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">.., &#39;</span><span style="color:#a3be8c;">_</span><span style="color:#c0c5ce;">&#39;))
+</span><span style="color:#c0c5ce;">      )
+</span><span style="color:#c0c5ce;">    )
+</span><span style="color:#c0c5ce;">  )(input)
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p><a href="https://github.com/winnow-rs/winnow/pull/252">#252</a> was released in 0.5.0.</p>
+<h3>Performance: Imperative, rather than pure-functional parsing</h3>
+<p>We started with the parsing model of nom:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">foo</span><span style="color:#c0c5ce;">&lt;I, O, E&gt;(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: I) -&gt; Result&lt;(I, O), ErrMode&lt;E&gt;&gt; {}
+</span></code></pre>
+<p>This works well!
+As you parse <code>input</code>, you return the mutated version of it.
+This makes it easy to reason about and test.</p>
+<p>But there is a problem and, from this section, you can guess its performance.
+The good news is that this isn't a general performance issue.
+In fixing this, most benchmarks didn't see a change.
+I suspect this is specifically when dealing with large <code>I</code> and <code>O</code> making <code>(I, O)</code> in the return type to be very large and causing a performance loss.
+In <code>toml_edit</code>, we hit this because we use <code>I=Located&lt;&amp;str&gt;</code> which is <code>(&amp;str, &amp;str)</code> or 4 pointers combined with large <code>O</code>s from tracking values and their
+formatting.</p>
+<p>We can instead switch the parser signature to:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">foo</span><span style="color:#c0c5ce;">&lt;I, O, E&gt;(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">mut</span><span style="color:#c0c5ce;"> I) -&gt; Result&lt;O, ErrMode&lt;E&gt;&gt; {}
+</span></code></pre>
+<p>and now the return type's size is independent of the size of <code>I</code>.</p>
+<p>The primary technical challenge is dealing with the error case.
+Translating <code>nom</code>s model to this, on any error, <code>input</code> should revert back to
+its original position.
+Instead, I found we could have error cases leave <code>input</code> as-is.
+This doesn't just simplify and reduce overhead from making <code>input</code>
+transactional but allows <code>E</code> to not track the original location where the error
+occurred but to instead use the final location <code>input</code> was left at.</p>
+<p>But do we lose the spirit of what we are trying to accomplish?</p>
+<p>I'm still unsure.
+I was pleasantly surprised to find that a lot of code was simplified because of this model.</p>
+<p>However, there are cases where explicit lifetimes are required:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">foo</span><span style="color:#c0c5ce;">&lt;</span><span style="color:#b48ead;">&#39;i</span><span style="color:#c0c5ce;">&gt;(</span><span style="color:#bf616a;">input</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">mut </span><span style="color:#c0c5ce;">&amp;</span><span style="color:#b48ead;">&#39;i str</span><span style="color:#c0c5ce;">) -&gt; Result&lt;&amp;</span><span style="color:#b48ead;">&#39;i str</span><span style="color:#c0c5ce;">, ErrMode&lt;E&gt;&gt; {}
+</span></code></pre>
+<p>I'm concerned this style of parser is not as Rust beginner friendly.
+That needs to be counter-balanced with my suspicion that this new API will allow users to avoid <code>RefCell</code>.
+Maybe its also ok because zero-copy parsing might already be more advanced?
+At this point, I feel like the only way to know for sure is to give it a spin.</p>
+<p><a id="numbers"></a></p>
+<h2>Performance by the numbers</h2>
+<p>Using <code>chumsky</code>'s <code>json</code> benchmark:</p>
+<table><thead><tr><th>library</th><th>version</th><th>time</th><th>note</th></tr></thead><tbody>
+<tr><td>pom</td><td>3.3.0</td><td>7.3021 ms</td><td></td></tr>
+<tr><td>pest</td><td>2.7.0</td><td>1.2894 ms</td><td></td></tr>
+<tr><td>nom</td><td>7.1.3</td><td>341.28 µs</td><td></td></tr>
+<tr><td>serde_json</td><td>1.0.102</td><td>317.31 µs</td><td></td></tr>
+<tr><td>chumsky (zero copy)</td><td>7a2e2e6</td><td>191.06 µs</td><td></td></tr>
+<tr><td>sn</td><td>0.1.2</td><td>154.84 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.3.6</td><td>125.54 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.0</td><td>138.71 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.1</td><td>251.97 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.2</td><td>242.56 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.3</td><td>240.69 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.4</td><td>230.01 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.5</td><td>257.89 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.6</td><td>262.45 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.7</td><td>231.48 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.8</td><td>234.59 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.9</td><td>244.81 µs</td><td></td></tr>
+<tr><td>winnow</td><td>0.4.9</td><td>245.02 µs</td><td>migrated bench to non-deprecated APIs</td></tr>
+<tr><td>winnow</td><td>0.4.9</td><td>245.82 µs</td><td>made bench more declarative</td></tr>
+<tr><td>winnow</td><td>0.4.9</td><td>96.408 µs</td><td>migrated bench away from slow API</td></tr>
+<tr><td>winnow</td><td>0.5.0</td><td>97.328 µs</td><td></td></tr>
+</tbody></table>
+<p>Using <code>toml_edit</code>'s <code>cargo_manifest/toml_edit/medium</code>:</p>
+<table><thead><tr><th>version</th><th>parser</th><th>version</th><th>time</th><th>note</th></tr></thead><tbody>
+<tr><td>0.15.0</td><td>combine</td><td>4.6.6</td><td>91.160 µs</td><td></td></tr>
+<tr><td><strong>0.16.0</strong></td><td><strong>nom8</strong></td><td><strong>0.1.0</strong></td><td>79.140 µs</td><td></td></tr>
+<tr><td><strong>0.16.1</strong></td><td>nom8</td><td>0.1.0</td><td>79.813 µs</td><td></td></tr>
+<tr><td><strong>0.16.2</strong></td><td>nom8</td><td><strong>0.2.0</strong></td><td>79.971 µs</td><td></td></tr>
+<tr><td><strong>0.19.3</strong></td><td>nom8</td><td>0.2.0</td><td>96.821 µs</td><td></td></tr>
+<tr><td><strong>0.19.4</strong></td><td>winnow</td><td><strong>0.3.0</strong></td><td>78.559 µs</td><td></td></tr>
+<tr><td><strong>0.19.7</strong></td><td>winnow</td><td>0.3.0</td><td>78.502 µs</td><td></td></tr>
+<tr><td>0.19.7</td><td>winnow</td><td><strong>0.3.6</strong></td><td>79.326 µs</td><td></td></tr>
+<tr><td><strong>0.19.8</strong></td><td>winnow</td><td><strong>0.4.0</strong></td><td>77.498 µs</td><td></td></tr>
+<tr><td>0.19.8</td><td>winnow</td><td><strong>0.4.1</strong></td><td>76.795 µs</td><td></td></tr>
+<tr><td>0.19.8</td><td>winnow</td><td><strong>0.4.2</strong></td><td>78.532 µs</td><td></td></tr>
+<tr><td>0.19.8</td><td>winnow</td><td><strong>0.4.3</strong></td><td>78.682 µs</td><td></td></tr>
+<tr><td>0.19.8</td><td>winnow</td><td><strong>0.4.4</strong></td><td>78.562 µs</td><td></td></tr>
+<tr><td>0.19.8</td><td>winnow</td><td><strong>0.4.5</strong></td><td>78.572 µs</td><td></td></tr>
+<tr><td>0.19.8</td><td>winnow</td><td><strong>0.4.6</strong></td><td>83.424 µs</td><td></td></tr>
+<tr><td><strong>0.19.9</strong></td><td>winnow</td><td>0.4.6</td><td>83.856 µs</td><td></td></tr>
+<tr><td>0.19.9</td><td>winnow</td><td><strong>0.4.7</strong></td><td>73.803 µs</td><td></td></tr>
+<tr><td>0.19.9</td><td>winnow</td><td><strong>0.4.8</strong></td><td>73.605 µs</td><td></td></tr>
+<tr><td>0.19.9</td><td>winnow</td><td><strong>0.4.9</strong></td><td>74.002 µs</td><td></td></tr>
+<tr><td><strong>0.19.12</strong></td><td>winnow</td><td>0.4.9</td><td>74.029 µs</td><td></td></tr>
+<tr><td><strong>68be6ab</strong></td><td>winnow</td><td>0.4.9</td><td>74.085 µs</td><td>prep for winnow 0.5.0</td></tr>
+<tr><td>68be6ab+</td><td>winnow</td><td><strong>0.5.0</strong></td><td>63.075 µs</td><td></td></tr>
+</tbody></table>
+<ul>
+<li><a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md">winnow changelog</a></li>
+<li><a href="https://github.com/toml-rs/toml/blob/main/crates/toml_edit/CHANGELOG.md">toml_edit changelog</a></li>
+</ul>
+<p>Methodology:
+I ran <code>cargo bench</code> on the individual bench until I observed a second cluster
+of results and picked the lowest. 
+I've observed that on my machine, jitter is fairly tight around two clusters
+and without waiting for that second cluster, the results can be misleading if the slower cluster manifested.
+I would recommend not getting caught up in differences up to 10%, based on the variance I saw.
+I should look into icount benchmarks...</p>
+<p>Observations:</p>
+<ul>
+<li>The hassle of running benchmarks can lead to blindspots.
+I tended to focus on the performance impact to a Winnow benchmark and a <code>toml_edit</code> benchmark.
+Winnow uses lower level parsers to better line the code up with the TOML BNF grammar and I was able to catch most performance regressions there.
+Even if I ran all of the benchmarks, I was unlikely to catch some of these problems.
+Switching to icount benchmarks with a benchmark CI service would be a big help.</li>
+<li>Seemingly minor refactors can have big affects.
+Some came from what was inlined or not (and adding more inlines helped) but I never figured it all out.</li>
+<li>The performance of some parsers seems dependent on the context its called in.
+In micro-benchmarks, I would not see a problem reproducible within a
+file-format parser using winnow.  Again, I suspect inlining differences to be
+at play.</li>
+</ul>
+<p>So if Winnow is the fastest, why is the title of this post a question?</p>
+<ol>
+<li>chumsky's benchmark is missing <a href="https://github.com/jsdw/yap">yap</a> which seems promising on performance.
+For more parsers, see <a href="https://github.com/rosetta-rs/parse-rosetta-rs">parse-rosetta-rs</a></li>
+<li>Performance will depend on your use case and needed feature set.
+I could make Winnow faster by changing the error type in the bench.
+The bench could also be slower if the parser was instrumented with span tracking or error recovery.</li>
+</ol>
+<p><em>Note: every change that has led to a performance improvement has been reported back to nom</em></p>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>

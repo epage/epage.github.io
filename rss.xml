@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Iterating on Testing in Rust</title><link>https://epage.github.io/blog/2023/06/iterating-on-test/</link><description><![CDATA[<p>With the release of rust 1.70, there was
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Winnow 0.5: The Fastest Rust Parser-Combinator Library?</title><link>https://epage.github.io/blog/2023/07/winnow-0-5-the-fastest-rust-parser-combinator-library/</link><description><![CDATA[<p><a href="https://crates.io/crates/winnow">Winnow</a> is a parser-combinator library for Rust and
+<a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#050---2023-07-13">0.5</a>
+is now out.
+I <a href="/blog/2023/02/winnow-toml-edit-combine-nom/#winnow">last wrote</a> about the 0.3.0 release, so I'll be covering all of the releases between.</p>
+]]></description><guid>https://epage.github.io/blog/2023/07/winnow-0-5-the-fastest-rust-parser-combinator-library/</guid><pubDate>Thu, 13 Jul 2023 20:18:49 +0000</pubDate></item><item><title>Iterating on Testing in Rust</title><link>https://epage.github.io/blog/2023/06/iterating-on-test/</link><description><![CDATA[<p>With the release of rust 1.70, there was
 <a href="https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/">some surprise and frustation</a>
 that
 <a href="https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html#enforced-stability-in-the-test-cli">unstable <code>test</code> features now require nightly</a>,
