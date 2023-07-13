@@ -432,4 +432,5 @@ So if Winnow is the fastest, why is the title of this post a question?
 *Note: every change that has led to a performance improvement has been reported back to nom*
 
 Discuss on
+[reddit](https://www.reddit.com/r/rust/comments/14yvfsy/winnow_05_parser_combinator_library_is_out_even/?)
 [mastadon](https://hachyderm.io/@epage/110708637819903154)
