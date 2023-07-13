@@ -430,3 +430,6 @@ So if Winnow is the fastest, why is the title of this post a question?
    The bench could also be slower if the parser was instrumented with span tracking or error recovery.
 
 *Note: every change that has led to a performance improvement has been reported back to nom*
+
+Discuss on
+[mastadon](https://hachyderm.io/@epage/110708637819903154)
