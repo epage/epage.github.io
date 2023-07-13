@@ -11,7 +11,8 @@ data:
 [Winnow](https://crates.io/crates/winnow) is a parser-combinator library for Rust and
 [0.5](https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#050---2023-07-13)
 is now out.
-I [last wrote](/blog/2023/02/winnow-toml-edit-combine-nom/#winnow) about the 0.3.0 release, so I'll be covering all of the releases between.
+I [last wrote](/blog/2023/02/winnow-toml-edit-combine-nom/#winnow) about the
+0.3.0 release, so I'll be covering all of the releases since then.
 
 <!-- more -->
 
