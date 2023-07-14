@@ -283,13 +283,11 @@ So instead our parser would look like:
 fn hexadecimal(input: &str) -> IResult<&str, &str> {
   preceded(
     alt(("0x", "0X")),
-    recognize(
-      repeat(
-        0..,
-        terminated(one_of(('0'..='9', 'a'..='f', 'A'..='F')), repeat(0.., '_'))
-      )
-    )
-  )(input)
+    repeat(
+      0..,
+      terminated(one_of(('0'..='9', 'a'..='f', 'A'..='F')), repeat(0.., '_'))
+    ).recognize()
+  ).parse_next(input)
 }
 ```
 
