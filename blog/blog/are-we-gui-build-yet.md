@@ -101,7 +101,8 @@ to the all-in-one solutions like [Buck2](https://buck2.build/) and
 (see also ["Scaling Rust builds with Bazel"](https://mmapped.blog/posts/17-scaling-rust-builds-with-bazel.html)).
 Buck2 has a lot of really great things going for it but I can't endorse it
 whole heartedly.
-Last I looked at the project, `cargo` support was only for publishing packages,
+[Last I looked at the project](https://www.reddit.com/r/rust/comments/136qs44/hello_rrust_we_are_meta_engineers_who_created_the/),
+`cargo` support was only for publishing packages,
 creating a bifurcated ecosystem where you have to choose between Buck2 or
 cargo.
 It also loses out on a lot of the usability of cargo,
