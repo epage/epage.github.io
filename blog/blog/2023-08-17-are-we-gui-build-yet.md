@@ -1,13 +1,13 @@
 ---
 title: Are we GUI (build) yet?
+published_date: 2023-08-17 17:32:22.05568602 +0000
 layout: default.liquid
-is_draft: true
+is_draft: false
 data:
   tags:
   - programming
   - rust
 ---
-
 ["Are we GUI yet?"](https://areweguiyet.com/) is a topic that frequently comes
 up within the Rust community.
 There are a lot of hard problems to solve, from the complexity of state management
