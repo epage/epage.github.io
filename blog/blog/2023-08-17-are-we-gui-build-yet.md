@@ -166,3 +166,8 @@ fragmentation which requires more work for a smaller set of solutions to "win
 out'.
 
 So where should we be drawing the line?
+
+Discuss on
+[lemmy](https://lemmy.ml/post/3473433)
+[mastadon](https://hachyderm.io/@epage/110906190449739447)
+[reddit](https://www.reddit.com/r/rust/comments/15tudvx/are_we_gui_build_yet/?)
