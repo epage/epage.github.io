@@ -8,11 +8,12 @@ data:
   - rust
 ---
 
-["Are we GUI yet?"](https://areweguiyet.com/) is a topic that frequently comes up within the Rust community.
+["Are we GUI yet?"](https://areweguiyet.com/) is a topic that frequently comes
+up within the Rust community.
 There are a lot of hard problems to solve, from the complexity of state management
 to something as easy to overlook as
 [smooth resize](https://raphlinus.github.io/rust/gui/2019/06/21/smooth-resize-test.html).
-One problem I don't see discussed often is a development and release pipeline
+One problem I don't see discussed as often is a development and release pipeline
 that can handle the unique circumstances of each target platform.
 I met up with a bunch of application framework developers the day after
 [RustNL](https://2023.rustnl.org/) to explore this problem and what can be done
@@ -26,7 +27,7 @@ Cargo's workflow is designed around building a binary for a target platform.
 This doesn't work for macOS as users would need x64 and aarch64 binaries built
 and bundled as a universal binary.
 For some applications, there is also the need for plugins into the main runtime
-to test and run together.
+to run and test together.
 
 These binaries also need post-processing, like signing.
 
@@ -38,13 +39,14 @@ processing, including de-duplication and conversion to the format needed for
 the platform target.
 
 Related to the actual build is `cargo run` and `cargo test` which are dependent
-on this plus can have special requirements to run the build artifacts.
+on this but add extra requirements for running the build artifacts, like
+deploying to an emulator or an embedded device.
 We do have [a config for customizing the runner](https://doc.rust-lang.org/cargo/reference/config.html#targettriplerunner)
 but that is only for `cargo`s build artifact, absent of any of these post-build steps.
 It is also [an environment setting rather than a project setting](https://internals.rust-lang.org/t/proposal-move-some-cargo-config-settings-to-cargo-toml/13336).
 
-The needs of a platform also evolve and can be encumbered with legal
-requirements, making it difficult for cargo to support natively.
+Each platform's needs also evolve in breaking ways and can be encumbered with
+legal requirements, making it difficult for cargo to support natively
 
 And these build orchestration challenges are not unique to application development.
 The [post-build script feature request](https://github.com/rust-lang/cargo/issues/545)
@@ -80,7 +82,8 @@ However, there is a gap between the simplicity of automating with a simple
 and a fully blown cargo-xtask with all of its complexity.
 I appreciate what deno did with
 [deno task](https://deno.land/manual@v1.35.0/tools/task_runner)
-where they created a cross-platform shell language.
+where they created a cross-platform shell language to for greater flexibility
+without sacrificing cross-platform support.
 Personally, I wish there was a modern TCL but I could see something like
 [nushell](https://www.nushell.sh/) or
 [duckscript](https://sagiegurari.github.io/duckscript/)
@@ -104,6 +107,9 @@ eschewing convention for explicit configuration both in defining your build
 plan and in how you specify what to build.
 Worst of all, it suffers from closed governance with public code dumps (via git
 mirroring) where you have to hope our interests align with theirs.
+[pixi](https://prefix.dev/docs/pixi/overview) is intriguing as it looks like it
+tries to sit between the lower-level `make` approach and the all encompassing
+`buck2` approach.
 
 Dare we consider
 [creating a new build orchestration tool](https://xkcd.com/927/)?
@@ -114,16 +120,19 @@ better spent trying out new ideas.
 
 ### Next steps
 
+... yes, thats it.
+
 When we discussed this, I felt like we left with more questions than answers.
-I'm hoping by sharing some of these thoughts,
+I'm hoping by sharing some of these thoughts
 new overlooked options can be pointed out,
 maybe some unexpected collaborations will open up,
 or maybe we get the confirmation that something new really is needed.
 
 To summarize, I feel like the biggest concerns were:
+- Users need flexibility at every step of the way
 - It should be as easy to use as cargo, with a strong focus on convention
-  - Low overhead for common tasks
-  - Encourage a common vocabulary of tasks between projects
+  - Encourage a common vocabulary (e.g. `build`, `test`, `run`) of tasks between projects
+  - Low ceremony for common tasks
   - i.e. this should feel cohesive rather than cobbled together
 - You should be able to compose tasks out of build rules, both that you wrote
   and that others have published
@@ -131,12 +140,29 @@ To summarize, I feel like the biggest concerns were:
   including cargo, allowing users to build on their existing knowledge and
   resources, rather than re-inventing it.
 
-While some things I'm not quite sure of include:
-- Whether this should use some scripting language for tasks and build rules
-  (e.g. nushell or duckscript), Rust, or be like cargo-make and say "yes"
-- Whether development should be decoupled from the Rust ecosystem.
-  I'm concerned about even the impression of users being "locked in" to a
-  Rust-specific solution.
-  There is little that is Rust-specific to these problems,
-  users will likely need to cross language-ecosystems especially for partial ports,
-  and isolating ourselves in a corner does little good.
+### Aside: rust or general solutions?
+
+Something I've been grappling with and would also appreciate input on is when
+we should focus on language-specific solutions or cross-language solutions.
+
+For a lot of these bigger application problems,
+a lot is in common across languages for solving them.
+Likely, people will also be needing to use more than just Rust.
+I'm also not a fan of "lock in", that migrating to or from Rust also requires
+an overhaul of everything else, both in processes and in knowledge.
+I'd rather we not isolate ourselves in a corner with our own set of tools.
+
+I think this applies more broadly than just build orchestration but also other areas like
+- Templates for project scaffolding ([rust-lang/cargo#5151](https://github.com/rust-lang/cargo/issues/5151))
+- Embedded scripting langues (i.e. lua vs Rust-specific solutions like [rhai](https://crates.io/crates/rhai))
+
+That isn't to say that everything should be language agnostic.
+Cargo is great!
+Having a language-specific solution for building packages reduces a lot of overhead.
+
+And a challenge with going for a wider audience is its harder to settle on some de
+factor standard(s) because there are more inputs to decisions leading to more
+fragmentation which requires more work for a smaller set of solutions to "win
+out'.
+
+So where should we be drawing the line?
