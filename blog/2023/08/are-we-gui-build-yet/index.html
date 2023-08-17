@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Are we GUI (build) yet?</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>Are we GUI (build) yet?</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p><a href="https://areweguiyet.com/">&quot;Are we GUI yet?&quot;</a> is a topic that frequently comes
+up within the Rust community.
+There are a lot of hard problems to solve, from the complexity of state management
+to something as easy to overlook as
+<a href="https://raphlinus.github.io/rust/gui/2019/06/21/smooth-resize-test.html">smooth resize</a>.
+One problem I don't see discussed as often is a development and release pipeline
+that can handle the unique circumstances of each target platform.
+I met up with a bunch of application framework developers the day after
+<a href="https://2023.rustnl.org/">RustNL</a> to explore this problem and what can be done
+for it.</p>
+<!-- more -->
+<h3>Challenges</h3>
+<p>Cargo's workflow is designed around building a binary for a target platform.
+This doesn't work for macOS as users would need x64 and aarch64 binaries built
+and bundled as a universal binary.
+For some applications, there is also the need for plugins into the main runtime
+to run and test together.</p>
+<p>These binaries also need post-processing, like signing.</p>
+<p>After all of this, they then need to be packaged for distribution, including any assets.
+For those I talked to, assets are typically processed in another part of the
+development pipeline.
+They tended to pull these in through <code>git-lfs</code> and only have to do minimal
+processing, including de-duplication and conversion to the format needed for
+the platform target.</p>
+<p>Related to the actual build is <code>cargo run</code> and <code>cargo test</code> which are dependent
+on this but add extra requirements for running the build artifacts, like
+deploying to an emulator or an embedded device.
+We do have <a href="https://doc.rust-lang.org/cargo/reference/config.html#targettriplerunner">a config for customizing the runner</a>
+but that is only for <code>cargo</code>s build artifact, absent of any of these post-build steps.
+It is also <a href="https://internals.rust-lang.org/t/proposal-move-some-cargo-config-settings-to-cargo-toml/13336">an environment setting rather than a project setting</a>.</p>
+<p>Each platform's needs also evolve in breaking ways and can be encumbered with
+legal requirements, making it difficult for cargo to support natively</p>
+<p>And these build orchestration challenges are not unique to application development.
+The <a href="https://github.com/rust-lang/cargo/issues/545">post-build script feature request</a>
+contains many other examples.</p>
+<h3>Potential solutions</h3>
+<p>Support for a <a href="https://github.com/rust-lang/cargo/issues/545">post-build equivalent of <code>build.rs</code></a>
+might fill some of these needs but I don't think it fills enough and will
+instead lead to future frustrations when people run up to its limits.
+At minimum, this wouldn't help when needing to integrate multiple build artifacts.
+If this were to run during <code>cargo install</code>, then it would need a way to access
+assets, some degree of control over their layout, and the binary would need to
+know where all of that went.</p>
+<p>While it might be a bit of an abuse of the features,
+we could do all of this in a
+<code>build.rs</code> once we have <a href="https://github.com/rust-lang/cargo/issues/9096">artifact dependencies</a>.
+The <code>build.rs</code> would pull in the relevant build artifacts, post-process them,
+and output the final artifact format needed for distribution.</p>
+<p>Something you can do today is to create third-party subcommands that can extend
+cargo with the needed functionality,
+like <a href="https://crates.io/crates/cargo-apk">cargo-apk</a>.
+However, a project cannot automatically set these tools up for developers.
+People have requested ways to do this and while
+<a href="https://github.com/matklad/cargo-xtask">cargo-xtask</a> is a way to emulate it,
+it only supports running your own programs and not declaring dependencies on
+external ones.
+Maybe <a href="https://github.com/rust-lang/cargo/issues/9096">artifact dependencies</a> could help.
+However, there is a gap between the simplicity of automating with a simple
+<a href="https://doc.rust-lang.org/cargo/reference/config.html#alias"><code>[alias]</code></a>
+and a fully blown cargo-xtask with all of its complexity.
+I appreciate what deno did with
+<a href="https://deno.land/manual@v1.35.0/tools/task_runner">deno task</a>
+where they created a cross-platform shell language to for greater flexibility
+without sacrificing cross-platform support.
+Personally, I wish there was a modern TCL but I could see something like
+<a href="https://www.nushell.sh/">nushell</a> or
+<a href="https://sagiegurari.github.io/duckscript/">duckscript</a>
+filling a role like this.</p>
+<p>There are also more general build orchestration tools, ranging from the venerable <code>make</code>,
+and related tools like 
+<a href="https://crates.io/crates/cargo-make">cargo make</a> and 
+<a href="https://crates.io/crates/just">just</a>,
+to the all-in-one solutions like <a href="https://buck2.build/">Buck2</a> and
+<a href="https://bazel.build/">Bazel</a>
+(see also <a href="https://mmapped.blog/posts/17-scaling-rust-builds-with-bazel.html">&quot;Scaling Rust builds with Bazel&quot;</a>).
+Buck2 has a lot of really great things going for it but I can't endorse it
+whole heartedly.
+<a href="https://www.reddit.com/r/rust/comments/136qs44/hello_rrust_we_are_meta_engineers_who_created_the/">Last I looked at the project</a>,
+<code>cargo</code> support was only for publishing packages,
+creating a bifurcated ecosystem where you have to choose between Buck2 or
+cargo.
+It also loses out on a lot of the usability of cargo,
+eschewing convention for explicit configuration both in defining your build
+plan and in how you specify what to build.
+Worst of all, it suffers from closed governance with public code dumps (via git
+mirroring) where you have to hope our interests align with theirs.
+<a href="https://prefix.dev/docs/pixi/overview">pixi</a> is intriguing as it looks like it
+tries to sit between the lower-level <code>make</code> approach and the all encompassing
+<code>buck2</code> approach.</p>
+<p>Dare we consider
+<a href="https://xkcd.com/927/">creating a new build orchestration tool</a>?
+Many already exist and provide a lot of compelling features.
+I'm just not sure they provide the right blend of features.
+The question is how much we can work with them to get there or if the effort is
+better spent trying out new ideas.</p>
+<h3>Next steps</h3>
+<p>... yes, thats it.</p>
+<p>When we discussed this, I felt like we left with more questions than answers.
+I'm hoping by sharing some of these thoughts
+new overlooked options can be pointed out,
+maybe some unexpected collaborations will open up,
+or maybe we get the confirmation that something new really is needed.</p>
+<p>To summarize, I feel like the biggest concerns were:</p>
+<ul>
+<li>Users need flexibility at every step of the way</li>
+<li>It should be as easy to use as cargo, with a strong focus on convention
+<ul>
+<li>Encourage a common vocabulary (e.g. <code>build</code>, <code>test</code>, <code>run</code>) of tasks between projects</li>
+<li>Low ceremony for common tasks</li>
+<li>i.e. this should feel cohesive rather than cobbled together</li>
+</ul>
+</li>
+<li>You should be able to compose tasks out of build rules, both that you wrote
+and that others have published</li>
+<li>The default path should be for working with the native Rust ecosystem,
+including cargo, allowing users to build on their existing knowledge and
+resources, rather than re-inventing it.</li>
+</ul>
+<h3>Aside: rust or general solutions?</h3>
+<p>Something I've been grappling with and would also appreciate input on is when
+we should focus on language-specific solutions or cross-language solutions.</p>
+<p>For a lot of these bigger application problems,
+a lot is in common across languages for solving them.
+Likely, people will also be needing to use more than just Rust.
+I'm also not a fan of &quot;lock in&quot;, that migrating to or from Rust also requires
+an overhaul of everything else, both in processes and in knowledge.
+I'd rather we not isolate ourselves in a corner with our own set of tools.</p>
+<p>I think this applies more broadly than just build orchestration but also other areas like</p>
+<ul>
+<li>Templates for project scaffolding (<a href="https://github.com/rust-lang/cargo/issues/5151">rust-lang/cargo#5151</a>)</li>
+<li>Embedded scripting langues (i.e. lua vs Rust-specific solutions like <a href="https://crates.io/crates/rhai">rhai</a>)</li>
+</ul>
+<p>That isn't to say that everything should be language agnostic.
+Cargo is great!
+Having a language-specific solution for building packages reduces a lot of overhead.</p>
+<p>And a challenge with going for a wider audience is its harder to settle on some de
+factor standard(s) because there are more inputs to decisions leading to more
+fragmentation which requires more work for a smaller set of solutions to &quot;win
+out'.</p>
+<p>So where should we be drawing the line?</p>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>

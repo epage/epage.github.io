@@ -1,4 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Winnow 0.5: The Fastest Rust Parser-Combinator Library?</title><link>https://epage.github.io/blog/2023/07/winnow-0-5-the-fastest-rust-parser-combinator-library/</link><description><![CDATA[<p><a href="https://crates.io/crates/winnow">Winnow</a> is a parser-combinator library for Rust and
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>Are we GUI (build) yet?</title><link>https://epage.github.io/blog/2023/08/are-we-gui-build-yet/</link><description><![CDATA[<p><a href="https://areweguiyet.com/">&quot;Are we GUI yet?&quot;</a> is a topic that frequently comes
+up within the Rust community.
+There are a lot of hard problems to solve, from the complexity of state management
+to something as easy to overlook as
+<a href="https://raphlinus.github.io/rust/gui/2019/06/21/smooth-resize-test.html">smooth resize</a>.
+One problem I don't see discussed as often is a development and release pipeline
+that can handle the unique circumstances of each target platform.
+I met up with a bunch of application framework developers the day after
+<a href="https://2023.rustnl.org/">RustNL</a> to explore this problem and what can be done
+for it.</p>
+]]></description><guid>https://epage.github.io/blog/2023/08/are-we-gui-build-yet/</guid><pubDate>Thu, 17 Aug 2023 17:32:22 +0000</pubDate></item><item><title>Winnow 0.5: The Fastest Rust Parser-Combinator Library?</title><link>https://epage.github.io/blog/2023/07/winnow-0-5-the-fastest-rust-parser-combinator-library/</link><description><![CDATA[<p><a href="https://crates.io/crates/winnow">Winnow</a> is a parser-combinator library for Rust and
 <a href="https://github.com/winnow-rs/winnow/blob/main/CHANGELOG.md#050---2023-07-13">0.5</a>
 is now out.
 I <a href="/blog/2023/02/winnow-toml-edit-combine-nom/#winnow">last wrote</a> about the
