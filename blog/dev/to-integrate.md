@@ -58,3 +58,5 @@ Supposedly from SiCP Ch 3
 Other notes
 - https://un.curl.dev/
 - https://rhodesmill.org/brandon/2012/one-sentence-per-line/
+
+https://siderea.dreamwidth.org/1209794.html
