@@ -94,7 +94,7 @@ there is the temptation to let a feature influence the schedule to avoid the iss
 For example, in Rust, there were people saying that the 2024 Edition (a
 meta-release) should slip to allow some specific features to "make it".
 
-I wasn't around to see how their efforts to improve their release process
+I wasn't around to see how this company's efforts to improve their release process
 worked out but I have been contributing to Rust which follows a 6 week release
 cycle which has been great!
 I rarely think about thw merge window for a given release.
