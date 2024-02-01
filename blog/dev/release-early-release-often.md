@@ -56,7 +56,9 @@ As an aside, we are now veering into feature-driven releases, unless its cost ef
 
 The later a bug is discovered, the more expensive it is to fix.
 A stabilization effort at the end of the release is more expensive than discovering and fixing it immediately.
-This means the growth of overhead from a release stabilization effort is more than the cumulation of finding and fixing the bugs.
+This means the growth of overhead from a release stabilization effort is more
+than the cumulation of finding and fixing the bugs during the initial
+development.
 
 However, your own testing will never be as exhaustive as users as they can be
 [quite creative in how they use your software](https://xkcd.com/1172/).
