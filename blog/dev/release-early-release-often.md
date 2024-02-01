@@ -72,7 +72,7 @@ out as they get frustrated in enforcing these standards of perfection.
 
 As this company used a hybrid of timed release with feature-driven releases,
 the schedule was flexible to accommodate the "committed features".
-The idea was to be a minimal-viable product
+The idea was to be a [minimal-viable product](../mvp)
 but you didn't find out what was truly minimal until a week before the release.
 Rather than directly addressing the problem with self-honesty and telling others "no",
 they invested a new term, "key".
