@@ -34,7 +34,7 @@ When you focus on smaller, more incremental improvement (like 2x),
 you focus on the smaller, more immediately beneficial improvements.
 The [cost/benefit trade off](https://xkcd.com/1205/) is a part of this.
 When you focus on dramatic improvement (like 10x),
-you need to re-think things more fundamentally to find a solution.
+you need to re-think fundamentals to find a solution.
 My first exposure to this idea was at this company.
 They decided to adjust to a strict 3-month potential-release cycle.
 They wouldn't necessarily release to customers every 3 months but they would simulate
