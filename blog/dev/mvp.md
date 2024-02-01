@@ -1,5 +1,5 @@
 ---
-title: "Warstory: MVP (Minimum Viable Product)"
+title: "War Story: MVP (Minimum Viable Product)"
 data:
     tags: ["warstory"]
 ---

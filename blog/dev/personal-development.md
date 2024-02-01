@@ -1,5 +1,5 @@
 ---
-title: "Warstory: Personal Development"
+title: "War Story: Personal Development"
 data:
     tags: ["warstory"]
 ---

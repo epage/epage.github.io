@@ -1,5 +1,5 @@
 ---
-title: "Warstory: The HID PID Bug"
+title: "War Story: The HID PID Bug"
 data:
     tags: ["warstory"]
 ---

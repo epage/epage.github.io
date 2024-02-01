@@ -1,5 +1,5 @@
 ---
-title: "Warstory: Recharging Engineers"
+title: "War Story: Recharging Engineers"
 data:
     tags: ["warstory"]
 ---
