@@ -70,7 +70,7 @@ This "perfectionism" makes on-boarding new contributors more difficult and
 frustrating and leads to existing contributors being more prickly and burning
 out as they get frustrated in enforcing these standards of perfection.
 
-With this being hybrid with feature-driven releases,
+As this company used a hybrid of timed release with feature-driven releases,
 the schedule was flexible to accommodate the "committed features".
 The idea was to be a minimal-viable product
 but you didn't find out what was truly minimal until a week before the release.
