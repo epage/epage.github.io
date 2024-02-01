@@ -13,6 +13,7 @@ We'd release twice a year in a tic-toc fashion
 (longer cycle for big changes, shorter cycle for fewer changes).
 
 This led to death marches and burn out.
+
 When Sales came to R&D with a users need, it was needed yesterday.
 Let's look at the latency of different release cycles by looking at two extremes:
 release after each PR (how I treat my open source projects) or release once every 3 years (the C++ language spec).
