@@ -18,7 +18,7 @@ Let's look at the latency of different release cycles by looking at two extremes
 release after each PR (how I treat my open source projects) or release once every 3 years (the C++ language spec).
 With instant release, if the latency is 0.
 With 3 year release cycles, the latency is 0-3 years, depending on when my feature was merged.
-When a feature is at risk of not making the window,
+When a feature is at risk of not making the merge window,
 the choice is waiting 3 more years for it or have a death march to make sure the feature makes the release.
 The shorter the release cycle, the less pressure there is to force work to make a release.
 This applies to open source too but instead the contributor is filling the role
