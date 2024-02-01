@@ -29,7 +29,7 @@ Paradoxically, when you release less frequently,
 the overhead of the release is likely to be the same or worse than multiple releases in the same time period.
 The first factor is the [cost/benefit trade off of automation](https://xkcd.com/1205/).
 The second factor is related to the concept that [10x Is Easier Than 2x](https://www.penguinrandomhouse.com/books/710816/10x-is-easier-than-2x-by-dan-sullivan-founder-of-strategic-coach-with-dr-benjamin-hardy/).
-I won't be speaking to that book because I've no read it, but the title matches my experience.
+I won't be speaking to that book because I've not read it, but the title matches my experience.
 When you focus on smaller, more incremental improvement (like 2x),
 you focus on the smaller, more immediately beneficial improvements.
 The [cost/benefit trade off](https://xkcd.com/1205/) is a part of this.
