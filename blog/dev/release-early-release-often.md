@@ -76,8 +76,8 @@ the schedule was flexible to accommodate the "committed features".
 The idea was to be a [minimal-viable product](../mvp)
 but you didn't find out what was truly minimal until a week before the release.
 Rather than directly addressing the problem with self-honesty and telling others "no",
-they invested a new term, "key".
-When that still didn't work, they invented the term "driven".
+they invented a new feature category, "key".
+When that still didn't work, they invented the category "driven".
 To be fair, the system was working against them due to latency from the long release cycles.
 
 A side effect of this lack of self-honesty and unwillingness to say "no"
