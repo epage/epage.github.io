@@ -44,7 +44,7 @@ the process to highlight these more fundamental problems that needed fixing to r
 I said the worst-case latency for a 3 year release cycle is 3 years but that is a lie and is more likely 3.5+ years.
 Why is that?
 When a release cycle is extremely short,
-a develper can't half-implement something and say "I'll fix that in a follow up".
+a developer can't half-implement something and say "I'll fix that in a follow up".
 When the release cycle is anything but extremely short, this becomes much easier.
 This usually starts with tests and documentation but quickly expands to
 functionality and stability of the new feature
