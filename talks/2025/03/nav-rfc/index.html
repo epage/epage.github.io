@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nav Rfc</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/talks/remark_theme_orange_standard.css"/>
+    <style>
+@page {
+  size: 1210px 681px;
+  margin: 0;
+}
+
+.left-column  { width: 49%; float: left; }
+.right-column { width: 49%; float: right; }
+
+@media print {
+  .remark-slide-scaler {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1) !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: title
+name: title
+# Navigating the RFC Process
+
+???
+
+Summary:
+
+> I continue to see people confused at the role of RFCs or dread the process.
+> I'll be stepping through how the place RFCs have in the Rust ecosystem and
+> how the process can work to help make it a better experience for people to
+> effect change within the Rust ecosystem.
+
+---
+class: title
+count: false
+# How to win checkboxes and influence FCPs
+
+---
+name: why-me
+## Lessons I've learned
+
+.image-middle[![I've authored 12 RFCs](https://epage.github.io/talks/nav-rfc-my-rfcs.png)]
+
+???
+
+I'm pulling this from lessons I've learned in authoring RFCs
+
+---
+count:false
+## Lessons I've learned
+
+.image-middle[![Cargo team reviews a lot of RFCs](https://epage.github.io/talks/nav-rfc-cargo-rfcs.png)]
+
+???
+
+And mentoring and reviewing other RFCs
+
+Some times RFCs can be rough.
+I wouldn't be surprised if people felt if RFCs were a punishment for having a good idea.
+In particular, the RFC for naming `usize` was handled poorly.
+Another major rough patch was the module system for the 2018 Edition.
+
+---
+name: use-case
+## Who is this for?
+<br/>
+### I have an idea!
+
+???
+
+One day, you may have an idea and some time to kill to drive it forward
+
+
+---
+count: false
+## Who is this for?
+<br/>
+### I have an idea!
+
+### Something I care about
+
+???
+
+More likely, you'll come across an RFC that you *have thoughts* on
+
+I'm going to first talk to potential RFC authors as I think that helps provide context for all of us.
+
+---
+name: author
+## I have an idea!
+<br/>
+What do I do with it?
+
+---
+count: false
+## I have an idea!
+<br/>
+What do I do with it?
+
+> I must write an RFC!
+
+.image-small[![RFC New PR button being clicked](https://epage.github.io/talks/nav-rfc-new-pr.png)]
+
+???
+
+Not necessarily
+
+---
+name: available-tools
+## I have an idea!
+<br/>
+What do I do with it?
+
+> MCP or RFC or WTF?
+
+???
+
+The Rust Project has been experimenting with decision making processes on the team level
+
+But this leaves the question of what these are, which to use, or even where to find these.
+
+Knowing about MCPs, participated in them, and even authored some, I had a hard time finding the documentation for them.
+
+---
+count: false
+## I have an idea!
+<br/>
+What do I do with it?
+
+.left-column[
+MCP
+- MCP: Major Change Proposal
+- ACP: API Change Proposal
+- Or just an Issue
+]
+
+???
+
+So what is an MCP?
+
+Well, its a term specific to the compiler team and a general idea with different takes by each team.
+
+For example, the API team calls it an "API Change Proposal" while cargo doesn't have anything so formal and we use issues.
+
+So what sets apart an MCP from an RFC?
+
+How do I know which one to use?
+
+---
+name: mcp-vs-rfc
+## I have an idea!
+<br/>
+What do I do with it?
+
+.left-column[
+MCP (Major Change Proposal)
+- One-way doors
+]
+
+.right-column[
+RFC
+
+- One-way doors
+]
+
+???
+
+‘2-Way Door’: reversible decisions, we make a call, and it’s relatively easy to change it if we discover it’s not working out as we’d hoped. 
+
+‘1-Way Door‘: irreversible decisions, once we’re in, we’re not coming back out. From Jeff B: “These decisions must be made methodically, carefully, slowly, with great deliberation and consultation. If you walk through and don't like what you see on the other side, you can't get back to where you were before.”
+
+But the line isn't always clear-cut.
+- Editions can't undo 1-way doors but can reduce the impact.
+- Shifting the community's momentum takes work and we don't want to be yanking them around.
+- A refactoring might seem like a 2-way door but the cost to pull it out 6 months down the line might be high.
+
+---
+count: false
+## I have an idea!
+<br/>
+What do I do with it?
+
+.left-column[
+MCP (Major Change Proposal)
+- One-way doors
+- Niche, Internal
+- Less formal proposal
+- Sign off: 2
+]
+
+.right-column[
+RFC
+
+- One-way doors
+- Community-wide
+- Thorough coverage
+- Sign off: >=(All - 2) 
+]
+
+???
+
+MCP examples:
+- major refactorings
+- changes to important types
+- important changes to how the compiler does something
+- smaller user-facing changes
+
+So how do I know which to use?
+
+Members of the relevant team can help but we are skipping a step.
+
+---
+name: socialize
+## I have an idea!
+<br/>
+What do I do with it?
+
+> Socialize it!
+
+.image-small[![Search issues](https://epage.github.io/talks/nav-rfc-search-issues.png)]
+
+???
+
+Find issues
+
+---
+count: false
+## I have an idea!
+<br/>
+What do I do with it?
+
+> Socialize it!
+
+.image-small[![Search Internals](https://epage.github.io/talks/nav-rfc-search-internals.png)]
+
+???
+
+Or or past discussions.
+
+If someone else is already running with it, great! Now you are my other target audience
+
+If it has been discussed but stalled out, the first thing to do is to understand all of the previous discussion and summarize it back.
+This will help you understand the nuance with the idea and help the team members catch up on this specific topic which makes it more likely they'll participate.
+Then find a way to navigate concerns raised and present this back.
+
+If nothing, then Internals tends to be a great place to get a vibe check on your idea and to better flesh it out.
+You may even formalize this into what we call a Pre-RFC
+
+---
+count: false
+## I have an idea!
+<br/>
+What do I do with it?
+
+> Socialize it!
+
+![Pre-RFC](https://epage.github.io/talks/nav-rfc-pre.png)
+
+---
+name: roles
+## I have an idea!
+<br/>
+What do I do with it?
+
+> Socialize it!
+
+.center[![Long discussions](https://epage.github.io/talks/nav-rfc-load-more.png)]
+
+???
+
+Whether on Internals or the RFC, you are likely to run into a lot of feedback
+
+---
+name: rapid
+## I have an idea!
+<br/>
+Know everyone's role!
+
+**Project Team:** decision makers
+
+**Community:** valuable input
+
+**Author:** you have a say!
+
+???
+
+You can easily be pulled in many different directions.
+
+Knowing that ultimately it is the team that must sign off without dissent helps focus how you deal with these.
+
+Even within a team you can have conflicting opinions but that is a smaller group to focus on.
+
+This doesn't mean you ignore the community!
+
+---
+name: pluralism
+## I have an idea!
+<br/>
+Balance feedback through our values!
+
+> **Pluralism** is about who we target: Rust seeks to simultaneously appeal to die-hard C++ programmers and to empower dyed-in-the-wool JS devs, and to reach several other varied audiences. ... And pluralism happens at the level of community and goals, not at the level of the actual design.
+
+> A **positive-sum** view starts by seeing different perspectives and priorities as legitimate and worthwhile, with a faith that by respecting each other in this way, we can find strictly better solutions than had we optimized solely for one perspective.
+
+.right[*Source: [Aaron Turon, listening and trust, part 2](https://aturon.github.io/tech/2018/06/02/listening-part-2/)*]
+
+???
+
+For the MSRV resolver RFC,
+while some people did not get their way,
+listening to everyone's input and digging into their underlying concerns was critical for coming to the final design of the RFC.
+
+> We don’t embrace “there’s more than one way to do it” as a goal for our designs, nor do we “take the average” between opposed priorities (and please no one). Ultimately, we have to make hard decisions.
+
+---
+name: find-team
+## I have an idea!
+<br/>
+Know everyone's role!
+
+.center[![team label on an RFC](https://epage.github.io/talks/nav-rfc-team-label.png)]
+
+???
+
+So who are the decision makers? Each RFC is tagged with the responsible team.
+
+---
+name: team-members
+## I have an idea!
+<br/>
+Know everyone's role!
+
+.center[![listing of team members](https://epage.github.io/talks/nav-rfc-team-members.png)]
+
+???
+
+You can then use the governance page to find out who they are.
+
+Yes, this should be made clear in the interface.
+
+---
+name: multiple-teams
+## I have an idea!
+<br/>
+Know everyone's role!
+
+.center[![team labels on an RFC](https://epage.github.io/talks/nav-rfc-team-labels.png)]
+
+???
+
+The more people involved in the decision, the harder it is, especially when it crosses teams as that means you have two autonomous groups meeting individually, throwing their thoughts over the wall at each other.
+
+Look for ways to scale down an RFC to an MVP that only involves one team.
+For example, the `supported-targets` RFC might have involved crates.io but that part got deferred.
+
+Or see how you can split an RFC per team.  For example, cargo-script has a T-lang syntax RFC and a T-cargo use of that syntax RFC
+
+---
+name: split-rfc
+## I have an idea!
+<br/>
+> The ideal size of an RFC is one unit of controversy
+
+.right[*Source: paraphrasing Josh Triplett paraphrasing me*]
+
+???
+
+I said this about PRs and then Josh applied to RFCs.
+Like PRs, if you put too much into an RFC, it can make the discussion take longer because people tend to be distracted by the biggest "problem"
+
+Sometimes that means that some "problems" never get proper consideration.
+
+---
+count: false
+## I have an idea!
+<br/>
+> The ideal size of an RFC is one unit of controversy
+
+.right[*Source: paraphrasing Josh Triplett paraphrasing me*]
+
+.center[![RFC 3502 and 3503](https://epage.github.io/talks/nav-rfc-split-teams.png)]
+
+---
+name: rfc-myths
+## I have an idea!
+<br/>
+All unresolved questions will need to be addressed before being approved.
+
+<br/>
+
+Once the RFC is approved, it is final.
+
+---
+name: rfc-myths
+## I have an idea!
+<br/>
+~~All unresolved questions will need to be addressed before being approved.~~
+
+<br/>
+
+~~Once the RFC is approved, it is final.~~
+
+???
+
+Some things are best learned by experimentation.
+
+And we may need to change course.
+
+---
+count: false
+## I have an idea!
+
+.center[![Changes from an RFC](https://epage.github.io/talks/nav-rfc-changes.png)]
+
+???
+
+As a new Cargo team member mentoring a new contributor,
+it was daunting to say that we should throw out parts of an RFC written by Alex.
+
+Whats important is that we communicate them to the responsible team when stabilizing.
+
+However, deferring decisions or changing decisions only works when the problem is niche, not requiring full community input.
+
+---
+count: false
+## I have an idea!
+
+.center[.image-middle[![Supereded RFC](https://epage.github.io/talks/nav-rfc-supersede.png)]]
+---
+name: knowing
+## Something I care about
+<br/>
+How do I know about it?
+
+???
+
+Before you even provide feedback, you need to know it exists!
+
+If you have a specific interest, we have already talked about searching
+
+---
+count: false
+## Something I care about
+<br/>
+How do I know about it?
+
+.center[![This Week in Rust](https://epage.github.io/talks/nav-rfc-twir.png)]
+
+???
+
+Reading This Week in Rust is an important tool for finding out about RFCs as it reports when they go through state changes (new, FCP, approved, tracking issue).
+
+---
+name: overwhelmed
+## Something I care about
+<br/>
+How do I jump in?
+
+.center[![Long discussions](https://epage.github.io/talks/nav-rfc-load-more.png)]
+
+???
+
+As we've discussed, its easy to get overwhelmed with long discussions.
+
+If the author has been summarizing resolved conversations within the RFC, that helps.
+
+---
+name: overwhelmed
+## Something I care about
+<br/>
+How do I jump in?
+
+.center[![A threaded conversation](https://epage.github.io/talks/nav-rfc-threads.png)]
+
+???
+
+My tip? never post on the main thread.  Find the most relevant part of the RFC and post there.
+- The main thread can be hard to follow
+- Maybe someone else with the same idea thought to post in the same spot and you will find their comment 
+
+Hopefully the author is also working to consolidate threads, including taking things off the main thread.
+
+---
+name: humility
+## Something I care about
+<br/>
+How do I jump in?
+
+- Humility, in order to genuinely question the instinct that your values, ideas and opinions are the Right Ones.
+- Empathy, in order to genuinely “put on” someone else’s perspective, needs and values as if they were your own.
+- Introspection, in order to reach a deeper understanding of your own impulses and values.
+.right[*Source: [Aaron Turon, listening and trust, part 2](https://aturon.github.io/tech/2018/06/02/listening-part-2/)*]
+
+???
+
+It can be easy to forget there are care abouts beyond your own, when authoring or reviewing a PR.
+We need people to look at the bigger picture across concerns and understand that at times,
+two competent people can come to different conclusions and accept it
+
+Items I may have not covered:
+- "why don't you just"
+- values
+- be cautious of momentum, fatigue, etg
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+        var slideshow = remark.create({
+        highlightLines: true,
+        });
+    </script>
+  </body>
+</html>
