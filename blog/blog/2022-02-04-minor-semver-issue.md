@@ -159,3 +159,7 @@ dependencies tested it.  A stop gap measure is to always specify the full
 minimum version when adding or upgrading a dependency.  That is what will
 initially be in your lock file and what you and other active developers will
 develop against so most likely it will be correct.
+
+See also
+
+- [SemVer Is Not About You](https://matklad.github.io/2024/11/23/semver-is-not-about-you.html)
