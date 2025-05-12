@@ -1,0 +1,380 @@
+---
+layout: remark2.liquid
+format: Raw
+permalink: /{{parent}}/{{year}}/{{month}}/{{slug}}/
+data:
+  venue: RustWeek
+---
+class: title
+name: title
+# Performance
+
+## We're In This Together
+
+???
+
+Hmmm, there is a lot of different kinds of performance, maybe I need to clarify
+
+Goals:
+- Solicit input on workflows
+- Build excitement for the All Hands topic
+- Seed the All Hands conversation so we're ready to go
+
+Take-aways:
+- We need to look at user workflows, not tools
+  - Keep in mind survivorship bias: what are people avoiding because its slow?
+  - Impact on workflows is in buckets, not percents
+- Improving build-time performance requires crossing teams and even out into the community
+  - Requesting features that may not make sense in isolation
+  - Both sides need to participate to get the benefit
+  - Some approaches may negate each other
+
+---
+class: title
+# **Build** Performance
+
+## We're In This Together
+
+???
+
+As this is the Project track, we're talking about making the product we produce, Rust, faster.
+
+---
+## Build Performance
+
+![rustc-perf graph]({{site.base_url}}/talks/perf-rustc-trend.png)
+
+???
+
+A lot of great work has been put into making Rust faster, including:
+- Incremental improvements
+- Incremental compilation
+- Pipelined builds
+- Parallel backend
+
+*[Source](https://perf.rust-lang.org/dashboard.html)*
+
+---
+## On Roc's Zig migration
+
+> ### Why Zig over Rust?
+>
+> Rust's compile times are slow. Zig's compile times are fast. This is not the only reason, but it's a big reason.
+>
+> Having a slow feedback loop has been a major drain on both our productivity and also our enjoyment when working on the code base. Waiting several seconds to build a single test, before it has even started running, is not enjoyable.
+
+*\- Richard Feldman on migrating Roc from Rust to Zig*
+
+???
+
+Unfortunately, its not enough.
+
+People aren't needing 1% to 2% improvements, they are needing order of magnitude improvements.
+
+*[Source](https://gist.github.com/rtfeldman/77fb430ee57b42f5f2ca973a3992532f)*
+
+---
+## On Roc's Zig migration
+
+> **In contrast, there isn’t anything comparable on the Rust roadmap** in terms of performance improvements.
+> The Cranelift backend has been WIP since 2019 when Roc had its first line of code written,
+> so although I do expect it will land eventually,
+> it’s not like Zig’s x86_64 backend which is (as I understand it)
+> close enough to done that it may even land in the next release in a about a week,
+> and which of course will be significantly faster than a Cranelift backend would be.
+
+*\- Richard Feldman on migrating Roc from Rust to Zig*
+
+???
+
+Whats worse is that when a Zig developer pointed outs its performance today is worse than Rust,
+It was Zig's roadmap and trust in their ability to deliver that made the difference.
+
+This is not unique to Roc.
+
+While our LoC for LoC performance might be on par with C++,
+- Non-C++ developers have higher expectations
+- C++ developers don't rebuild the world.  Are game developers regularly rebuilding Unreal from scratch?
+
+So how do we fix this?
+
+*[Source](https://lobste.rs/s/0jknbl/roc_rewrites_compiler_zig)*
+
+---
+class: title
+
+# Nature of Performance
+
+???
+
+Let's first break down a user-centric perspective on performance
+
+---
+## Nature of Performance
+
+![rustc-perf graph]({{site.base_url}}/talks/perf-rustc-trend.png)
+
+???
+
+Tracking performance is important but when looking at things from the users perspective,
+a 10% performance improvement doesn't mean much.
+
+---
+## Nature of Performance
+
+![performance buckets]({{site.base_url}}/talks/perf-buckets.png)
+
+???
+
+User reactions are discrete and the jump between reactions can be quite large.
+
+In all but the most extreme cases, we've interrupted the users flow
+
+But reactions to what?
+
+---
+## Nature of Performance
+
+Workflows involve iterating on:
+
+- Errors and warnings
+- Test failures
+- Exploratory testing
+- CI feedback
+- Reviewer feedback
+
+???
+
+This isn't always about incremental compilation of the crate you are on.
+It can involve all of the crates in your workspace that depend on it.
+
+---
+## Nature of Performance
+
+![cargo tree on zed]({{site.base_url}}/talks/perf-zed-workspace.png)
+
+???
+
+In the case of zed, there are over 150 workspace members with deep nesting (up-to 9 deep)
+Iterating on compilation errors and tests in this kind of situation is dramatically different
+than working on leaf packages.
+
+This also isn't just about rustc or even cargo's performance but about how they behave.
+
+Examples:
+
+If Cargo and rust-analyzer are fighting over your build cache, you could end up doing full builds every time.
+
+If you jump around your workspace to experiment with changing or testing different parts, the changing of activated features can cause a significant amount of rebuilding.
+
+---
+class: center,middle
+
+# We need to talk to users
+
+The bigger the better
+
+???
+
+We need to understand how they are interacting with Rust to identify what is impacting them
+
+A major source of inspiration for this presentation was from Remy and I meeting with people from Zed and other projects.
+
+---
+## Nature of Performance
+
+![tip: delete doctests]({{site.base_url}}/talks/perf-delete-doctests.png)
+
+*\- matklad, Delete Cargo Integration Tests*
+
+???
+
+In particular, what are they working around or not using?
+Could it be because of performance?
+
+*[Source](https://matklad.github.io/2021/02/27/delete-cargo-integration-tests.html)*
+
+---
+## Nature of Performance
+
+doctest execution time:
+![merged doctests]({{site.base_url}}/talks/perf-merge-doctests.png)
+
+???
+
+These become rich areas to target with many positive side effects.
+
+And in this case, it led to a significant reaction-changing improvement.
+
+*[Source](https://blog.guillaume-gomez.fr/articles/2024-08-17+Doctests+-+How+were+they+improved%3F)*
+
+---
+## Nature of Performance
+
+> ### Third-party crates
+>
+> Although the compiler improvements are nice, some declarative macros remain expensive, and rewriting or removing them altogether **from third-party crates is worthwhile.**
+
+*\- nnethercote, How to speed up the Rust compiler in April 2022*
+
+???
+
+This can involve finding alternative ways around a problem, working cross-team, or even making changes to the ecosystem.
+
+Nick was a great inspiration in this area.
+When he got the limit of optimizing declarative macros, he looked at how they were being used and found it was sub-optimal.
+He even updated the Little Book of Macros to talk about this.
+
+*[Source](https://nnethercote.github.io/2022/04/12/how-to-speed-up-the-rust-compiler-in-april-2022.html)*
+
+---
+class: title
+
+# Unexpected Improvements
+
+???
+
+When looking at why things are slow, the way to improve things can be indirect.
+Work from one team might unexpectedly help improvements of interest to another team.
+
+For example, what if I said that T-lang moving forward with implicit `mod` statements could speed up `cargo test`?
+
+---
+## Unexpected Improvements
+
+![tip: merge itests]({{site.base_url}}/talks/perf-merge-itests.png)
+
+*\- matklad, Delete Cargo Integration Tests*
+
+???
+
+Instead of generating an integration test binary per file, matklad recommended having a single integration test.
+
+Granted, this is blurs the line of working around slow linking vs how things should be.
+
+Managing this manually is takes more work and is error prone, making it harder to recommend as the default choice for cargo users.
+
+If we had "auto mod", this becomes a lot more effortless and we can consider making this the expected path for users.
+
+Admittedly, this doesn't mean that there aren't complications or reasons *not* to do "auto mod"
+but we should consider it and
+it serves as an example of how changing our feature set can drive performance improvements without the slow slog of profiling and experimenting.
+Granted, this instead involves the slog of an RFC.
+
+*[Source](https://matklad.github.io/2021/02/27/delete-cargo-integration-tests.html)*
+
+---
+## Unexpected Improvements
+
+Feature Name: `cfg_version` and `cfg_accessible`
+
+Permit users to `#[cfg(..)]` on whether:
+- they have a certain minimum Rust version (`#[cfg(version(1.27.0))]`).
+- a certain external path is accessible (`#[cfg(accessible(::std::mem::ManuallyDrop))]`).
+
+
+???
+
+Have you considered that these are a way to improve performance in Rust?
+
+Looking at the depednencies for a "basic" web application and it had around 10 build scripts dealing with version detection with 2 proc macros built on top of that.
+
+That requires us to build, link, and run each of these.
+
+Its a similar story for other features like `cfg_alias`
+
+---
+class: title
+
+# Competing Improvements
+
+???
+
+Another area that we need to talk through is when there are multiple major routes for improving bjild performance to understand which we should put our focus towards.
+
+---
+## Competing Improvements: proc-macros
+
+.column-1-3[
+
+Ways to help proc-macros:
+- Cache expansion
+- Include expansion in `.crate` files
+- Stabilize more features
+
+]
+
+???
+
+There are several things we could explore for improving build times with proc-macros
+
+---
+## Competing Improvements: proc-macros
+
+.column-1-3[
+
+Ways to help proc-macros:
+- Cache expansion
+- Include expansion in `.crate` files
+- Stabilize more features
+
+]
+
+.column-2-3[
+
+Replace with declarative macros:
+- Add `derive` and attribute macros
+- Add function, struct, and enum patterns
+
+]
+
+???
+
+Alternatively, we could focus on improving declarative macros. 
+They can't replace every proc-macro but they can replace most to the point that people could more easily have a feature rich application without a single proc-macro.
+
+This also has other benefits:
+- No sandboxing needed (which would slow down proc-macros further)
+- `$crate` support which is quite tricky to solve with proc-macros
+
+---
+## Competing Improvements: proc-macros
+
+.column-1-3[
+
+Ways to help proc-macros:
+- Cache expansion
+- Include expansion in `.crate` files
+- Stabilize more features
+
+]
+
+.column-2-3[
+
+Replace with declarative macros:
+- Add `derive` and attribute macros
+- Add function, struct, and enum patterns
+
+]
+
+.column-3-3[
+
+Replace most derives with reflection:
+- Experiment with `facet`
+
+]
+
+???
+
+I'm also really curious where Amos investigation into `facet` will lead.
+My main concerns are
+- `unsafe` (mostly an issue with this as a library)
+- Is field visibility respected?
+- How are attributes defined and stored?
+
+The main limitations:
+- Doesn't help with attribute macros
+- Can't do compile-time transforms, like case conversions
+
+---
+## Competing Improvements: caching
