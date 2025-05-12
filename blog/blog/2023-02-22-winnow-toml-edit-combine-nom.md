@@ -246,7 +246,7 @@ responsibilities onto users.
 
 #### Existing Users vs Future Users
 
-Another priority we conflicted on was which users to prioritze for:
+Another priority we conflicted on was which users to prioritize for:
 - Existing parsers that have to be upgraded across breaking changes
 - The parsers yet written
 

@@ -203,7 +203,7 @@ git log
 # Marks the commit as fixing up another commit
 git commit --fixup <hash>
 
-# Somtime later when you are ready to cleanup your history, this will
+# Sometime later when you are ready to cleanup your history, this will
 # automatically move your commit just after <hash> and squash it into <hash>
 git rebase --autosquash master
 ```

@@ -34,7 +34,7 @@ implementation detail unless stated otherwise in documentation. This can be
 achieved with `Box<dyn Error>` but with trade-offs
 
 - In Rust, errors types are statically constrained with traits, preventing a
-  `Box<dyn Error>` from being clonable, serialiable, etc.
+  `Box<dyn Error>` from being cloneable, serialiable, etc.
 - For the performance sensitive, `Box<dyn Error>` is 2 pointers-wide and risks
   changing how the compiler returns values (using the stack instead of
   registers).
@@ -43,7 +43,7 @@ achieved with `Box<dyn Error>` but with trade-offs
   usage and `impl Error` for
   interop](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=ff8d532f1e6cdb1cd635e32d6c0432d0)).
   Another spin on this is [doing something similar ourselves](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=268fdba6fb89f3ecc99f1c3d8e9f01d4).
-  This can't work until specialization is stablized.
+  This can't work until specialization is stabilized.
 
 Other challenges that are unique to Rust:
 

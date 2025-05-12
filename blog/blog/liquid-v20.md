@@ -106,7 +106,7 @@ There is still a lot of room for improvement and [contributors are most welcome]
 - Performance: The biggest bottleneck atm is `clone`-ing data for for-loops, see [#337][liquid#337]
 - [Javascript API wrapping a wasm build][liquid#399]
 
-I'm probalby going to slow down my rate of contributions as I shift my focus to
+I'm probably going to slow down my rate of contributions as I shift my focus to
 other projects that this work helped unblock.
 
 ### Highlights from past releases

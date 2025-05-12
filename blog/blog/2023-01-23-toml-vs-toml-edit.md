@@ -83,7 +83,7 @@ parse.  A concrete example of what this allows is for
 Users should also expect maintenance going forward to improve as the code base
 is easier to support and not just because of the two-for-one maintenance.
 Before, `toml` had a handwritten parser that had to deal the non-linear nature
-of TOML.  Now, `toml` parses everything to an AST and then deserialzies to the
+of TOML.  Now, `toml` parses everything to an AST and then deserializes to the
 end-users data types.  Separating the steps of parsing and deserialize
 simplifies them, making it easier to confidently make changes.  The parser is
 also easier to update as it is higher level, using a parser combinator crate.

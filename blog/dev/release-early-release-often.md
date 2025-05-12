@@ -97,7 +97,7 @@ meta-release) should slip to allow some specific features to "make it".
 I wasn't around to see how this company's efforts to improve their release process
 worked out but I have been contributing to Rust which follows a 6 week release
 cycle which has been great!
-I rarely think about thw merge window for a given release.
+I rarely think about the merge window for a given release.
 I know if I miss the next beta branch, waiting 6 weeks isn't too big of a deal.
 The main time I do pay attention is when I want to *add* latency by merging
 just after the beta branch so it gets 12 weeks of pre-release testing, instead

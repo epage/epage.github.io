@@ -9,7 +9,7 @@ data:
   - rust
 ---
 With the release of rust 1.70, there was
-[some surprise and frustation](https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/)
+[some surprise and frustration](https://www.reddit.com/r/rust/comments/13xqhbm/announcing_rust_1700/jmji422/)
 that
 [unstable `test` features now require nightly](https://blog.rust-lang.org/2023/06/01/Rust-1.70.0.html#enforced-stability-in-the-test-cli),
 like all other unstable features in Rust.

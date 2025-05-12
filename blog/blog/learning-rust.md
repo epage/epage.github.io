@@ -147,7 +147,7 @@ choices) and occasional extra work by the developer.
 
 This standard library-alternative could **design out errors** as we re-examine
 why different APIs might error or panic and look to generalize it.  For
-example, instead of `text[range]` panicing on out-of-bounds, we re-define the
+example, instead of `text[range]` panicking on out-of-bounds, we re-define the
 behavior to
 [return at most the start and end bound](https://github.com/epage/eztd/blob/main/crates/eztd-core/src/string/mod.rs#L666).
 

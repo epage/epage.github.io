@@ -350,7 +350,7 @@ Similarly, if your `Fail` has no `cause`, then it will be the `root_cause`.
 
 I can understand the need for functions that behave like these but not with
 names that imply they won't include your current `Fail`.  Granted, I personally
-would find `causes` not returning the top `Fail` more convinient.
+would find `causes` not returning the top `Fail` more convenient.
 
 Suggestion:
 - Either find new names or change the behavior of the functions to avoid surprising developers.
