@@ -147,7 +147,7 @@ quite a few functions at the cost of some runtime performance (for non-optimal
 choices) and occasional extra work by the developer.</p>
 <p>This standard library-alternative could <strong>design out errors</strong> as we re-examine
 why different APIs might error or panic and look to generalize it.  For
-example, instead of <code>text[range]</code> panicing on out-of-bounds, we re-define the
+example, instead of <code>text[range]</code> panicking on out-of-bounds, we re-define the
 behavior to
 <a href="https://github.com/epage/eztd/blob/main/crates/eztd-core/src/string/mod.rs#L666">return at most the start and end bound</a>.</p>
 <p>A sticky question is whether such a library's string type should stay focused
