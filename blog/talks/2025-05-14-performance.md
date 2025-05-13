@@ -525,3 +525,11 @@ whether its raising awareness of how other teams can help us with performance or
 - Opaque dependencies
 
 ]
+
+???
+
+And there is a lot to talk about!
+This is only what I'm aware of and would love to hear from you on what ideas you have as well.
+
+We also need help in moving a lot of this further.
+This is more than one person can do.
