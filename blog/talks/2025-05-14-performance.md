@@ -20,7 +20,7 @@ Goals:
 - Build excitement for the All Hands topic
 - Seed the All Hands conversation so we're ready to go
 
-Take-aways:
+Take-away:
 - We need to look at user workflows, not tools
   - Keep in mind survivorship bias: what are people avoiding because its slow?
   - Impact on workflows is in buckets, not percents
@@ -308,6 +308,11 @@ Ways to help proc-macros:
 
 There are several things we could explore for improving build times with proc-macros
 
+Granted, proc-macros have other problems, like
+- Build input tracking for caching
+- Running of arbitrary code
+- Lack of `$crate`
+
 ---
 ## Competing Improvements: proc-macros
 
@@ -333,9 +338,7 @@ Replace with declarative macros:
 Alternatively, we could focus on improving declarative macros. 
 They can't replace every proc-macro but they can replace most to the point that people could more easily have a feature rich application without a single proc-macro.
 
-This also has other benefits:
-- No sandboxing needed (which would slow down proc-macros further)
-- `$crate` support which is quite tricky to solve with proc-macros
+This also means we avoid some of the other problems with proc-macros
 
 ---
 ## Competing Improvements: proc-macros
@@ -378,3 +381,135 @@ The main limitations:
 
 ---
 ## Competing Improvements: caching
+
+.left-column[
+
+cross-workspace caching
+- Remote caching in future?
+
+]
+
+???
+
+Cargo has been interested in cross-workspace caching.
+
+Granted, build scripts and proc-macros are a problem for this and would be left out of the initial version.
+You also would get unique cache entries if any dependency version is different.
+
+The remote caching would not help with caching of workspace members
+
+Note that I'm not saying "pre-built packages".
+That would break Cargo's model where the end-application has full control over dependencies including
+- Versions, including patching
+- Profile
+- RUSTFLAGS
+
+We'd need to develop a whole new model of "opaque dependencies" to get that to work, much like how `std` is opaque.
+
+To solve this, we also would likely to solve most of the problem of fine-grained locking of `target-dir`
+
+---
+## Competing Improvements: caching
+
+.left-column[
+
+cross-workspace caching
+- Remote caching in future?
+
+]
+
+
+.right-column[
+
+MIR-only rlibs
+- Cross-crate on-demand compilation in the future?
+
+]
+
+???
+
+There is also interest in MIR-only rlibs
+- Avoid duplicate code-gen for generics
+- Cross-crate dead code elimination before codegen
+
+This would mean every artifact in your workspace has to duplicate codegen, reducing how much caching we do within a project.
+
+If we can't reuse backend compilation between artifacts within a workspace, then we also can't do it cross-workspace.
+
+So this means we could only frontend.
+As extra caching coordinating has its own cost, does the frontend take long enough to overcome the caching costs?
+
+A naive implementation would also lose out on per-package profile overrides which can be essential for test time.
+
+All of this would be worse with Zig-style cross-crate on-demand compilation as that would happen earlier than MIR.
+
+Maybe if MIR-only rlibs everywhere is far enough out that maybe caching could pay off in the "short term" (even though its far out as well).
+
+I mentioned opaque dependencies.  Maybe we could use those as a deciding line for codegen.
+
+---
+## Competing Improvements: caching
+
+.center[
+
+![its complicated]({{site.base_url}}/talks/perf-conspiracy.jpg)
+
+]
+
+---
+class: center,middle
+
+# We need to talk to each other
+
+All Hands, Saturday at 9:30
+
+???
+
+When it comes to the next big performance improvements, we need to coordinate across the project,
+whether its raising awareness of how other teams can help us with performance or to not negate each others work
+
+---
+
+## Ideas I'm aware of
+
+.column-1-3[
+
+- Alternative linker (almost there!)
+- Parallel frontend
+- Faster backend
+- `cargo build` reusing `cargo check`
+- "API" fingerprinting
+- Cross-workspace caching`
+- Remove caching
+- MIR-only rlibs
+- Zig-style compilation
+- Fine-grained target-dir locking
+
+]
+
+.column-2-3[
+
+- `cfg(version)`
+- `cfg_value!()`
+- `cfg_alias`
+- Delegating build scripts
+- System-deps
+- Proc-macro expansion caching
+- Replace proc-macros with declarative macros
+- Reflection
+- Faster `dev` profile
+- `check` or `test`-specific opt-level
+
+]
+
+.column-3-3[
+
+- Parallel `cargo fix`
+- Introspection on rebuild reasons
+- Port unit test tidy check to clippy
+- "auto mod"
+- Integrate doctests into Cargo's build process
+- Coverage-driven test selection
+- Stabilize cargo-workspace-hack
+
+]
