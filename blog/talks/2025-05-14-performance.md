@@ -15,6 +15,8 @@ name: title
 
 Hmmm, there is a lot of different kinds of performance, maybe I need to clarify
 
+Below is non-speaking:
+
 Goals:
 - Solicit input on workflows
 - Build excitement for the All Hands topic
@@ -59,15 +61,18 @@ A lot of great work has been put into making Rust faster, including:
 
 > ### Why Zig over Rust?
 >
-> Rust's compile times are slow. Zig's compile times are fast. This is not the only reason, but it's a big reason.
+> **Rust's compile times are slow.** Zig's compile times are fast. This is not the only reason, but it's a big reason.
 >
-> Having a slow feedback loop has been a major drain on both our productivity and also our enjoyment when working on the code base. Waiting several seconds to build a single test, before it has even started running, is not enjoyable.
+> Having a slow feedback loop has been **a major drain on** both our **productivity** and also our **enjoyment** when working on the code base. Waiting several seconds to build a single test, before it has even started running, is not enjoyable.
 
 *\- Richard Feldman on migrating Roc from Rust to Zig*
 
 ???
 
 Unfortunately, its not enough.
+
+A factor in Roc moving away from Rust is the affect of build times.
+This isn't just making things slower, its affecting how people feel when programming Rust.
 
 People aren't needing 1% to 2% improvements, they are needing order of magnitude improvements.
 
@@ -191,6 +196,8 @@ A major source of inspiration for this presentation was from Remy and I meeting 
 
 In particular, what are they working around or not using?
 Could it be because of performance?
+
+Hear, we are seeing build-time advice to avoid doctests
 
 *[Source](https://matklad.github.io/2021/02/27/delete-cargo-integration-tests.html)*
 
@@ -370,14 +377,18 @@ Replace most derives with reflection:
 ???
 
 I'm also really curious where Amos investigation into `facet` will lead.
-My main concerns are
-- `unsafe` (mostly an issue with this as a library)
-- Is field visibility respected?
-- How are attributes defined and stored?
+This is still very young and there are areas that need further exploration and refinement.
 
 The main limitations:
 - Doesn't help with attribute macros
 - Can't do compile-time transforms, like case conversions
+
+But for a lot of derive use cases, we could see a lot of benefit.
+
+Self-notes: My main concerns are
+- `unsafe` (mostly an issue with this as a library)
+- Is field visibility respected?
+- How are attributes defined and stored?
 
 ---
 ## Competing Improvements: caching
@@ -511,5 +522,6 @@ whether its raising awareness of how other teams can help us with performance or
 - Integrate doctests into Cargo's build process
 - Coverage-driven test selection
 - Stabilize cargo-workspace-hack
+- Opaque dependencies
 
 ]
