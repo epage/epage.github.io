@@ -15,7 +15,7 @@ name: title
 
 Hmmm, there is a lot of different kinds of performance, maybe I need to clarify
 
-Below is non-speaking:
+*Below is non-speaking:*
 
 Goals:
 - Solicit input on workflows
@@ -76,6 +76,8 @@ This isn't just making things slower, its affecting how people feel when program
 
 People aren't needing 1% to 2% improvements, they are needing order of magnitude improvements.
 
+There is one problem with this, according to a Zig developer, its actually slower than Rust.
+
 *[Source](https://gist.github.com/rtfeldman/77fb430ee57b42f5f2ca973a3992532f)*
 
 ---
@@ -92,14 +94,13 @@ People aren't needing 1% to 2% improvements, they are needing order of magnitude
 
 ???
 
-Whats worse is that when a Zig developer pointed outs its performance today is worse than Rust,
-It was Zig's roadmap and trust in their ability to deliver that made the difference.
+Richard clarified that it was Zig's roadmap and trust in their ability to deliver that made the difference.
 
-This is not unique to Roc.
+This frustration with build times is not unique to Roc.
 
 While our LoC for LoC performance might be on par with C++,
-- Non-C++ developers have higher expectations
-- C++ developers don't rebuild the world.  Are game developers regularly rebuilding Unreal from scratch?
+- Non-C++ developers have **higher expectations**
+- C++ developers don't rebuild the world.  Are game developers regularly **rebuilding Unreal from scratch?**
 
 So how do we fix this?
 
@@ -112,7 +113,7 @@ class: title
 
 ???
 
-Let's first break down a user-centric perspective on performance
+We first need to look at performance from the user's perspective.
 
 ---
 ## Nature of Performance
@@ -131,8 +132,8 @@ a 10% performance improvement doesn't mean much.
 
 ???
 
-What matters if how people will react to a delay.
-If you lose their attention, they will never notice a small improvement because they are off doing something else.
+What matters if how people will **react to a delay**.
+**If you lose their attention**, they will never notice a small improvement because they are off doing something else.
 This makes the performance bars discrete with large jumps between them.
 
 But reactions to what?
@@ -150,8 +151,7 @@ Workflows involve iterating on:
 
 ???
 
-This isn't always about incremental compilation of the crate you are on.
-It can involve all of the crates in your workspace that depend on it.
+We can't stop here.  What people are doing within these workflows and problems they encounter in them are just as important.
 
 ---
 ## Nature of Performance
@@ -161,10 +161,10 @@ It can involve all of the crates in your workspace that depend on it.
 ???
 
 In the case of zed, there are over 150 workspace members with deep nesting (up-to 9 deep)
-Iterating on compilation errors and tests in this kind of situation is dramatically different
-than working on leaf packages.
+Iterating on compilation errors and tests in this kind of situation is dramatically
+**different than working on leaf packages**.
 
-This also isn't just about rustc or even cargo's performance but about how they behave.
+This also isn't just about rustc or even cargo's performance but **about how they behave**.
 
 Examples:
 
@@ -241,10 +241,10 @@ class: title
 
 ???
 
-When looking at why things are slow, the way to improve things can be indirect.
+When looking at why things are slow, the way to improve things can be **indirect**.
 Work from one team might unexpectedly unblock improvements of interest to another team.
 
-For example, what if I said that T-lang moving forward with implicit `mod` statements could speed up `cargo test`?
+For example, what if I said that **T-lang moving forward with implicit `mod` statements** could speed up `cargo test`?
 
 ---
 ## Unexpected Improvements
