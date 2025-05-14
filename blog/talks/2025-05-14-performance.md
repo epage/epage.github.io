@@ -131,9 +131,9 @@ a 10% performance improvement doesn't mean much.
 
 ???
 
-User reactions are discrete and the jump between reactions can be quite large.
-
-In all but the most extreme cases, we've interrupted the users flow
+What matters if how people will react to a delay.
+If you lose their attention, they will never notice a small improvement because they are off doing something else.
+This makes the performance bars discrete with large jumps between them.
 
 But reactions to what?
 
@@ -453,6 +453,8 @@ As extra caching coordinating has its own cost, does the frontend take long enou
 A naive implementation would also lose out on per-package profile overrides which can be essential for test time.
 
 All of this would be worse with Zig-style cross-crate on-demand compilation as that would happen earlier than MIR.
+But, it also means that we wouldn't need to use Cargo features as often to allow people to opt-out of unused code which would also have usability improvements.
+Imagine `windows-sys` without any features!
 
 Maybe if MIR-only rlibs everywhere is far enough out that maybe caching could pay off in the "short term" (even though its far out as well).
 
