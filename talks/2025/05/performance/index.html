@@ -222,7 +222,7 @@ A major source of inspiration for this presentation was from Remy and I meeting 
 In particular, what are they working around or not using?
 Could it be because of performance?
 
-Hear, we are seeing build-time advice to avoid doctests
+Here, we are seeing build-time advice to avoid doctests
 
 *[Source](https://matklad.github.io/2021/02/27/delete-cargo-integration-tests.html)*
 
@@ -254,7 +254,7 @@ And in this case, it led to a significant reaction-changing improvement.
 This can involve finding alternative ways around a problem, working cross-team, or even making changes to the ecosystem.
 
 Nick was a great inspiration in this area.
-When he got the limit of optimizing declarative macros, he looked at how they were being used and found it was sub-optimal.
+When he hit the limit of optimizing declarative macros, he looked crates and found their macros' algorithmic complexity could be reduced.
 He even updated the Little Book of Macros to talk about this.
 
 *[Source](https://nnethercote.github.io/2022/04/12/how-to-speed-up-the-rust-compiler-in-april-2022.html)*
@@ -267,7 +267,7 @@ class: title
 ???
 
 When looking at why things are slow, the way to improve things can be indirect.
-Work from one team might unexpectedly help improvements of interest to another team.
+Work from one team might unexpectedly unblock improvements of interest to another team.
 
 For example, what if I said that T-lang moving forward with implicit `mod` statements could speed up `cargo test`?
 
@@ -284,7 +284,7 @@ Instead of generating an integration test binary per file, matklad recommended h
 
 Granted, this is blurs the line of working around slow linking vs how things should be.
 
-Managing this manually is takes more work and is error prone, making it harder to recommend as the default choice for cargo users.
+Managing this manually takes **more work and is error prone**, making it harder to recommend as the default choice for cargo users.
 
 If we had "auto mod", this becomes a lot more effortless and we can consider making this the expected path for users.
 
@@ -325,7 +325,7 @@ class: title
 Another area that we need to talk through is when there are multiple major routes for improving bjild performance to understand which we should put our focus towards.
 
 ---
-## Competing Improvements: proc-macros
+## Competing Improvements: macros
 
 .column-1-3[
 
@@ -346,7 +346,7 @@ Granted, proc-macros have other problems, like
 - Lack of `$crate`
 
 ---
-## Competing Improvements: proc-macros
+## Competing Improvements: macros
 
 .column-1-3[
 
@@ -373,7 +373,7 @@ They can't replace every proc-macro but they can replace most to the point that 
 This also means we avoid some of the other problems with proc-macros
 
 ---
-## Competing Improvements: proc-macros
+## Competing Improvements: macros
 
 .column-1-3[
 
@@ -410,7 +410,10 @@ The main limitations:
 
 But for a lot of derive use cases, we could see a lot of benefit.
 
-Self-notes: My main concerns are
+So this is an example where there are multiple avenues for improvement within one or two teams and all are legitimate but if we spread thin our attention,
+it can greatly limit our ability to make progress and reach *an* improvement.
+
+*Self-notes: My main concerns are*
 - `unsafe` (mostly an issue with this as a library)
 - Is field visibility respected?
 - How are attributes defined and stored?
@@ -427,22 +430,22 @@ cross-workspace caching
 
 ???
 
-Cargo has been interested in cross-workspace caching.
+As another example, Cargo has been interested in cross-workspace caching.
 
 Granted, build scripts and proc-macros are a problem for this and would be left out of the initial version.
 You also would get unique cache entries if any dependency version is different.
 
-The remote caching would not help with caching of workspace members
+To solve this, we also would likely to solve most of the problem of fine-grained locking of `target-dir`
 
-Note that I'm not saying "pre-built packages".
+However, the remote caching would not help with caching of workspace members
+
+**Note that I'm not saying "pre-built packages".**
 That would break Cargo's model where the end-application has full control over dependencies including
 - Versions, including patching
 - Profile
 - RUSTFLAGS
 
-We'd need to develop a whole new model of "opaque dependencies" to get that to work, much like how `std` is opaque.
-
-To solve this, we also would likely to solve most of the problem of fine-grained locking of `target-dir`
+We'd need to develop a whole new model of **"opaque dependencies"** to get that to work, much like how **`std`** is opaque.
 
 ---
 ## Competing Improvements: caching
@@ -468,20 +471,20 @@ There is also interest in MIR-only rlibs
 - Avoid duplicate code-gen for generics
 - Cross-crate dead code elimination before codegen
 
-This would mean every artifact in your workspace has to duplicate codegen, reducing how much caching we do within a project.
+This would mean every artifact in your workspace has to **duplicate codegen**, reducing how much **caching we do within a project.**
 
-If we can't reuse backend compilation between artifacts within a workspace, then we also can't do it cross-workspace.
+If we can't reuse backend compilation between artifacts within a workspace, then **we also can't do it cross-workspace.**
 
-So this means we could only frontend.
-As extra caching coordinating has its own cost, does the frontend take long enough to overcome the caching costs?
+So this means we could only **frontend caching**.
+As extra **caching coordinating has its own cost**, does the frontend take long enough to overcome the caching costs?
 
-A naive implementation would also lose out on per-package profile overrides which can be essential for test time.
+A naive implementation would also lose out on **per-package profile overrides** which can be essential for test time.
 
-All of this would be worse with Zig-style cross-crate on-demand compilation as that would happen earlier than MIR.
-But, it also means that we wouldn't need to use Cargo features as often to allow people to opt-out of unused code which would also have usability improvements.
+All of this would be worse with **Zig-style** cross-crate on-demand compilation as that would happen earlier than MIR.
+But, it also means that we wouldn't need to **use Cargo features as often** to allow people to opt-out of unused code which would also have usability improvements.
 Imagine `windows-sys` without any features!
 
-Maybe if MIR-only rlibs everywhere is far enough out that maybe caching could pay off in the "short term" (even though its far out as well).
+Maybe if MIR-only rlibs everywhere is far enough out that maybe caching could pay off in the **"short term"** (even though its far out as well).
 
 I mentioned opaque dependencies.  Maybe we could use those as a deciding line for codegen.
 
@@ -494,6 +497,10 @@ I mentioned opaque dependencies.  Maybe we could use those as a deciding line fo
 
 ]
 
+???
+
+We need to unravel these threads which are cross-team to know what direction will pay off if we move forward.
+
 ---
 class: center,middle
 
@@ -503,7 +510,7 @@ All Hands, Saturday at 9:30
 
 ???
 
-When it comes to the next big performance improvements, we need to coordinate across the project,
+So to move forward with these big performance improvements, we need to coordinate across the project,
 whether its raising awareness of how other teams can help us with performance or to not negate each others work
 
 ---
@@ -558,8 +565,8 @@ whether its raising awareness of how other teams can help us with performance or
 And there is a lot to talk about!
 This is only what I'm aware of and would love to hear from you on what ideas you have as well.
 
-We also need help in moving a lot of this further.
-This is more than one person can do.
+I also can't do this on my own, even limiting this to the parts within Cargo.
+We need help to deliver on this.
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
