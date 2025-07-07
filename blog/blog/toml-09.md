@@ -45,6 +45,50 @@ As the focus is on what Cargo needs, the comparison will be based on implementat
 | `toml` v0.9.0 | `DeTable<'static>` | 501us | 320us | 304us |
 | `toml` v0.9.0 | `DeTable<'s>` | 398us | 283us | 267us |
 
+For other and older views of the data, see
+[891](https://github.com/toml-rs/toml/pull/891),
+[922](https://github.com/toml-rs/toml/pull/922),
+[#945](https://github.com/toml-rs/toml/pull/945)
+
+<!--
+
+cargo bench --bench 0-cargo -- 0_cargo::serde_json::document::2-features
+259us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::serde_json::document::2-features
+158us
+
+cargo bench --bench 0-cargo -- 0_cargo::toml_v05::manifest::2-features
+939us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::toml_v05::manifest::2-features
+895us
+
+
+cargo bench --bench 0-cargo -- 0_cargo::toml_edit::document::2-features
+0.22.27: 542us
+main: 478us
+
+cargo bench --bench 0-cargo -- 0_cargo::toml::detable_owned::2-features
+501us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::toml::detable_owned::2-features
+320us
+
+cargo bench --bench 0-cargo -F preserve_order,fast_hash -- 0_cargo::toml::detable_owned::2-features
+304us
+
+cargo bench --bench 0-cargo -- 0_cargo::toml::detable::2-features
+398us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::toml::detable::2-features
+283us
+
+cargo bench --bench 0-cargo -F preserve_order,fast_hash -- 0_cargo::toml::detable::2-features
+267us
+
+--!>
+
 ### Format challenges
 
 While JSON started as a subset of Javascript,
