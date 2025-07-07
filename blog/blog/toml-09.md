@@ -34,6 +34,17 @@ There was hesitance due to risks associated with having two for the same content
 one viewed by users and the other viewed by machines.
 This was a last ditch effort to prove whether `Cargo.toml` parsing could be sufficiently fast.
 
+As the focus is on what Cargo needs, the comparison will be based on implementations cargo has used or may use, with `serde_json` as a theoretical baseline:
+
+| library             | type | baseline | `preserve_order` | `preserve_order,fast_hash` |
+|---------------------|----|----------|----------------|--------------------------|
+| `serde_json` v1.0.140 | `Value` | 259us | 158us | \- |
+| `toml` v0.5         | `Table` | 939us | 895us | \- |
+| `toml_edit` v0.22.27 | `Document` | \- | 542us | \- |
+| `toml_edit` v0.23.0 | `Document` | \- | 478us | \- |
+| `toml` v0.9.0 | `DeTable<'static>` | 501us | 320us | 304us |
+| `toml` v0.9.0 | `DeTable<'s>` | 398us | 283us | 267us |
+
 ### Format challenges
 
 While JSON started as a subset of Javascript,
