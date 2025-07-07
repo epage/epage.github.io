@@ -327,7 +327,7 @@ Speaking of alternative TOML parsers, we have:
 *(for statements on conformance, see [toml-test-matrix](https://toml-lang.github.io/toml-test-matrix/))*
 
 Based on the requirements, parser implementations, and lack of a maintainer for `toml`,
-[transitioning `toml` to be on top of `toml_edit`]]({{site.base_url}}/blog/2023/01/toml-vs-toml-edit/)
+[transitioning `toml` to be on top of `toml_edit`]({{site.base_url}}/blog/2023/01/toml-vs-toml-edit/)
 was the right call even if it was heavier than some people preferred.
 With where we are at in testing, code structure, and parser implementations,
 we can better fulfill some of the needs that led to these other parsers but it took a lot of work to get there.
