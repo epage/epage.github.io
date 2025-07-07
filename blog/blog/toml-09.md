@@ -219,7 +219,7 @@ a [`DeTable<'s>`] to a [`DeTable<'static>`] as lifetimes do not affect layout (o
 
 ### Implementation
 
-Internally, `toml` v0.5 has a fallible tokenizer that iterated through `char`s` in a `&str`, requiring UTF-8 decoding logic in the inner loop.
+Internally, `toml` v0.5 has a fallible tokenizer that iterated through `char`s in a `&str`, requiring UTF-8 decoding logic in the inner loop.
 As mentioned before, it then parsed into a `Vec<Table>` (non-recursive) and created lookup tables to speed up access.
 
 `toml` v0.6 (via `toml_edit`) directly parsed bytes, avoiding the UTF-8 decoding, directly into a [`Table`] (recursive).
