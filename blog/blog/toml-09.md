@@ -46,8 +46,8 @@ As the focus is on what Cargo needs, the comparison will be based on implementat
 | `toml` v0.9.0 | `DeTable<'s>` | 398us | 283us | 267us |
 
 For other and older views of the data, see
-[891](https://github.com/toml-rs/toml/pull/891),
-[922](https://github.com/toml-rs/toml/pull/922),
+[#891](https://github.com/toml-rs/toml/pull/891),
+[#922](https://github.com/toml-rs/toml/pull/922),
 [#945](https://github.com/toml-rs/toml/pull/945)
 
 <!--
