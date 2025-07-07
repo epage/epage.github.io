@@ -87,7 +87,7 @@ cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::toml::detable::2-featu
 cargo bench --bench 0-cargo -F preserve_order,fast_hash -- 0_cargo::toml::detable::2-features
 267us
 
---!>
+-->
 
 ### Format challenges
 
