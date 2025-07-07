@@ -49,6 +49,8 @@ For other and older views of the data, see
 [#891](https://github.com/toml-rs/toml/pull/891),
 [#922](https://github.com/toml-rs/toml/pull/922),
 [#945](https://github.com/toml-rs/toml/pull/945)
+[#956](https://github.com/toml-rs/toml/pull/956)
+[#957](https://github.com/toml-rs/toml/pull/957)
 
 <!--
 
