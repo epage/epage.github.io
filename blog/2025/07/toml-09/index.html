@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>toml v0.9</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>toml v0.9</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p><a href="https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#090---2025-07-08">toml v0.9</a>
+is a near-complete rewrite with dramatic performance improvements, <code>no_std</code> support, and many other improvements.</p>
+<p>This is where I've disappeared to over the last 3 months, trying to wrap up a years-old experiment that has been &quot;almost done&quot; for these last 3 months, with use case after use case building up encouraging me to finish this up rather than my regularly scheduled Cargo work.</p>
+<!-- more -->
+<h2>Goal: performance</h2>
+<p>The primary goal of this effort was to experiment with a different parser architecture to see what the performance of it would be like.
+People are not normally dependent on how long a TOML file takes to parse.
+However, Cargo may parse a thousand TOML files on every invocation.
+Most people don't notice the impact because compile times can dwarf the parsing of these files.
+It's in the small things that this will be noticed, like</p>
+<ul>
+<li><code>rustup</code> adding overhead to every the execution of every Rust toolchain command to parse <code>rust-toolchain.toml</code> (<a href="https://github.com/rust-lang/rustup/issues/2626">rustup#2626</a>)</li>
+<li>Higher latency when your shell looks up completions for <code>cargo</code> with Cargo's new completion system (<a href="https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#native-completions">Unstable: native-completions</a>)</li>
+<li>Cargo's overhead when running a cargo-script (<a href="https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#script">Unstable: script</a>)</li>
+<li>Other tools using cargo programmatically (<a href="https://rust-lang.zulipchat.com/#narrow/channel/246057-t-cargo/topic/.60cargo.20metadata.60.20performance/near/476523460">zulip: <code>cargo metadata</code> performance</a>)</li>
+</ul>
+<p>Previously, I had proposed that <code>cargo publish</code> include a <code>Cargo.json</code> or <code>Cargo.cbor</code> inside of the <code>*.crate</code> file,
+bypassing the overhead of parsing <code>Cargo.toml</code> for the majority of packages.
+There was hesitance due to risks associated with having two files for the same content,
+one viewed by users and the other viewed by machines.
+This was a last ditch effort to prove whether <code>Cargo.toml</code> parsing could be sufficiently fast.</p>
+<p>Comparing <code>Cargo.toml</code> parsing across past, present (bold), future, and theoretical:</p>
+<table><thead><tr><th>library</th><th>type</th><th>baseline</th><th><code>preserve_order</code></th><th><code>preserve_order,fast_hash</code></th></tr></thead><tbody>
+<tr><td>toml v0.5</td><td><code>Table</code></td><td>939us</td><td>895us</td><td>-</td></tr>
+<tr><td><strong>toml_edit v0.22.27</strong></td><td><code>Document</code></td><td>-</td><td><strong>542us</strong></td><td>-</td></tr>
+<tr><td>toml_edit v0.23.0</td><td><code>Document</code></td><td>-</td><td>478us</td><td>-</td></tr>
+<tr><td>toml v0.9.0</td><td><code>DeTable&lt;'static&gt;</code></td><td>501us</td><td>320us</td><td>304us</td></tr>
+<tr><td>toml v0.9.0</td><td><code>DeTable&lt;'s&gt;</code></td><td>398us</td><td>283us</td><td>267us</td></tr>
+<tr><td><code>serde_json</code> v1.0.140</td><td><code>Value</code></td><td>259us</td><td>158us</td><td>-</td></tr>
+</tbody></table>
+<p>For other and older views of the data, see
+<a href="https://github.com/toml-rs/toml/pull/891">#891</a>,
+<a href="https://github.com/toml-rs/toml/pull/922">#922</a>,
+<a href="https://github.com/toml-rs/toml/pull/945">#945</a>
+<a href="https://github.com/toml-rs/toml/pull/956">#956</a>
+<a href="https://github.com/toml-rs/toml/pull/957">#957</a></p>
+<p>The drop in parse times is sufficient to justify the more complex code.
+This may even be enough to not need to add support for <code>Cargo.json</code>.</p>
+<!--
+
+cargo bench --bench 0-cargo -- 0_cargo::serde_json::document::2-features
+259us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::serde_json::document::2-features
+158us
+
+cargo bench --bench 0-cargo -- 0_cargo::toml_v05::manifest::2-features
+939us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::toml_v05::manifest::2-features
+895us
+
+
+cargo bench --bench 0-cargo -- 0_cargo::toml_edit::document::2-features
+0.22.27: 542us
+main: 478us
+
+cargo bench --bench 0-cargo -- 0_cargo::toml::detable_owned::2-features
+501us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::toml::detable_owned::2-features
+320us
+
+cargo bench --bench 0-cargo -F preserve_order,fast_hash -- 0_cargo::toml::detable_owned::2-features
+304us
+
+cargo bench --bench 0-cargo -- 0_cargo::toml::detable::2-features
+398us
+
+cargo bench --bench 0-cargo -F preserve_order -- 0_cargo::toml::detable::2-features
+283us
+
+cargo bench --bench 0-cargo -F preserve_order,fast_hash -- 0_cargo::toml::detable::2-features
+267us
+
+-->
+<h3>Format challenges</h3>
+<p>While JSON started as a subset of Javascript,
+it has a fairly simple syntax and structure and it is well understood how to make it fast due to its heavy use in machine-to-machine communication.
+On the other hand, TOML is more heavily oriented towards humans with less care for the impact on performance.</p>
+<p>Some examples of this include:</p>
+<p>TOML has order independent sub-tables which requires building up the result piecemeal which isn't compatible with models like <code>serde</code> and requires additional bookkeeping of some sort.</p>
+<p>For example, the following are equivalent:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">[one]
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">[two]
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">[one.a]
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">[three]
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">[one.b]
+</span></code></pre>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">  &quot;</span><span style="color:#a3be8c;">one</span><span style="color:#c0c5ce;">&quot;: {
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">a</span><span style="color:#c0c5ce;">&quot;: {},
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">b</span><span style="color:#c0c5ce;">&quot;: {}
+</span><span style="color:#c0c5ce;">  },
+</span><span style="color:#c0c5ce;">  &quot;</span><span style="color:#a3be8c;">two</span><span style="color:#c0c5ce;">&quot;: {},
+</span><span style="color:#c0c5ce;">  &quot;</span><span style="color:#a3be8c;">three</span><span style="color:#c0c5ce;">&quot;: {}
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>or</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">apple.type = &quot;fruit&quot;
+</span><span style="color:#c0c5ce;">orange.type = &quot;fruit&quot;
+</span><span style="color:#c0c5ce;">apple.skin = &quot;thin&quot;
+</span><span style="color:#c0c5ce;">orange.skin = &quot;thick&quot;
+</span><span style="color:#c0c5ce;">apple.color = &quot;red&quot;
+</span><span style="color:#c0c5ce;">orange.color = &quot;orange&quot;
+</span></code></pre>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">  &quot;</span><span style="color:#a3be8c;">apple</span><span style="color:#c0c5ce;">&quot;: {
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">type</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">fruit</span><span style="color:#c0c5ce;">&quot;,
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">skin</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">thin</span><span style="color:#c0c5ce;">&quot;,
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">color</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">red</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">  },
+</span><span style="color:#c0c5ce;">  &quot;</span><span style="color:#a3be8c;">orange</span><span style="color:#c0c5ce;">&quot;: {
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">type</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">fruit</span><span style="color:#c0c5ce;">&quot;,
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">skin</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">thick</span><span style="color:#c0c5ce;">&quot;,
+</span><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">color</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">orange</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">  }
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>TOML has very specific rules about how different table syntaxes can be combined (<code>[table]</code>, <code>dotted.key</code>, <code>{ &quot;inline&quot; = &quot;table&quot; }</code>).</p>
+<p>For example,</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">[fruit]
+</span><span style="color:#c0c5ce;">apple.color = &quot;red&quot;
+</span><span style="color:#c0c5ce;">apple.taste.sweet = true
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;"># [fruit.apple]  # INVALID
+</span><span style="color:#c0c5ce;"># [fruit.apple.taste]  # INVALID
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">[fruit.apple.texture]  # you can add sub-tables
+</span><span style="color:#c0c5ce;">smooth = true
+</span></code></pre>
+<p><a href="https://docs.rs/toml/latest/toml/">toml</a> v0.5 solved this problem by parsing tokens into an AST (a <code>Vec&lt;Table&gt;</code> where <code>Table</code> is not recursive) and generating lookup tables to make it easier to walk the logical structure among the syntactic structure.</p>
+<p><a href="https://docs.rs/toml/latest/toml/">toml</a> v0.6 <a href="https://epage.github.io/blog/2023/01/toml-vs-toml-edit/">delegated parsing to toml_edit</a> which
+parses directly into a <a href="https://docs.rs/toml_edit/latest/toml_edit/struct.Document.html"><code>Document</code></a> representing the logical structure (a recursive <a href="https://docs.rs/toml/latest/toml/type.Table.html"><code>Table</code></a>).
+<a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> did two lookups for every table for simplicity of matching TOML's rules for merging of syntactic tables.
+When starting to parse a syntactic table,
+we remove the <a href="https://docs.rs/toml/latest/toml/type.Table.html"><code>Table</code></a> and directly insert into it.
+When we find the next table header,
+we then re-insert the <a href="https://docs.rs/toml/latest/toml/type.Table.html"><code>Table</code></a> we were just editing.</p>
+<p><a href="https://docs.rs/toml/latest/toml/">toml</a> v0.9 continues with the approach of <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> by providing a logical <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a> that it parses into.</p>
+<h3>Cargo requirements</h3>
+<p>Originally, <code>cargo</code> had been using <a href="https://docs.rs/toml/latest/toml/">toml</a> v0.5 to parse <code>Cargo.toml</code> files.</p>
+<p>This changed with the introduction of <code>cargo add</code> which used <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> for its ability to make changes to <code>Cargo.toml</code> without losing the users formatting.
+When proposing to merge <code>cargo add</code>, the Cargo team was concerned about having two different TOML parsers inside of Cargo which may have slight incompatibilities and different errors.
+I had proposed that we solve this problem by having one parser, <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>, and extending it to support tomls API.
+This brought on the requirement of &quot;no loss in performance&quot;.</p>
+<p><a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> was then relied on to parse <code>--config key=false</code> TOML expressions as it made it easy to validate that only a single key-value expression was present and not a full document, including comments and newlines.</p>
+<p>Lately, the Cargo team is experimenting with using the richer information reported from <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> to provide rustc-like diagnostics for <code>Cargo.toml</code>.</p>
+<p>To summarize, the traits we need to preserve while making <a href="https://docs.rs/toml/latest/toml/">toml</a> faster include:</p>
+<ul>
+<li>Consistent parsing behavior between <code>serde</code>-like reading and writing of TOML and format-preserving edits of user TOML files</li>
+<li>Validation of <code>key=value</code> expressions</li>
+<li>Spans for keys and values</li>
+</ul>
+<p><strong>To ensure consistent behavior,</strong>
+we cleaned up the tests in <a href="https://docs.rs/toml/latest/toml/">toml</a> and <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>,
+isolating crate-specifics,
+and synced them into each other.
+This puts a burden on us to ensure that any changes to <a href="https://docs.rs/toml/latest/toml/">toml</a> or <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>s shared tests get synced back to the other.</p>
+<p>As a second line of defence, parsing of the AST is shared in the <a href="https://docs.rs/toml_parser/latest/toml_parser">toml_parser</a> crate.</p>
+<p>As a third-line of defence, the conversion from the AST to the logical structure and the <code>serde</code> implementations are maintained in such a way that we can diff the implementations.
+However, this is noisy and requires us to remember to sync even changes, much like the tests.</p>
+<p><strong>Validating of <code>key=value</code> expressions can still be done with toml_edit.</strong></p>
+<p><strong>As for providing Spans,</strong>
+we leveraged the fact that we need to provide a logical <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a> for <code>serde</code> and included Spans in it (i.e. <code>Spanned&lt;DeTable&gt;</code>).</p>
+<p>Like <a href="https://docs.rs/toml_edit/latest/toml_edit/struct.Document.html"><code>toml_edit::Document</code></a>, this requires <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a> to be an owned type so that <code>cargo</code> can keep it around until a diagnostic needs it.
+However, it should be rare that <code>cargo</code> needs spans for dependencies.
+To prepare for this possibility, we made <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable&lt;'s&gt;</code></a> track all strings using
+<a href="https://doc.rust-lang.org/std/borrow/enum.Cow.html"><code>Cow</code></a> to avoid allocations when escaping isn't used.
+To make this owned, you can call <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html#method.make_owned"><code>DeTable::make_owned</code></a> which switches all <code>Cow::Borrowed</code>s to <code>Cow::Owned</code>.
+At that point, it is safe to
+<a href="https://doc.rust-lang.org/core/mem/fn.transmute.html">transmute</a>
+a <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable&lt;'s&gt;</code></a> to a <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable&lt;'static&gt;</code></a> as lifetimes do not affect layout (or so I'm told).</p>
+<h3>Implementation</h3>
+<p>Internally, <a href="https://docs.rs/toml/latest/toml/">toml</a> v0.5 has a fallible tokenizer that iterated through <code>char</code>s in a <code>&amp;str</code>, requiring UTF-8 decoding logic in the inner loop.
+As mentioned before, it then parsed into a <code>Vec&lt;Table&gt;</code> (non-recursive) and created lookup tables to speed up access.</p>
+<p><a href="https://docs.rs/toml/latest/toml/">toml</a> v0.6 (via <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>) directly parsed bytes, avoiding the UTF-8 decoding, directly into a <a href="https://docs.rs/toml/latest/toml/type.Table.html"><code>Table</code></a> (recursive).
+For parsing bytes, it helps that TOML syntax only distinguishes 7-bit ASCII characters from each other and UTF-8 is left opaque.
+<code>unsafe</code> was heavily used to avoid re-validating that the <code>&amp;[u8]</code>s returned were actually <code>&amp;str</code>.
+The parser is written using parser combinators via <a href="https://docs.rs/winnow/latest/winnow/">winnow</a>.
+This made it very easy to compare the implementation to the
+<a href="https://github.com/toml-lang/toml/blob/1.0.0/toml.abnf">grammar</a>
+and got fairly good performance results compared to the old parser.
+However, this required backtracking and carrying state in <code>Result</code>s which likely helped spill return values over from registers to the stack
+(see <a href="https://github.com/winnow-rs/winnow/issues/72">winnow#72</a>).
+To preserve formatting,
+the size of an <a href="https://docs.rs/toml_edit/latest/toml_edit/enum.Item.html"><code>Item</code></a> returned by a parser is also quite large.
+By doing direct parsing, we had deeper call stacks for this all to accumulate in and higher costs, both in terms of the call stack and parsed result, when backtracking.</p>
+<p><a href="https://docs.rs/toml/latest/toml/">toml</a> v0.9 (via <a href="https://docs.rs/toml_parser/latest/toml_parser">toml_parser</a>) has an infallible <a href="https://docs.rs/toml_parser/latest/toml_parser/lexer/struct.Lexer.html">tokenizer</a> that we collect into a <a href="https://docs.rs/toml_parser/latest/toml_parser/lexer/struct.Token.html"><code>Vec&lt;Token&gt;</code></a>,
+assuming the capacity based on the length of the <code>&amp;str</code> we are tokenizing.
+The tokenizer processes bytes within each individual step to calculate indices to take a sub-slice of a <code>&amp;str</code>.
+We made <code>unsafe</code> optional in toml_parser to avoid the UTF-8 boundary checks but found the overhead of the safe option to be low enough that we didn't use it.
+We then report parse events and errors through callbacks,
+with <a href="https://docs.rs/toml/latest/toml/">toml</a> collecting them into a <a href="https://docs.rs/toml_parser/latest/toml_parser/parser/struct.Event.html"><code>Vec&lt;Event&gt;</code></a> with the capacity inferred from <a href="https://docs.rs/toml_parser/latest/toml_parser/lexer/struct.Token.html"><code>Vec&lt;Token&gt;</code></a>s length.
+In a couple of places (table headers, scalar values),
+the parser does do some lookahead but only needs to compare <a href="https://docs.rs/toml_parser/latest/toml_parser/lexer/enum.TokenKind.html"><code>TokenKind</code></a>s and not iterate through a sequence of bytes.
+The parser only looks at <a href="https://docs.rs/toml_parser/latest/toml_parser/lexer/enum.TokenKind.html"><code>TokenKind</code></a>s and not the <code>&amp;str</code>, meaning that scalar values are not validated at this stage.
+All structural syntactic errors are expected to be reported at this stage.
+<a href="https://docs.rs/toml/latest/toml/">toml</a> walks these events to build up a <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a>, validating the logical structure and decoding and validating scalars along the way.</p>
+<p>rustc's tokenizer tries to minimize the size of a token by only keeping the token length and storing it in a <code>u32</code>.
+We were unsure how much value this would provide <a href="https://docs.rs/toml/latest/toml/">toml</a> and didn't experiment with this.</p>
+<h2>Secondary goals</h2>
+<p>While the focus was on performance for Cargo,
+the architecture we were going with provided an opportunity to help with areas of interest.</p>
+<h3>Error recovery</h3>
+<p>Like <code>rustc</code>, we wanted to allow <a href="https://docs.rs/toml/latest/toml/">toml</a> to report as many errors as possible, not just the first.</p>
+<p>The core of error recovery is that all errors reported through a <a href="https://docs.rs/toml_parser/latest/toml_parser/trait.ErrorSink.html"><code>&amp;mut dyn ErrorSink</code></a> parameter.
+The caller can choose whether they collected into a <code>()</code>, <a href="https://docs.rs/toml_parser/latest/toml_parser/struct.ParseError.html"><code>Option&lt;ParseError&gt;</code></a>, <a href="https://docs.rs/toml_parser/latest/toml_parser/struct.ParseError.html"><code>Vec&lt;ParseError&gt;</code></a>, or something else entirely.
+This was another important reason to avoid backtracking because we didn't want to have to revert errors that had been reported.</p>
+<p>To keep the logic in <a href="https://docs.rs/toml/latest/toml/">toml</a> as simple as possible,
+we also made the parser create synthetic <a href="https://docs.rs/toml_parser/latest/toml_parser/parser/struct.Event.html"><code>Event</code></a>s wherever possible
+(e.g. reporting a <a href="https://docs.rs/toml_parser/latest/toml_parser/parser/trait.EventReceiver.html#method.std_table_close">closed table header</a> with an empty span when a <code>]</code> was missing).</p>
+<p>Currently, we only expose error recovery in <a href="https://docs.rs/toml/latest/toml/">toml</a> through <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html#method.parse_recoverable"><code>DeTable::parse_recoverable</code></a>.</p>
+<h3>Bignum support</h3>
+<p>While I figure an <code>i64</code> is good enough for any config file,
+that didn't appear to be the case.
+While we previously parsed integers into an <code>i64</code>, <a href="https://docs.rs/toml/latest/toml/">toml</a> now tracks <a href="https://docs.rs/toml/latest/toml/de/struct.DeInteger.html">a validated, normalized string</a> that it can later parse into the type requested via <code>serde</code>.
+Users can also directly parse into a <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a> and get the raw parts of a <a href="https://docs.rs/toml/latest/toml/de/struct.DeInteger.html"><code>DeInteger</code></a> to handle it themselves.</p>
+<h3><code>no_std</code></h3>
+<p>While TOML is unlikely a good format for systems so constrained that they lack <a href="https://doc.rust-lang.org/alloc">alloc</a>,
+it could still work for systems that lack <a href="https://doc.rust-lang.org/stable/std/">std</a>.
+In fact, <a href="https://crates.io/crates/tomling"><code>tomling</code></a> was created for this purpose but the author would rather not maintain that.</p>
+<p>In designing <a href="https://docs.rs/toml_parser/latest/toml_parser">toml_parser</a> for <a href="https://doc.rust-lang.org/alloc">alloc</a>,
+I found it wasn't too much harder to support <a href="https://doc.rust-lang.org/core/">core</a>,
+so I did so as a challenge to myself.</p>
+<p>For resource constrained systems or for general performance,
+a caller may not care about parsing the entire document.
+We made it so that an <a href="https://docs.rs/toml_parser/latest/toml_parser/parser/trait.EventReceiver.html"><code>EventReceiver</code></a> can say &quot;don't care&quot; when recursing into an array or inline table.
+We also deferred scalar value validation to access by users, giving them control over which scalars they bother to validate.</p>
+<p>In <code>no_std</code> environments, the size of the stack may further constrained.
+Instead of offering built-in recursion protection to toml_parser,
+it is built on top as an <a href="https://docs.rs/toml_parser/latest/toml_parser/parser/trait.EventReceiver.html"><code>EventReceiver</code></a> decorator that callers can control.</p>
+<p>All of this is then collected up into <a href="https://docs.rs/toml/latest/toml/">toml</a> which provides one way of handling all of these decisions.</p>
+<h3>facet</h3>
+<p><a href="https://facet.rs/">facet</a> is an effort towards reflection in Rust,
+including offering parallels to what is supported in serde.
+<a href="https://crates.io/crates/facet-toml">facet-toml</a> is currently built on top of <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>, much like <a href="https://docs.rs/toml/latest/toml/">toml</a> is.
+They were considering writing their own but I encouraged them to wait on this effort (<a href="%5Bhttps://github.com/facet-rs/facet/issues/148">facet#148</a>).
+Our <a href="https://docs.rs/toml_parser/latest/toml_parser/parser/trait.EventReceiver.html"><code>EventReceiver</code></a> design was taking into account that they hope that they can parse TOML directly to the end-users type without an intermediate like <a href="https://docs.rs/toml_edit/latest/toml_edit/struct.Document.html"><code>Document</code></a> or <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a>.
+We'll see how that goes.</p>
+<p>To encourage sharing and best practices,
+we also split out <a href="https://docs.rs/toml_writer/latest/toml_writer">toml_writer</a> to abstract away the lowest level details of writing out TOML.
+They still have to deal with quirks of writing out tables correctly.
+<a href="https://docs.rs/toml/latest/toml/">toml</a> was updated to directly translate <code>serde</code> into toml_writer,
+without an intermediate like <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a> or <a href="https://docs.rs/toml_edit/latest/toml_edit/struct.Document.html"><code>Document</code></a>,
+completely dropping the dependency on <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>.
+Some extra buffers were used to avoid the <code>TableAfterValue</code> errors that users regularly saw with <a href="https://docs.rs/toml/latest/toml/">toml</a> v0.5
+(<a href="https://github.com/dtolnay/basic-toml/issues/3">basic-toml#3</a>).</p>
+<h3>Reducing the proliferation of TOML parsers</h3>
+<p>Speaking of alternative TOML parsers, we have:</p>
+<ul>
+<li><a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> which is focused on format-preserving edits</li>
+<li><a href="https://docs.rs/toml/latest/toml/">toml</a> which is focused on <code>serde</code> compatibility</li>
+<li><a href="https://crates.io/crates/basic-toml">basic-toml</a> which is a deprecated, non-conformant fork of toml v0.5</li>
+<li><a href="https://crates.io/crates/toml-span">toml-span</a> which is a fork of <code>basic-toml</code> (inheriting its problems) but tracks spans</li>
+<li><a href="https://crates.io/crates/boml">boml</a>, which is a dependency-light, non-conformant independent parser</li>
+<li><a href="https://github.com/tamasfe/taplo">taplo</a> which is a deprecated, non-conformant, LSP focused parser</li>
+<li><a href="https://github.com/tombi-toml/tombi">tombi</a> which is focused on being an LSP</li>
+</ul>
+<p><em>(for statements on conformance, see <a href="https://toml-lang.github.io/toml-test-matrix/">toml-test-matrix</a>)</em></p>
+<p>Based on the requirements, parser implementations, and lack of a maintainer for toml,
+<a href="https://epage.github.io/blog/2023/01/toml-vs-toml-edit/">transitioning toml to be on top of toml_edit</a>
+was the right call even if it was heavier than some people preferred.
+With where we are at in testing, code structure, and parser implementations,
+we can better fulfill some of the needs that led to these other parsers but it took a lot of work to get there.
+Granted, we won't be &quot;zero dependencies&quot; but that is a proxy for other care abouts like compile times, binary size, web of trust, etc which were were either already doing well on or have improved with this release.</p>
+<p>It might not make sense for everyone to switch to toml but maybe we can collaborate on some of the lower level layers in <a href="https://docs.rs/toml_parser/latest/toml_parser">toml_parser</a>, like the parser or even the lexer.</p>
+<h2>On parser combinators</h2>
+<p>In reflecting back on this rewriting a parser combinator-based parser into a hand written parser,
+I still think the default choice should be parser combinators
+(<a href="https://docs.rs/winnow/latest/winnow/_topic/why/index.html#hand-written-parsers">source</a>).
+With parser combinators, there was generally a 1:1 mapping between code and  the
+<a href="https://github.com/toml-lang/toml/blob/1.0.0/toml.abnf">ABNF grammar</a>.
+Now, that relationship is less clear.
+Each section of code is fuzzy in how it maps to the grammar and implements a subset of it,
+either assuming a layer above or below takes care of it or there is not-quite duplicated code within the same layer that handles it.
+Maintaining this in the future will be quite a burden, requiring knowledge of how the parts interact to make sure all of the pieces get updated correctly.</p>
+<p>In this case, it was worth it because of user-facing goals it met.
+In most cases, including <a href="https://docs.rs/toml/latest/toml/">toml</a> in the past, the most important goal is being able to delivery something.</p>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
