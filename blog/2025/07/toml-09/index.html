@@ -170,7 +170,7 @@ we then re-insert the <a href="https://docs.rs/toml/latest/toml/type.Table.html"
 <p>Originally, <code>cargo</code> had been using <a href="https://docs.rs/toml/latest/toml/">toml</a> v0.5 to parse <code>Cargo.toml</code> files.</p>
 <p>This changed with the introduction of <code>cargo add</code> which used <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> for its ability to make changes to <code>Cargo.toml</code> without losing the users formatting.
 When proposing to merge <code>cargo add</code>, the Cargo team was concerned about having two different TOML parsers inside of Cargo which may have slight incompatibilities and different errors.
-I had proposed that we solve this problem by having one parser, <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>, and extending it to support tomls API.
+I had proposed that we solve this problem by having one parser, <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>, and extending it to support <a href="https://docs.rs/toml/latest/toml/">toml</a>s API.
 This brought on the requirement of &quot;no loss in performance&quot;.</p>
 <p><a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> was then relied on to parse <code>--config key=false</code> TOML expressions as it made it easy to validate that only a single key-value expression was present and not a full document, including comments and newlines.</p>
 <p>Lately, the Cargo team is experimenting with using the richer information reported from <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a> to provide rustc-like diagnostics for <code>Cargo.toml</code>.</p>
