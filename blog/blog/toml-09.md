@@ -198,7 +198,7 @@ isolating crate-specifics,
 and synced them into each other.
 This puts a burden on us to ensure that any changes to `toml` or `toml_edit`s shared tests get synced back to the other.
 
-As a second line of defence, parsing of the AST is shared in the [`toml_parse`] crate.
+As a second line of defence, parsing of the AST is shared in the [`toml_parser`] crate.
 
 As a third-line of defence, the conversion from the AST to the logical structure and the `serde` implementations are maintained in such a way that we can diff the implementations.
 However, this is noisy and requires us to remember to sync even changes, much like the tests.
@@ -235,10 +235,10 @@ To preserve formatting,
 the size of an [`Item`] returned by a parser is also quite large.
 By doing direct parsing, we had deeper call stacks for this all to accumulate in and higher costs, both in terms of the call stack and parsed result, when backtracking.
 
-`toml` v0.9 (via [`toml_parse`]) has an infallible tokenizer that we collect into a [`Vec<Token>`][`Token`],
+`toml` v0.9 (via [`toml_parser`]) has an infallible tokenizer that we collect into a [`Vec<Token>`][`Token`],
 assuming the capacity based on the length of the `&str` we are parsing.
 The tokenizer processed bytes within each individual step but to calculate indices to take a sub-slice of a `&str`.
-We made `unsafe` optional in `toml_parse` to avoid the UTF-8 boundary checks but found the overhead of the safe option to be low enough that we didn't use it.
+We made `unsafe` optional in `toml_parser` to avoid the UTF-8 boundary checks but found the overhead of the safe option to be low enough that we didn't use it.
 We then report parse events and errors through callbacks,
 with `toml` collecting them into `Vec`s with [`Vec<Event>`][`Event`]s capacity inferred from [`Vec<Token>`][Token]s length.
 In a couple of places (table headers, scalar values),
@@ -280,7 +280,7 @@ If you are parsing in such a constrained environment that you lack [`alloc`],
 it is understandable to be in an environment without [`std`].
 In fact, [`tomling`](https://crates.io/crates/tomling) was created for this purpose but the author would rather not maintain that.
 
-In designing [`toml_parse`] for [`alloc`],
+In designing [`toml_parser`] for [`alloc`],
 I found it wasn't too much harder to support [`core`],
 so I did so as a challenge to myself.
 
@@ -290,7 +290,7 @@ We made it so that an [`EventReceiver`] can say "don't care" when recursing into
 We also deferred scalar value validation to access by users, giving them control over which scalars they bother to validate.
 
 In `no_std`, the size of the stack by be different.
-Instead of offering built-in recursion protection to `toml_parse`,
+Instead of offering built-in recursion protection to `toml_parser`,
 it is built on top as an [`EventReceiver`] decorator that callers can control.
 
 All of this is then collected up into `toml` which provides one way of handling all of these decisions.
@@ -305,9 +305,9 @@ Our [`EventReceiver`] design was taking into account that they hope that they ca
 We'll see how that goes.
 
 To encourage sharing and best practices,
-we also split out [`toml_write`] to abstract away the lowest level details of writing out TOML.
+we also split out [`toml_writer`] to abstract away the lowest level details of writing out TOML.
 They still have to deal with quirks of writing out tables correctly.
-`toml` was updated to directly translate `serde` into `toml_write`,
+`toml` was updated to directly translate `serde` into `toml_writer`,
 without an intermediate like [`DeTable`] or [`Document`],
 completely dropping the dependency on `toml_edit`.
 Some extra buffers were used to avoid the `TableAfterValue` errors that users regularly saw with `toml` v0.5
@@ -333,7 +333,7 @@ With where we are at in testing, code structure, and parser implementations,
 we can better fulfill some of the needs that led to these other parsers but it took a lot of work to get there.
 Granted, we won't be "zero dependencies" but that is a proxy for other care abouts like compile times, binary size, web of trust, etc which were were either already doing well on or have improved with this release.
 
-It might not make sense for everyone to switch to `toml` but maybe we can collaborate on some of the lower level layers in [`toml_parse`], like the parser or even the lexer.
+It might not make sense for everyone to switch to `toml` but maybe we can collaborate on some of the lower level layers in [`toml_parser`], like the parser or even the lexer.
 
 [`DeTable`]: TODO
 [`DeInteger`]: TODO
@@ -344,8 +344,8 @@ It might not make sense for everyone to switch to `toml` but maybe we can collab
 [`ErrorReport`]: TODO
 [`EventReceiver`]: TODO
 [`ParseError`]: TODO
-[`toml_parse`]: https://docs.rs/toml_parse/latest/toml_parse
-[`toml_write`]: https://docs.rs/toml_write/latest/toml_write
+[`toml_parser`]: https://docs.rs/toml_parser/latest/toml_parser
+[`toml_writer`]: https://docs.rs/toml_writer/latest/toml_writer
 [`Document`]: https://docs.rs/toml_edit/latest/toml_edit/struct.Document.html
 [`Table`]: https://docs.rs/toml_edit/latest/toml_edit/struct.Table.html
 [`winnow`]: https://docs.rs/winnow/latest/winnow/
