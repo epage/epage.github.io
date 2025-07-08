@@ -263,7 +263,7 @@ it is built on top as an <a href="https://docs.rs/toml_parser/latest/toml_parser
 <p><a href="https://facet.rs/">facet</a> is an effort towards reflection in Rust,
 including offering parallels to what is supported in serde.
 <a href="https://crates.io/crates/facet-toml">facet-toml</a> is currently built on top of <a href="https://docs.rs/toml_edit/latest/toml_edit/">toml_edit</a>, much like <a href="https://docs.rs/toml/latest/toml/">toml</a> is.
-They were considering writing their own but I encouraged them to wait on this effort (<a href="%5Bhttps://github.com/facet-rs/facet/issues/148">facet#148</a>).
+They were considering writing their own but I encouraged them to wait on this effort (<a href="https://github.com/facet-rs/facet/issues/148">facet#148</a>).
 Our <a href="https://docs.rs/toml_parser/latest/toml_parser/parser/trait.EventReceiver.html"><code>EventReceiver</code></a> design was taking into account that they hope that they can parse TOML directly to the end-users type without an intermediate like <a href="https://docs.rs/toml_edit/latest/toml_edit/struct.Document.html"><code>Document</code></a> or <a href="https://docs.rs/toml/latest/toml/de/type.DeTable.html"><code>DeTable</code></a>.
 We'll see how that goes.</p>
 <p>To encourage sharing and best practices,
