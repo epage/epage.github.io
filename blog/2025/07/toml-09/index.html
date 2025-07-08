@@ -38,7 +38,7 @@ bypassing the overhead of parsing <code>Cargo.toml</code> for the majority of pa
 There was hesitance due to risks associated with having two files for the same content,
 one viewed by users and the other viewed by machines.
 This was a last ditch effort to prove whether <code>Cargo.toml</code> parsing could be sufficiently fast.</p>
-<p>Comparing a <a href="https://github.com/toml-rs/toml/blob/main/crates/benchmarks/src/Cargo.web-sys.toml">Cargo.toml</a> parsing across past, present (bold), future, and theoretical:</p>
+<p>Comparing what Cargo would do to parse a <a href="https://github.com/toml-rs/toml/blob/main/crates/benchmarks/src/Cargo.web-sys.toml">Cargo.toml</a> across past, present (bold), future, and theoretical:</p>
 <table><thead><tr><th>library</th><th>type</th><th>baseline</th><th><code>preserve_order</code></th><th><code>preserve_order,fast_hash</code></th></tr></thead><tbody>
 <tr><td>toml v0.5</td><td><code>Table</code></td><td>939us</td><td>895us</td><td>-</td></tr>
 <tr><td><strong>toml_edit v0.22.27</strong></td><td><code>Document</code></td><td>-</td><td><strong>542us</strong></td><td>-</td></tr>
