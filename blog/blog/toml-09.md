@@ -9,7 +9,7 @@ data:
     - rust
 ---
 
-[`toml` v0.9][TODO] is a near-complete rewrite with dramatic performance improvements, `no_std` support, and many other improvements.
+[`toml` v0.9][https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#090---2025-07-08] is a near-complete rewrite with dramatic performance improvements, `no_std` support, and many other improvements.
 
 This is where I've disappeared to over the last 3 months, trying to wrap up a years-old experiment that has been "almost done" for these last 3 months, with use case after use case building up encouraging me to finish this up rather than my regularly scheduled Cargo work.
 
@@ -256,7 +256,7 @@ we wanted to experiment with some other improvements.
 
 Like `rustc`, we wanted to allow `toml` to report as many errors as possible, not just the first.
 
-The core of error recovery is that all errors reported through a [`&mut dyn ErrorReport`] parameter.
+The core of error recovery is that all errors reported through a [`&mut dyn ErrorSink`] parameter.
 The caller can choose whether they collected into a `()`, [`Option<ParseError>`], [`Vec<ParseError>`], or something else entirely.
 This was another important reason to avoid backtracking because we didn't want to have to revert errors that had been reported.
 
@@ -335,15 +335,15 @@ Granted, we won't be "zero dependencies" but that is a proxy for other care abou
 
 It might not make sense for everyone to switch to `toml` but maybe we can collaborate on some of the lower level layers in [`toml_parser`], like the parser or even the lexer.
 
-[`DeTable`]: TODO
-[`DeInteger`]: TODO
-[`DeTable::make_owned`]: TODO
-[`Token`]: TODO
-[`TokenKind`]: TODO
-[`Event`]: TODO
-[`ErrorReport`]: TODO
-[`EventReceiver`]: TODO
-[`ParseError`]: TODO
+[`DeTable`]: https://docs.rs/toml/latest/toml/de/type.DeTable.html
+[`DeInteger`]: https://docs.rs/toml/latest/toml/de/struct.DeInteger.html
+[`DeTable::make_owned`]: https://docs.rs/toml/latest/toml/de/type.DeTable.html#method.make_owned
+[`Token`]: https://docs.rs/toml_parser/latest/toml_parser/lexer/struct.Token.html
+[`TokenKind`]: https://docs.rs/toml_parser/latest/toml_parser/lexer/enum.TokenKind.html
+[`Event`]: https://docs.rs/toml_parser/latest/toml_parser/parser/struct.Event.html
+[`ErrorSink`]: https://docs.rs/toml_parser/latest/toml_parser/trait.ErrorSink.html
+[`EventReceiver`]: https://docs.rs/toml_parser/latest/toml_parser/parser/trait.EventReceiver.html
+[`ParseError`]: https://docs.rs/toml_parser/latest/toml_parser/struct.ParseError.html
 [`toml_parser`]: https://docs.rs/toml_parser/latest/toml_parser
 [`toml_writer`]: https://docs.rs/toml_writer/latest/toml_writer
 [`Document`]: https://docs.rs/toml_edit/latest/toml_edit/struct.Document.html
