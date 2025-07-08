@@ -306,7 +306,7 @@ All of this is then collected up into [toml] which provides one way of handling 
 [facet](https://facet.rs/) is an effort towards reflection in Rust,
 including offering parallels to what is supported in serde.
 [facet-toml](https://crates.io/crates/facet-toml) is currently built on top of [toml_edit], much like [toml] is.
-They were considering writing their own but I encouraged them to wait on this effort ([facet#148]([https://github.com/facet-rs/facet/issues/148)).
+They were considering writing their own but I encouraged them to wait on this effort ([facet#148](https://github.com/facet-rs/facet/issues/148)).
 Our [`EventReceiver`] design was taking into account that they hope that they can parse TOML directly to the end-users type without an intermediate like [`Document`] or [`DeTable`].
 We'll see how that goes.
 
