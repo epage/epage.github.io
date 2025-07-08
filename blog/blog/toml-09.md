@@ -184,7 +184,7 @@ Originally, `cargo` had been using [toml] v0.5 to parse `Cargo.toml` files.
 
 This changed with the introduction of `cargo add` which used [toml_edit] for its ability to make changes to `Cargo.toml` without losing the users formatting.
 When proposing to merge `cargo add`, the Cargo team was concerned about having two different TOML parsers inside of Cargo which may have slight incompatibilities and different errors.
-I had proposed that we solve this problem by having one parser, [toml_edit], and extending it to support tomls API.
+I had proposed that we solve this problem by having one parser, [toml_edit], and extending it to support [toml]s API.
 This brought on the requirement of "no loss in performance".
 
 [toml_edit] was then relied on to parse `--config key=false` TOML expressions as it made it easy to validate that only a single key-value expression was present and not a full document, including comments and newlines.
