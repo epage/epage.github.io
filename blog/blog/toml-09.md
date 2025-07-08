@@ -35,7 +35,7 @@ There was hesitance due to risks associated with having two files for the same c
 one viewed by users and the other viewed by machines.
 This was a last ditch effort to prove whether `Cargo.toml` parsing could be sufficiently fast.
 
-Comparing a [Cargo.toml](https://github.com/toml-rs/toml/blob/main/crates/benchmarks/src/Cargo.web-sys.toml) parsing across past, present (bold), future, and theoretical:
+Comparing what Cargo would do to parse a [Cargo.toml](https://github.com/toml-rs/toml/blob/main/crates/benchmarks/src/Cargo.web-sys.toml) across past, present (bold), future, and theoretical:
 
 | library             | type | baseline | `preserve_order` | `preserve_order,fast_hash` |
 |---------------------|----|----------|----------------|--------------------------|
