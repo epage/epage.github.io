@@ -1,0 +1,12 @@
+[default]
+extend-ignore-identifiers-re = [
+  # Handles git short SHA-1 hashes
+  "[a-f0-9]{8,9}",
+]
+
+[default.extend-identifiers]
+# Names
+VanderPlas = "VanderPlas"
+Ned = "Ned"
+# Intentional spelling mistake
+optio = "optio"
