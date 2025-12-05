@@ -60,3 +60,5 @@ Other notes
 - https://rhodesmill.org/brandon/2012/one-sentence-per-line/
 
 https://siderea.dreamwidth.org/1209794.html
+
+https://www.jlowin.dev/blog/oss-maintainers-guide-to-saying-no

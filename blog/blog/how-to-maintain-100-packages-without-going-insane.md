@@ -161,3 +161,4 @@ The main downside I've seen to this is the error reporting; its common for it to
 - RenovateBot
 - cargo release
 
+https://www.jlowin.dev/blog/oss-maintainers-guide-to-saying-no
