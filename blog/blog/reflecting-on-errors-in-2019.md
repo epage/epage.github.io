@@ -122,7 +122,7 @@ I think `anyhow::Error` and `anyhow::anyhow!` are close to something we can stan
 
 ### `From` for `?`
 
-The first problem is `From<dep::Errpr>` exposing implementation details.
+The first problem is `From<dep::Error>` exposing implementation details.
 - `snafu` experiments with the ideas of macro-generated "selectors" which are
   private types which would keep `From<dep::Error>` private. I find the
   approach interesting and an area we should do more experimentation (though

@@ -147,7 +147,7 @@ This behavior will become the default in clap 4.0.
 
 ### Multicall and REPLs
 
-On a completely unrelated note, we are stablizing `Command::multicall`.  This
+On a completely unrelated note, we are stabilizing `Command::multicall`.  This
 new setting will cause the binary name (`argv[0]`) to be parsed as a
 subcommand.  This allows for [busybox-like
 binaries](https://github.com/clap-rs/clap/blob/master/examples/multicall-busybox.rs)

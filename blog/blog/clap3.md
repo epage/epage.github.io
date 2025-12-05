@@ -197,9 +197,9 @@ for years would just kill any investment people have in contributing.  This can
 introduce regressions and there isn't the forcing function of a release to make
 sure these features are polished enough.
 
-To help, we introduced our stablization process with `unstable-` feature flags
+To help, we introduced our stabilization process with `unstable-` feature flags
 with
-[stablization issues](https://github.com/clap-rs/clap/issues?q=is%3Aopen+is%3Aissue+label%3AC-tracking-issue).
+[stabilization issues](https://github.com/clap-rs/clap/issues?q=is%3Aopen+is%3Aissue+label%3AC-tracking-issue).
 
 We also had to take the hard stance of treating `master` is if we would release
 it any day, rather than one day.  This raised the bar for what we'd accept for

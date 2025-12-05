@@ -109,7 +109,7 @@ Our new guidelines in clap's [CONTRIBUTING.md](https://github.com/clap-rs/clap/b
 >   - Common documentation pattern: `/// Deprecated in [Issue #XXX](https://github.com/clap-rs/clap/issues/XXX), replaced with [intra-doc-link]`
 >   - Common deprecation pattern: `#[deprecated(since = "X.Y.Z", note = "Replaced with `ITEM` in Issue #XXX")]`
 >   - Please keep API addition and deprecation in separate commits in a PR to make it easier to review
-> - Develop the feature behind an `unstable-<name>` feature flag with a stablization tracking issue (e.g. [Multicall Tracking issue](https://github.com/clap-rs/clap/issues/2861))
+> - Develop the feature behind an `unstable-<name>` feature flag with a stabilization tracking issue (e.g. [Multicall Tracking issue](https://github.com/clap-rs/clap/issues/2861))
 
 While we expect this to evolve over time, we feel this is a good start to helping meet the needs from earlier.
 

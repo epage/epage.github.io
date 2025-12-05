@@ -144,7 +144,7 @@ In contrast, a Jekyll-style include would pass the variable as {%raw%}```{{ vari
 [Goncalerta][Goncalerta] took on the monumental task of replacing all of this
 with a [pest][pest]-based parser written from the ground up.
 
-No matter the parser library, language plugins are a chalenge.  In Pest's case,
+No matter the parser library, language plugins are a challenge.  In Pest's case,
 it has a grammar file that gets turned into Rust code.  For now, we've taken
 the approach of expressing all the parts of the native grammar and where
 plugins are involved, we expose more of a higher-level token stream than

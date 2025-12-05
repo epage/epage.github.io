@@ -71,7 +71,7 @@ paranoia or due to export-restrictions.
   - Some part of culture are embedded in a monorepo's policies
   - Culture alignment can improve efficiency
   - Are there negative aspects of a mono-culture though? Do all practices work for all teams?
-- For software that can't always be shippable, submissions might get throttled during stablization periods but now everyone is on the same stablization schedule, causing other teams to hold your product hostage.
+- For software that can't always be shippable, submissions might get throttled during stabilization periods but now everyone is on the same stabilization schedule, causing other teams to hold your product hostage.
 - Cost of change has an impact on culture, including autonomy and empowerment
   - e.g. With monorepo, can find and update all clients and fix them
     - But required to do it in one pass
