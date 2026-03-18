@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guideline: Rust Style</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>Guideline: Rust Style</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<h1>Checklist</h1>
+<p>Project structure</p>
+<ul>
+<li>Prefer <code>mod.rs</code> over <code>name.rs</code> (P-MOD)</li>
+<li>Directory-root modules only re-export (P-DIR-MOD)</li>
+<li>Prelude module only re-exports (P-PRELUDE-MOD)</li>
+<li>Avoid <code>#[path]</code> (P-PATH-MOD)</li>
+<li>API is a subset of file layout (P-API)</li>
+<li>Simple visibility (P-VISIBILITY)</li>
+</ul>
+<p>File structure</p>
+<ul>
+<li>Private then public imports (M-PRIV-PUB-USE)</li>
+<li>Limit private imports (M-PRIV-USE)</li>
+<li>Import items individually (M-SINGLE-USE)</li>
+<li>Central item first (M-ITEM-TOC)</li>
+<li>Types then associated functions (M-TYPE-ASSOC)</li>
+<li>Associated functions then trait impls (M-ASSOC-TRAIT)</li>
+<li>Caller then callee (M-CALLER-CALLEE)</li>
+<li>Public then private items (M-PUB-PRIV)</li>
+<li>Use your judgement on ambiguity (M-AMBIGUITY)</li>
+</ul>
+<p>Function structure</p>
+<ul>
+<li>Group related logic (F-GROUP)</li>
+<li>Open with output variables (F-OUT)</li>
+<li>Blocks reflect business logic (F-VISUAL)</li>
+<li>Pure combinators (F-COMBINATOR)</li>
+</ul>
+<h1>Principles</h1>
+<p>Writing software is not just an act of writing for the compiler
+but writing for your reviewer and those who will debug and change the code in the future.
+It should be viewed as a form of technical writing and apply the same principles, including:</p>
+<ul>
+<li>[Inverted pyramid](https://en.wikipedia.org/wiki/Inverted_pyramid_(journalism) or Progressive Disclosure:
+lead with or highlight the most salient details, letting readers decide how much they want to dig into the low-level details</li>
+<li>Guide the user through the structure:
+with writing, you guide the user through organization including topical essays, table of contents, sections, paragraphs, sentences, fragments, and words.</li>
+</ul>
+<p>Unlike writing, code is heavily cross-referenced (i.e. functions)
+and your reader has a limited memory shared with a lot of other context.</p>
+<ul>
+<li>Strong abstractions obviate the need to digging into details</li>
+<li>The weaker the abstraction, the closer it needs to be to the use or not even exist
+<ul>
+<li>When optimizing for CPU caches, we consider temporal and spatial locality. Let's offer our reader the same benefit.</li>
+</ul>
+</li>
+</ul>
+<h1>Project structure</h1>
+<h2>Prefer <code>mod.rs</code> over <code>name.rs</code> (P-MOD)</h2>
+<p>When splitting a file into a directory,
+prefer <code>mod.rs</code> for the root module.</p>
+<p>This ensures the module is an atomic unit for
+reading (e.g. browsing, searching) or operating on (e.g. moving, renaming).
+For example, when browsing on GitHub, it can be easy to overlook the existence of a <code>name/</code> when seeing a <code>name.rs</code>.
+This is also consistent with <code>lib.rs</code> and <code>main.rs</code>.</p>
+<p>Automation: enable <a href="https://rust-lang.github.io/rust-clippy/master/index.html?search=self_#self_named_module_files"><code>clippy.self_named_module_files = &quot;warn&quot;</code></a></p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">src/
+</span><span style="color:#c0c5ce;">  stuff/
+</span><span style="color:#c0c5ce;">    stuff_files.rs
+</span><span style="color:#c0c5ce;">  stuff.rs
+</span><span style="color:#c0c5ce;">  lib.rs
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">src/
+</span><span style="color:#c0c5ce;">  stuff/
+</span><span style="color:#c0c5ce;">    stuff_files.rs
+</span><span style="color:#c0c5ce;">    mod.rs
+</span><span style="color:#c0c5ce;">  lib.rs
+</span></code></pre>
+<h2>Directory-root modules only re-export (P-DIR-MOD)</h2>
+<p>When splitting a file into a directory,
+the root of the directory (<code>mod.rs</code>, <code>lib.rs</code>)
+should only contain re-exports.
+All definitions should live in topically named files with <code>mod.rs</code> acting as a Table of Contents.</p>
+<p>It can be confusing for a reader to figure out where to look when logic is
+split between topics and the root.
+It is better to consistently limit it to re-exporting.</p>
+<p>Possible exceptions:</p>
+<ul>
+<li>An inline <code>mod prelude</code> in <code>lib.rs</code></li>
+<li>The titular definition for the module (e.g. a <code>fn compile</code> inside a <code>mod compile</code>)</li>
+</ul>
+<h2>Prelude module only re-exports (P-PRELUDE-MOD)</h2>
+<p>If a prelude is desired,
+they are intended as an import convenience.</p>
+<p>Users would not expect to find original logic in them.</p>
+<h2>Avoid <code>#[path]</code> (P-PATH-MOD)</h2>
+<p>Prefer the standard module lookup rules over <code>#[path]</code>.</p>
+<p>This makes the project structure more predictable.</p>
+<p>Possible exceptions:</p>
+<ul>
+<li>Modding <code>build.rs</code> generated files</li>
+</ul>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cfg</span><span style="color:#c0c5ce;">(windows)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">path</span><span style="color:#c0c5ce;">(foo_windows.rs)]
+</span><span style="color:#b48ead;">mod </span><span style="color:#c0c5ce;">foo;
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cfg</span><span style="color:#c0c5ce;">(unix)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">path</span><span style="color:#c0c5ce;">(foo_unix.rs)]
+</span><span style="color:#b48ead;">mod </span><span style="color:#c0c5ce;">foo;
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cfg</span><span style="color:#c0c5ce;">(windows)]
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">path</span><span style="color:#c0c5ce;">(foo_windows.rs)]
+</span><span style="color:#b48ead;">mod </span><span style="color:#c0c5ce;">foo_windows;
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cfg</span><span style="color:#c0c5ce;">(windows)]
+</span><span style="color:#b48ead;">use</span><span style="color:#c0c5ce;"> foo_windows as foo;
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cfg</span><span style="color:#c0c5ce;">(unix)]
+</span><span style="color:#b48ead;">mod </span><span style="color:#c0c5ce;">foo_unix;
+</span><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">cfg</span><span style="color:#c0c5ce;">(unix)]
+</span><span style="color:#b48ead;">use</span><span style="color:#c0c5ce;"> foo_unix as foo;
+</span></code></pre>
+<h2>API is a subset of file layout (P-API)</h2>
+<p>Modules should only re-export items from child modules and from sibling modules.
+Inline modules should be avoided.</p>
+<p>A dependent of your package should be able to take what they know of the API to browse to the code in question,
+or at least a parent directory of it.</p>
+<p>Exceptions:</p>
+<ul>
+<li>Test modules (<a href="https://github.com/rust-lang/rust-clippy/issues/13589">maybe</a>)</li>
+<li>Preludes</li>
+<li><code>build.rs</code> generated files</li>
+</ul>
+<h1>Simple visibility (P-VISIBILITY)</h1>
+<p>Limit visibility to module-scope (no <code>pub</code>), crate-scope (<code>pub(crate)</code>), or dependent-scope (<code>pub</code>).</p>
+<p>If an item is not fully abstracted within a module to have no <code>pub</code>,
+the differences in which crate-level module can access it is small and <code>pub(crate)</code> should be used.
+By using <code>pub(crate)</code>, it reduces the friction in refactors.
+If there is a module from which it is fully abstracted,
+consider whether that module should instead be a crate.</p>
+<p>Exceptions:</p>
+<ul>
+<li>Test modules</li>
+</ul>
+<h1>File structure</h1>
+<h2>Private then public imports (M-PRIV-PUB-USE)</h2>
+<p>Group public imports with the file's public API.</p>
+<p>Private imports are a detail of the implementation that mostly matters when editing code.
+A reader approaching the file is likely to skip over private imports to look at the public items to get the big picture.</p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">rand::RangeExt as _;
+</span><span style="color:#b48ead;">pub use </span><span style="color:#c0c5ce;">regex::Regex;
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">serde::Deserialize as _;
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">rand::RangeExt as _;
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">serde::Deserialize as _;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">pub use </span><span style="color:#c0c5ce;">regex::Regex;
+</span></code></pre>
+<h2>Limit private imports (M-PRIV-USE)</h2>
+<p>Imports should be limited to where the meaning of the calling code remains obvious.</p>
+<p>Uncommonly used imports can be frequently added and removed as the implementation changes,
+causing merge conflicts.</p>
+<p>Expected use of imports</p>
+<ul>
+<li>Traits (anonymous imports)</li>
+<li>Heavily used items where the intent is clear from the name.</li>
+</ul>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::collections::HashMap;
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::collections::hash_map::Entry;
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">serde::Deserialize;
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::collections::HashMap;
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">serde::Deserialize as _;
+</span></code></pre>
+<h2>Import items individually (M-SINGLE-USE)</h2>
+<p>Compound imports increase the likelihood of merge conflicts.</p>
+<p>Compound imports have higher friction for editing by hand,
+particularly when using editors optimize for line editing like vim.</p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::collections::{HashMap, hash_map::Entry};
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::collections::hash_map::Entry;
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::collections::HashMap;
+</span><span style="color:#b48ead;">use </span><span style="color:#c0c5ce;">std::collections::hash_map::Entry;
+</span></code></pre>
+<h2>Central item first (M-ITEM-TOC)</h2>
+<p>When there is a titular or quintessential item for a module,
+that should come first before any other items.</p>
+<p>This is likely the item the reader is looking for when reading the module.</p>
+<p>This item provides the context for understanding the rest of the module.
+The item serves as a Table of Contents for the rest of the module,
+providing jumping off points for what the reader might want to dig further into.</p>
+<p>Note: this is a specialization of M-CALLER-CALLEE and M-PUB-PRIV.</p>
+<h2>Types then associated functions (M-TYPE-ASSOC)</h2>
+<p>To understand the intent, role, and how to use a type,
+you need to see the public interface for it
+as that provides the abstraction over the fields or variants.</p>
+<p>Exceptions:</p>
+<ul>
+<li>When a type is a newtype for a data-only inner type</li>
+</ul>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">Foo { ... }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">Bar { </span><span style="color:#bf616a;">inner</span><span style="color:#c0c5ce;">: BarInner }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">pub enum </span><span style="color:#c0c5ce;">BarInner { ... }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Foo {}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Bar {}
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">Foo { ... }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Foo {}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">Bar { </span><span style="color:#bf616a;">inner</span><span style="color:#c0c5ce;">: BarInner }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">pub enum </span><span style="color:#c0c5ce;">BarInner { ... }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Bar {}
+</span></code></pre>
+<h2>Associated functions then trait impls (M-ASSOC-TRAIT)</h2>
+<p>Typically,
+associated functions form the core API for a type and
+trait implementations augment that API.</p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">Foo { ... }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Display </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Foo {}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Foo {}
+</span></code></pre>
+<p>Instead use:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">pub struct </span><span style="color:#c0c5ce;">Foo { ... }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Foo {}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">Display </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">Foo {}
+</span></code></pre>
+<h2>Caller then callee (M-CALLER-CALLEE)</h2>
+<p>The caller provides context for the callees.
+The caller provides the context for understanding the callees.
+The caller serves as a Table of Contents,
+providing jumping off points for what the reader might want to dig further into.</p>
+<p>The weaker the abstraction of the callee,
+the more immediately after the caller it should be.</p>
+<p>Note: this is a generalization of M-ITEM-TOC.</p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">const </span><span style="color:#d08770;">FOO</span><span style="color:#c0c5ce;">: </span><span style="color:#b48ead;">str </span><span style="color:#c0c5ce;">= &quot;</span><span style="color:#a3be8c;">...</span><span style="color:#c0c5ce;">&quot;;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">bar</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; Bar { ... }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">foo</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">arg</span><span style="color:#c0c5ce;">: Arg) -&gt; Foo {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> b = </span><span style="color:#96b5b4;">bar</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">FOO</span><span style="color:#c0c5ce;">);
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">foo</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">arg</span><span style="color:#c0c5ce;">: Arg) -&gt; Foo {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> b = </span><span style="color:#96b5b4;">bar</span><span style="color:#c0c5ce;">(</span><span style="color:#d08770;">FOO</span><span style="color:#c0c5ce;">);
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">}
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">const </span><span style="color:#d08770;">FOO</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str </span><span style="color:#c0c5ce;">= &quot;</span><span style="color:#a3be8c;">...</span><span style="color:#c0c5ce;">&quot;;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">bar</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">s</span><span style="color:#c0c5ce;">: &amp;</span><span style="color:#b48ead;">str</span><span style="color:#c0c5ce;">) -&gt; Bar { ... }
+</span></code></pre>
+<h2>Public then private items (M-PUB-PRIV)</h2>
+<p>Group public items before private items, whether in a module, struct, or an impl block.</p>
+<p>These are likely the item the reader is looking for when reading the block.</p>
+<p>Grouping public items provides the context for understanding the rest of the module.
+Grouping public items serves as a Table of Contents for the rest of the module,
+providing jumping off points for what the reader might want to dig further into.</p>
+<p>Note: this is a generalization of M-ITEM-TOC.</p>
+<h2>Use your judgement on ambiguity (M-AMBIGUITY)</h2>
+<p>The file structure guidelines above can be in tension with each other.
+They are roughly ordered but use your judgement for how to apply them in any given situation.</p>
+<h1>Function structure</h1>
+<h2>Group related logic (F-GROUP)</h2>
+<p>Use newlines, or the lack of them, to group logic that shares a purpose.
+These are your &quot;paragraphs&quot; of your function.</p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">report_warning_count</span><span style="color:#c0c5ce;">(&amp;</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">, ...) {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> gctx = runner.bcx.gctx;
+</span><span style="color:#c0c5ce;">    runner.compilation.lint_warning_count += count.lints;
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">let mut</span><span style="color:#c0c5ce;"> message = </span><span style="color:#96b5b4;">descriptive_pkg_name</span><span style="color:#c0c5ce;">(&amp;unit.pkg.</span><span style="color:#96b5b4;">name</span><span style="color:#c0c5ce;">(), &amp;unit.target, &amp;unit.mode);
+</span><span style="color:#c0c5ce;">    message.</span><span style="color:#96b5b4;">push_str</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;"> generated </span><span style="color:#c0c5ce;">&quot;);
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ... builds up `message`
+</span><span style="color:#c0c5ce;">    gctx.</span><span style="color:#96b5b4;">shell</span><span style="color:#c0c5ce;">().</span><span style="color:#96b5b4;">warn</span><span style="color:#c0c5ce;">(message)
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">report_warning_count</span><span style="color:#c0c5ce;">(&amp;</span><span style="color:#bf616a;">self</span><span style="color:#c0c5ce;">, ...) {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> gctx = runner.bcx.gctx;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    runner.compilation.lint_warning_count += count.lints;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">let mut</span><span style="color:#c0c5ce;"> message = </span><span style="color:#96b5b4;">descriptive_pkg_name</span><span style="color:#c0c5ce;">(&amp;unit.pkg.</span><span style="color:#96b5b4;">name</span><span style="color:#c0c5ce;">(), &amp;unit.target, &amp;unit.mode);
+</span><span style="color:#c0c5ce;">    message.</span><span style="color:#96b5b4;">push_str</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;"> generated </span><span style="color:#c0c5ce;">&quot;);
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ... builds up `message`
+</span><span style="color:#c0c5ce;">    gctx.</span><span style="color:#96b5b4;">shell</span><span style="color:#c0c5ce;">().</span><span style="color:#96b5b4;">warn</span><span style="color:#c0c5ce;">(message)
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<h2>Open with output variables (F-OUT)</h2>
+<p>If a block exists to incrementally build up state,
+open with the declaration of that state.</p>
+<p>This will announce the intent of that group.</p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> sentinel = </span><span style="color:#96b5b4;">get_sentinel</span><span style="color:#c0c5ce;">();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> items = </span><span style="color:#96b5b4;">get_items</span><span style="color:#c0c5ce;">();
+</span><span style="color:#b48ead;">let mut</span><span style="color:#c0c5ce;"> message = String::new();
+</span><span style="color:#b48ead;">for</span><span style="color:#c0c5ce;"> item in items {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">let mut</span><span style="color:#c0c5ce;"> message = String::new();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> sentinel = </span><span style="color:#96b5b4;">get_sentinel</span><span style="color:#c0c5ce;">();
+</span><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> items = </span><span style="color:#96b5b4;">get_items</span><span style="color:#c0c5ce;">();
+</span><span style="color:#b48ead;">for</span><span style="color:#c0c5ce;"> item in items {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<h2>Blocks reflect business logic (F-VISUAL)</h2>
+<p>Emphasize the business logic using blocks, like the bodies of <code>if</code>s, <code>else</code>s, and <code>match</code>s.
+Where business logic has mutually exclusive paths, prefer <code>if</code> and <code>else</code> or <code>match</code>  over early returns.
+Instead, prefer early returns for non-business bookkeeping.</p>
+<p>Also prefer combinators (e.g. <code>Iterator</code>, <code>Option</code>, and <code>Result</code> methods) for non-business transformations.</p>
+<p>This draws the reader's attention to the details that matter most, allowing them to dig in further as needed.</p>
+<p>Example:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">if let </span><span style="color:#c0c5ce;">Some(foo) = foo {
+</span><span style="color:#c0c5ce;">    </span><span style="color:#65737e;">// ...
+</span><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">if</span><span style="color:#c0c5ce;"> case {
+</span><span style="color:#c0c5ce;">      </span><span style="color:#b48ead;">return </span><span style="color:#c0c5ce;">Ok(...);
+</span><span style="color:#c0c5ce;">    }
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">    Ok(...)
+</span><span style="color:#c0c5ce;">} </span><span style="color:#b48ead;">else </span><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">    Err(...)
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>Use instead:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">let</span><span style="color:#c0c5ce;"> foo = foo.</span><span style="color:#96b5b4;">ok_or_else</span><span style="color:#c0c5ce;">(|| ...)?;
+</span><span style="color:#b48ead;">if</span><span style="color:#c0c5ce;"> case {
+</span><span style="color:#c0c5ce;">    Ok(...)
+</span><span style="color:#c0c5ce;">} </span><span style="color:#b48ead;">else </span><span style="color:#c0c5ce;">{
+</span><span style="color:#c0c5ce;">    Ok(...)
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<h2>Pure combinators (F-COMBINATOR)</h2>
+<p>Closures passed to combinators (e.g. <code>Iterator</code>, <code>Option</code>, and <code>Result</code> methods) should not have side effects in the business logic.</p>
+<p>When a reader is scanning the file, they are unlikely to parse through the details of the combinators
+and so should not have any surprises.</p>
+<p>Exceptions:</p>
+<ul>
+<li>&quot;Invisible&quot; side effects like caching, logging</li>
+</ul>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
