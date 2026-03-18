@@ -36,7 +36,7 @@ Function structure
 Writing software is not just an act of writing for the compiler
 but writing for your reviewer and those who will debug and change the code in the future.
 It should be viewed as a form of technical writing and apply the same principles, including:
-- [Inverted pyramid](https://en.wikipedia.org/wiki/Inverted_pyramid_(journalism) or Progressive Disclosure:
+- [Inverted pyramid](https://en.wikipedia.org/wiki/Inverted_pyramid_%28journalism%29) or Progressive Disclosure:
   lead with or highlight the most salient details, letting readers decide how much they want to dig into the low-level details
 - Guide the user through the structure:
   with writing, you guide the user through organization including topical essays, table of contents, sections, paragraphs, sentences, fragments, and words.
