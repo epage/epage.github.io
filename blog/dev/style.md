@@ -140,8 +140,8 @@ A dependent of your package should be able to take what they know of the API to 
 or at least a parent directory of it.
 
 Exceptions:
-- Test modules ([maybe](https://github.com/rust-lang/rust-clippy/issues/13589))
-- Preludes
+- Inline test modules ([maybe](https://github.com/rust-lang/rust-clippy/issues/13589))
+- Inline preludes
 - `build.rs` generated files
 
 # Simple visibility (P-VISIBILITY)
