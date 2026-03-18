@@ -213,7 +213,6 @@ particularly when using editors optimize for line editing like vim.
 Example:
 ```rust
 use std::collections::{HashMap, hash_map::Entry};
-use std::collections::hash_map::Entry;
 ```
 Use instead:
 ```rust
