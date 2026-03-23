@@ -490,3 +490,29 @@ disallowed-methods = [
     { path = "std::iter::Iterator::try_for_each", reason = "prefer `for` for side-effects" },
 ]
 ```
+
+Example:
+```rust
+list.map(transform).for_each(collect);
+
+let mut seen = false;
+let other = list
+    .map(|i| {
+      seen = true;
+      // ...
+    })
+    .collect::<Vec<_>>();
+```
+Use instead:
+```rust
+for item in list.map(transform) {
+    collect(item);
+}
+
+let mut other = Vec::new();
+let mut seen = false;
+for item in list {
+      seen = true;
+      // ...
+}
+```
