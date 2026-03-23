@@ -7,29 +7,29 @@ data:
 # Checklist
 
 Project structure
-- Prefer `mod.rs` over `name.rs` (P-MOD)
-- Directory-root modules only re-export (P-DIR-MOD)
-- Prelude module only re-exports (P-PRELUDE-MOD)
-- Avoid `#[path]` (P-PATH-MOD)
-- API is a subset of file layout (P-API)
-- Simple visibility (P-VISIBILITY)
+- Prefer `mod.rs` over `name.rs` ([P-MOD](#p-mod))
+- Directory-root modules only re-export ([P-DIR-MOD](#p-dir-mod))
+- Prelude module only re-exports ([P-PRELUDE-MOD](#p-prelude-mod))
+- Avoid `#[path]` ([P-PATH-MOD](#p-path-mod))
+- API is a subset of file layout ([P-API](#p-api))
+- Simple visibility ([P-VISIBILITY](#p-visibility))
 
 File structure
-- Private then public imports (M-PRIV-PUB-USE)
-- Limit private imports (M-PRIV-USE)
-- Import items individually (M-SINGLE-USE)
-- Central item first (M-ITEM-TOC)
-- Types then associated functions (M-TYPE-ASSOC)
-- Associated functions then trait impls (M-ASSOC-TRAIT)
-- Caller then callee (M-CALLER-CALLEE)
-- Public then private items (M-PUB-PRIV)
-- Use your judgement on ambiguity (M-AMBIGUITY)
+- Private then public imports ([M-PRIV-PUB-USE](#m-priv-pub-use))
+- Limit private imports ([M-PRIV-USE](#m-priv-use))
+- Import items individually ([M-SINGLE-USE](#m-single-use))
+- Central item first ([M-ITEM-TOC](#m-item-toc))
+- Types then associated functions ([M-TYPE-ASSOC](#m-type-assoc))
+- Associated functions then trait impls ([M-ASSOC-TRAIT](#m-assoc-trait))
+- Caller then callee ([M-CALLER-CALLEE](#m-caller-callee))
+- Public then private items ([M-PUB-PRIV](#m-pub-priv))
+- Use your judgement on ambiguity ([M-AMBIGUITY](#m-ambiguity))
 
 Function structure
-- Group related logic (F-GROUP)
-- Open with output variables (F-OUT)
-- Blocks reflect business logic (F-VISUAL)
-- Pure combinators (F-COMBINATOR)
+- Group related logic ([F-GROUP](#f-group))
+- Open with output variables ([F-OUT](#f-out))
+- Blocks reflect business logic ([F-VISUAL](#f-visual))
+- Pure combinators ([F-COMBINATOR](#f-combinator))
 
 # Principles
 
@@ -48,6 +48,8 @@ and your reader has a limited memory shared with a lot of other context.
   - When optimizing for CPU caches, we consider temporal and spatial locality. Let's offer our reader the same benefit.
 
 # Project structure
+
+<a id="p-mod"></a>
 
 ## Prefer `mod.rs` over `name.rs` (P-MOD)
 
@@ -78,6 +80,8 @@ src/
   lib.rs
 ```
 
+<a id="p-dir-mod"></a>
+
 ## Directory-root modules only re-export (P-DIR-MOD)
 
 When splitting a file into a directory,
@@ -93,12 +97,16 @@ Possible exceptions:
 - An inline `mod prelude` in `lib.rs`
 - The titular definition for the module (e.g. a `fn compile` inside a `mod compile`)
 
+<a id="p-prelude-mod"></a>
+
 ## Prelude module only re-exports (P-PRELUDE-MOD)
 
 If a prelude is desired,
 they are intended as an import convenience.
 
 Users would not expect to find original logic in them.
+
+<a id="p-path-mod"></a>
 
 ## Avoid `#[path]` (P-PATH-MOD)
 
@@ -131,6 +139,8 @@ mod foo_unix;
 use foo_unix as foo;
 ```
 
+<a id="p-api"></a>
+
 ## API is a subset of file layout (P-API)
 
 Modules should only re-export items from child modules and from sibling modules.
@@ -143,6 +153,8 @@ Exceptions:
 - Inline test modules ([maybe](https://github.com/rust-lang/rust-clippy/issues/13589))
 - Inline preludes
 - `build.rs` generated files
+
+<a id="p-visibility"></a>
 
 # Simple visibility (P-VISIBILITY)
 
@@ -158,6 +170,8 @@ Exceptions:
 - Test modules
 
 # File structure
+
+<a id="m-priv-pub-use"></a>
 
 ## Private then public imports (M-PRIV-PUB-USE)
 
@@ -179,6 +193,8 @@ use serde::Deserialize as _;
 
 pub use regex::Regex;
 ```
+
+<a id="m-priv-use"></a>
 
 ## Limit private imports (M-PRIV-USE)
 
@@ -203,6 +219,8 @@ use std::collections::HashMap;
 use serde::Deserialize as _;
 ```
 
+<a id="m-single-use"></a>
+
 ## Import items individually (M-SINGLE-USE)
 
 Compound imports increase the likelihood of merge conflicts.
@@ -220,6 +238,8 @@ use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 ```
 
+<a id="m-item-toc"></a>
+
 ## Central item first (M-ITEM-TOC)
 
 When there is a titular or quintessential item for a module,
@@ -232,6 +252,8 @@ The item serves as a Table of Contents for the rest of the module,
 providing jumping off points for what the reader might want to dig further into.
 
 Note: this is a specialization of M-CALLER-CALLEE and M-PUB-PRIV.
+
+<a id="m-type-assoc"></a>
 
 ## Types then associated functions (M-TYPE-ASSOC)
 
@@ -267,6 +289,8 @@ pub enum BarInner { ... }
 impl Bar {}
 ```
 
+<a id="m-assoc-trait"></a>
+
 ## Associated functions then trait impls (M-ASSOC-TRAIT)
 
 Typically,
@@ -289,6 +313,8 @@ impl Foo {}
 
 impl Display for Foo {}
 ```
+
+<a id="m-caller-callee"></a>
 
 ## Caller then callee (M-CALLER-CALLEE)
 
@@ -327,6 +353,8 @@ const FOO: &str = "...";
 fn bar(s: &str) -> Bar { ... }
 ```
 
+<a id="m-pub-priv"></a>
+
 ## Public then private items (M-PUB-PRIV)
 
 Group public items before private items, whether in a module, struct, or an impl block.
@@ -339,12 +367,16 @@ providing jumping off points for what the reader might want to dig further into.
 
 Note: this is a generalization of M-ITEM-TOC.
 
+<a id="m-ambiguity"></a>
+
 ## Use your judgement on ambiguity (M-AMBIGUITY)
 
 The file structure guidelines above can be in tension with each other.
 They are roughly ordered but use your judgement for how to apply them in any given situation.
 
 # Function structure
+
+<a id="f-group"></a>
 
 ## Group related logic (F-GROUP)
 
@@ -376,6 +408,8 @@ fn report_warning_count(&self, ...) {
 }
 ```
 
+<a id="f-out"></a>
+
 ## Open with output variables (F-OUT)
 
 If a block exists to incrementally build up state,
@@ -401,6 +435,8 @@ for item in items {
     // ...
 }
 ```
+
+<a id="f-visual"></a>
 
 ## Blocks reflect business logic (F-VISUAL)
 
@@ -434,6 +470,8 @@ if case {
     Ok(...)
 }
 ```
+
+<a id="f-combinator"></a>
 
 ## Pure combinators (F-COMBINATOR)
 
