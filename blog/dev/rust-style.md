@@ -405,6 +405,7 @@ fn report_warning_count(&self, ...) {
     let mut message = descriptive_pkg_name(&unit.pkg.name(), &unit.target, &unit.mode);
     message.push_str(" generated ");
     // ... builds up `message`
+
     gctx.shell().warn(message)
 }
 ```
