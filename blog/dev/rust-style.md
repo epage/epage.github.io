@@ -251,7 +251,7 @@ This item provides the context for understanding the rest of the module.
 The item serves as a Table of Contents for the rest of the module,
 providing jumping off points for what the reader might want to dig further into.
 
-Note: this is a specialization of M-CALLER-CALLEE and M-PUB-PRIV.
+Note: this is a specialization of [M-CALLER-CALLEE](#m-caller-callee) and [M-PUB-PRIV](#m-pub-priv).
 
 <a id="m-type-assoc"></a>
 
@@ -326,7 +326,7 @@ providing jumping off points for what the reader might want to dig further into.
 The weaker the abstraction of the callee,
 the more immediately after the caller it should be.
 
-Note: this is a generalization of M-ITEM-TOC.
+Note: this is a generalization of [M-ITEM-TOC](#m-item-toc).
 
 Example:
 ```rust
@@ -365,7 +365,7 @@ Grouping public items provides the context for understanding the rest of the mod
 Grouping public items serves as a Table of Contents for the rest of the module,
 providing jumping off points for what the reader might want to dig further into.
 
-Note: this is a generalization of M-ITEM-TOC.
+Note: this is a generalization of [M-ITEM-TOC](#m-item-toc).
 
 <a id="m-ambiguity"></a>
 
