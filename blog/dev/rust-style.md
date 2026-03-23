@@ -161,7 +161,7 @@ Exceptions:
 
 Limit visibility to module-scope (no `pub(_)`), crate-scope (`pub(crate)`), or dependent-scope (`pub`).
 
-If an item is not fully abstracted within a module to have no `pub`,
+If an item is not fully abstracted within a module to have no `pub(_)`,
 the differences in which crate-level module can access it is small and `pub(crate)` should be used.
 By using `pub(crate)`, it reduces the friction in refactors.
 If there is a module from which it is fully abstracted,
