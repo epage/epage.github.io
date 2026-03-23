@@ -482,3 +482,11 @@ and so should not have any surprises.
 
 Exceptions:
 - "Invisible" side effects like caching, logging
+
+Automation: add the following to your `.clippy.toml`:
+```toml
+disallowed-methods = [
+    { path = "std::iter::Iterator::for_each", reason = "prefer `for` for side-effects" },
+    { path = "std::iter::Iterator::try_for_each", reason = "prefer `for` for side-effects" },
+]
+```
