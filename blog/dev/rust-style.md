@@ -29,6 +29,7 @@ Function structure
 - Group related logic ([F-GROUP](#f-group))
 - Open with output variables ([F-OUT](#f-out))
 - Blocks reflect business logic ([F-VISUAL](#f-visual))
+- Pure xor mutability ([F-PURE-MUT](#f-pure-mut))
 - Pure combinators ([F-COMBINATOR](#f-combinator))
 
 # Principles
@@ -471,6 +472,45 @@ if case {
 }
 ```
 
+<a id = "f-pure-mut"></a>
+
+## Pure xor mutability (F-PURE-MUT)
+
+The logic should either be expressed as statements with side effects or pure expressions but the two should not be mixed as it subverts the readers expectation, making it likely they miss a mutation.
+
+Exceptions:
+- "Invisible" side effects like caching, logging
+
+Example:
+```rust
+let mut case = false;
+let foo = if something {
+    case = true;
+    // ...
+} else {
+    // ...
+};
+```
+Use instead either:
+```rust
+let mut case = false;
+let foo;
+if something {
+    case = true;
+    // ...
+} else {
+    // ...
+}
+```
+Or:
+```rust
+let (foo, case) = if something {
+    // ...
+} else {
+    // ...
+};
+```
+
 <a id="f-combinator"></a>
 
 ## Pure combinators (F-COMBINATOR)
@@ -479,6 +519,8 @@ Closures passed to combinators (e.g. `Iterator`, `Option`, and `Result` methods)
 
 When a reader is scanning the file, they are unlikely to parse through the details of the combinators
 and so should not have any surprises.
+
+This is a specific application of [F-PURE-MUT](#f-pure-mut).
 
 Exceptions:
 - "Invisible" side effects like caching, logging
