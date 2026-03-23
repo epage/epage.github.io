@@ -159,7 +159,7 @@ Exceptions:
 
 # Simple visibility (P-VISIBILITY)
 
-Limit visibility to module-scope (no `pub`), crate-scope (`pub(crate)`), or dependent-scope (`pub`).
+Limit visibility to module-scope (no `pub(_)`), crate-scope (`pub(crate)`), or dependent-scope (`pub`).
 
 If an item is not fully abstracted within a module to have no `pub`,
 the differences in which crate-level module can access it is small and `pub(crate)` should be used.
