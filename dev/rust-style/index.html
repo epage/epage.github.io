@@ -155,7 +155,7 @@ or at least a parent directory of it.</p>
 </ul>
 <p><a id="p-visibility"></a></p>
 <h1>Simple visibility (P-VISIBILITY)</h1>
-<p>Limit visibility to module-scope (no <code>pub</code>), crate-scope (<code>pub(crate)</code>), or dependent-scope (<code>pub</code>).</p>
+<p>Limit visibility to module-scope (no <code>pub(_)</code>), crate-scope (<code>pub(crate)</code>), or dependent-scope (<code>pub</code>).</p>
 <p>If an item is not fully abstracted within a module to have no <code>pub</code>,
 the differences in which crate-level module can access it is small and <code>pub(crate)</code> should be used.
 By using <code>pub(crate)</code>, it reduces the friction in refactors.
