@@ -47,6 +47,7 @@ and your reader has a limited memory shared with a lot of other context.
 - Strong abstractions obviate the need to digging into details
 - The weaker the abstraction, the closer it needs to be to the use or not even exist
   - When optimizing for CPU caches, we consider temporal and spatial locality. Let's offer our reader the same benefit.
+- The reader will skim the majority of code
 
 # Project structure
 
