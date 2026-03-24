@@ -230,6 +230,8 @@ Compound imports increase the likelihood of merge conflicts.
 Compound imports have higher friction for editing by hand,
 particularly when using editors optimize for line editing like vim.
 
+The need for compound imports is greatly reduced with [M-PRIV-USE](#m-priv-use).
+
 Example:
 ```rust
 use std::collections::{HashMap, hash_map::Entry};
