@@ -60,7 +60,10 @@ prefer `mod.rs` for the root module.
 
 This ensures the module is an atomic unit for
 reading (e.g. browsing, searching) or operating on (e.g. moving, renaming).
-For example, when browsing on GitHub, it can be easy to overlook the existence of a `name/` when seeing a `name.rs`.
+
+This ensures readers have an expectation that when they look at `foo.rs`,
+that they know it is self-contained and that there are not submodules to also consider.
+
 This is also consistent with `lib.rs` and `main.rs`.
 
 Automation: enable [`clippy.self_named_module_files = "warn"`](https://rust-lang.github.io/rust-clippy/master/index.html?search=self_#self_named_module_files)
