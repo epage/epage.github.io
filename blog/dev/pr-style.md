@@ -68,7 +68,7 @@ A contributor's audience also extends to future readers, including
 
 ## Start with an Issue (D-ISSUE)
 
-Each PR should link to an issue, either fixing it or being an incremental step (e.g. a refactor, see [C-ISOLATE](#c-isolate)).
+Each PR should link to an issue with a reviewer's buy-in on the solution, either fixing it or being an incremental step (e.g. a refactor, see [C-ISOLATE](#c-isolate)).
 
 When creating the issue,
 the focus should be on the relevant use cases and the challenges within them.
