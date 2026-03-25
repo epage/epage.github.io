@@ -262,7 +262,7 @@ Examples:
 
 ## Isolate controversy (C-ISOLATE)
 
-Isolate changes that are likely to generate a lot of discussion to PRs with the fewest commits possible,
+Isolate changes that are likely to generate a lot of discussion to PRs with the fewest commits possible.
 If refactors make sense independent of the controversial part of the PR,
 split them out into a separate PR.
 
