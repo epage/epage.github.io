@@ -230,6 +230,14 @@ It can even be helpful to split out the adding or removing of a scope.
 For example, say a group of logic is going to be gated by an <code>if</code> condition,
 you can have a refactor commit that moves that logic into an indented block
 and then have the commit that adds the needed <code>if</code> before it.</p>
+<p>If a lot of refactors touch the same section of code,
+this means that a merge conflict on that section of code needs to be resolved multiple times.
+However, resolving each conflict is much easier.
+With <a href="#c-isolate">C-ISOLATE</a>,
+the review can also go much faster, reducing the risk of conflicts.</p>
+<p>For refactors that only make sense in the context of a feature or fix,
+structuring all of this can be throwaway work if the PR is not accepted.
+This is less likely to happen with <a href="#d-issue">D-ISSUE</a>.</p>
 <p>Examples:</p>
 <ul>
 <li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
@@ -249,6 +257,8 @@ These are likely isolated to refactors commits,
 thanks to <a href="#c-split">C-SPLIT</a>,
 and a fairly good likelihood that they can be justified without the controversial part,
 making them quick to merge when split out into a separate PR.</p>
+<p>You don't know what will be controversial before you post your PR.
+Familiarity with the culture and practices of a project makes this easier to predict.</p>
 <p>Examples:</p>
 <ul>
 <li><a href="https://github.com/rust-lang/cargo/pull/13993">cargo#13993</a> (refactor),
