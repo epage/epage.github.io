@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guideline: PR Style</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>Guideline: PR Style</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<h1>Checklist</h1>
+<p>Discussion</p>
+<ul>
+<li>Start with an Issue (<a href="#d-issue">D-ISSUE</a>)</li>
+<li>Avoid noise (<a href="#d-noise">D-NOISE</a>)</li>
+<li>Enable decisions (<a href="#d-summarize">D-SUMMARIZE</a>)</li>
+<li>Discuss (<a href="#d-discuss">D-DISCUSS</a>)</li>
+</ul>
+<p>Commit structure</p>
+<ul>
+<li>Atomic commits (<a href="#c-atomic">C-ATOMIC</a>)</li>
+<li>Be clear in a commit's intent (<a href="#c-intent">C-INTENT</a>)</li>
+<li>Reproduce the problem (<a href="#c-test">C-TEST</a>)</li>
+<li>Split out refactors (<a href="#c-split">C-SPLIT</a>)</li>
+<li>Isolate controversy (<a href="#c-isolate">C-ISOLATE</a>)</li>
+</ul>
+<h1>Principles</h1>
+<p>Problems we are trying to avoid include:</p>
+<ul>
+<li>PRs immediately rejected</li>
+<li>PRs sitting in limbo for years</li>
+<li>Back and forth that burns you out from your contribution</li>
+</ul>
+<p>Preparing a PR is an act of persuasive writing where you are trying to convince a reviewer to accept your contribution.
+A contribution involves both the user impact and the architectural impact and the reviewer needs to be convinced on both fronts.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion">modes of persuasion</a> include</p>
+<ul>
+<li>ethos, or an appeal to authority</li>
+<li>pathos, or an appeal to emotion</li>
+<li>logos, or an appeal to logic</li>
+</ul>
+<p>Ethos can be dangerous.
+If the reviewer does not the value the authority you are leveraging,
+they will distrust you and your contribution.
+Coercing through authority can lead to resentment or disengagement
+(e.g. relying on management pressure to push your PRs through).
+If the reviewer values your authority in any form,
+they could be concerned for how a perceived slight might get amplified
+they may be more cautious in what they say, causing longer feedback loops.
+A contributor can borrow authority by looking towards prior art but that can lead to cargo culting.</p>
+<p>Contributors relying on pathos has led to many negative outcomes for reviewers.
+For some, they take on a guilt that pressures them to do more and they burn out.
+Some avoid the guilt by emotionally shutting themselves off from contributors.
+A light touch is needed,
+like providing anecdotes when getting buy-in on the problem being solved
+which can help reviewers feel the impact the contribution will have on users
+more than statistics would.</p>
+<p>Logos is the primary mode when contributing.
+Reviewers need to internalize your reasoning to help them make decisions in the future around your or related use cases.
+Look to prior art and the motivations behind them (inferred if needed).
+Provide guideposts within your contribution to help them step through and understand it.</p>
+<p>A contributor's audience also extends to future readers, including</p>
+<ul>
+<li>Users looking at PRs to better understand a change</li>
+<li>Contributors seeking to better understand the motives for the code they are changing</li>
+<li>Contributors root causing behavior, like with <code>git bisect</code></li>
+</ul>
+<h1>Discussion</h1>
+<p><a id="d-issue"></a></p>
+<h2>Start with an Issue (D-ISSUE)</h2>
+<p>Each PR should link to an issue, either fixing it or being an incremental step (e.g. a refactor).</p>
+<p>When creating the issue,
+the focus should be on the relevant use cases and the challenges within them.
+Potential solutions can and will be discussed but as exploration of options.
+Do not be too attached to a specific solution.</p>
+<p>Starting with a PR causes the discussion of use cases, challenges, solutions, and the implementation of one particular solution to all be mixed together.
+Without discipline,
+reviewers and contributors can needlessly iterate on the implementation in parallel to conversations that can lead to more fundamental changes, causing extra iterations and delay that can lead to frustration and burn out on both sides.</p>
+<p>Discussing use cases, challenges, and solutions on a PR can fracture the conversation,
+making it harder to follow,
+making it less likely a reviewer will feel confident moving forward with your change.
+Not all PRs get merged and a different PR might finally address the problem.
+Some contributors are less familiar with git and create a new PR each time they try to update it.
+Some contributors will try out multiple solutions.
+Some will abandon their work and another will pick it up.</p>
+<p>PRs also create social pressure on reviewers to quickly merge them.
+The contributor is invested in the problem and there being a solution and presumably put effort into that particular solution.
+Catering to these contributors can lead to burnout or emotional disengagement of reviewers.
+Similarly, a large review backlog can burnout reviewers.
+Contributors waiting on the resolution of an Issue gives reviewers the opportunity to evaluate their capacity for reviewing changes.</p>
+<p>Exceptions:</p>
+<ul>
+<li>Obvious cases, on the order of typos.  In practice, many people over-estimate how obvious their case is, even for seemingly &quot;simple&quot; documentation changes.</li>
+</ul>
+<p><a id="d-noise"></a></p>
+<h2>Avoid noise (D-NOISE)</h2>
+<p>Do not make low effort posts,
+e.g. &quot;me too&quot;, &quot;when will this be fixed?&quot;, &quot;what is the status?&quot;.</p>
+<p>These add nothing.</p>
+<p>The Issue is the source of truth for a problem and should be updated if there is a status change.
+Acting as a &quot;forcing function&quot; by posting notifies everyone, wasting there time.
+If a reviewer decides to provide a personalized update for you,
+it will cause a disruptive context switch and take from their total available time,
+reducing the capacity to productively move that Issue forward.</p>
+<p>&quot;Me too&quot;s are an ineffective way of communicating the scope of a problem.
+When there is something new, describe your use case and the problem in a way to either convey the importance of the feature or additional requirements.</p>
+<p><a id="d-summarize"></a></p>
+<h2>Enable decisions (D-SUMMARIZE)</h2>
+<p>Summarizing the state of an Issue in terms that address reviewers needs is a powerful way to move an Issue forward.
+Long threads take time for all participants to catch up on each time the topic is discussed
+and making it likely that reviewers avoid the topic.</p>
+<p>Reviewers need to consider:</p>
+<ul>
+<li>Alignment with the values of the project</li>
+<li>Alignment with other users needs</li>
+<li>Alignment with existing and expected features to make sure they are cohesive</li>
+<li>Long-term maintenance load, in particular the increase in expectations a change creates for users</li>
+</ul>
+<p>Go beyond your personal need and look through the thread with that lens, covering topics like</p>
+<ul>
+<li>Use cases</li>
+<li>Requirements derived from those use cases</li>
+<li>Relevant requirements of the project that impact this issue</li>
+<li>Prior art from outside of the project</li>
+<li>Solutions and their trade offs</li>
+</ul>
+<p>It can also help to separately post a proposed solution derived from the above.</p>
+<p>Be careful about too lightly dismissing roadblocks as irrelevant as that can erode trust in your summary with the reviewer.</p>
+<p><a id = "d-discuss"></a></p>
+<h2>Discuss (D-DISCUSS)</h2>
+<p>Issues and PRs are discussions and communication should go both ways.
+As the user and/or the contributor,
+you have a unique perspective that the reviewer lacks as they are viewing this from afar.
+Don't blindly accept everything they say but share with them that personal knowledge.
+However, recognize that in the end it is the reviewers decision and accept final decisions.</p>
+<h1>Commit structure</h1>
+<p><a id="c-atomic"></a></p>
+<h2>Atomic commits (C-ATOMIC)</h2>
+<p>Each commit is minimal, yet complete.
+It fulfills a single purpose.
+It stands enough on its own to build, pass tests, pass formatters, etc.</p>
+<p>Symptoms of a non-atomic commit:</p>
+<ul>
+<li>&quot;and&quot; is in the commit description: likely fulfilling two purposes and should be split</li>
+<li>contains dead code: not complete, making it harder to review the appropriateness of without the caller</li>
+<li>common operations during a <code>git bisect</code> would fail (or mangle the commit like formatters)</li>
+<li>being followed by commits that address CI failures or review feedback</li>
+</ul>
+<p>Commits within a PR serve as guideposts for explaining your change to the reviewer and future readers as well as are the unit for root causing a problem with <code>git bisect</code>.
+By focusing on atomic commits,
+the reader is given a cohesive picture of what that commit is intended to do for properly evaluating all of the pieces.
+For <code>git bisect</code>, the caller is likely to get a more precise result.</p>
+<p>Exceptions:</p>
+<ul>
+<li>Pedantic linters may fail due to expected changes in upcoming commits within the PR</li>
+<li>If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes</li>
+</ul>
+<p><a id="c-intent"></a></p>
+<h2>Be clear in a commit's intent (C-INTENT)</h2>
+<p>The commit summary should clearly state the intent of the commit,
+particularly the visibility of the impact.
+This is where methods like <a href="https://www.conventionalcommits.org/">Conventional Commit</a> help
+which provides a way for describing the impact
+(e.g. <code>feat</code>, <code>fix</code>, <code>refactor</code>)
+and the scope of that impact.</p>
+<p>This helps the reviewer know what to look for or not look for,
+making it faster to scan for the commit and find ways that the commit didn't match the intent
+(e.g. a refactor changing an error message).</p>
+<p><a id="c-test"></a></p>
+<h2>Reproduce the problem (C-TEST)</h2>
+<p>Start the PR with one or more commits that introduce any additional tests needed for the PR,
+with the tests reproducing the existing behavior.</p>
+<p>This applies the concept of &quot;a picture is worth a thousand words&quot; to your PR.
+As future commits change the behavior,
+this gets visualized in the diff of the test results.</p>
+<p>This also helps you in making sure you are testing the right behavior
+if you make a behavior change and the tests remain unchanged.</p>
+<p>Depending on the type of change, the initial tests can take many shapes, including</p>
+<ul>
+<li>the fix commit just updates the expected output</li>
+<li>the feature commit adds an additional API call and updates the expected output</li>
+<li>the test commit uses an older API and the feature commit switches it to the new API call and updates the expected output</li>
+</ul>
+<p>In determining how to structure the test commits,
+the focus should be on ensuring the diff of the tests accentuates the key changes and minimizes noise.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
+<li><a href="https://github.com/rust-lang/cargo/pull/16265">cargo#16265</a></li>
+</ul>
+<p><a id="c-split"></a></p>
+<h2>Split out refactors (C-SPLIT)</h2>
+<p>Split refactor steps out of commits with behavior changes.</p>
+<p>A commit may seem atomic because it has only one side effect but
+the reviewer can still be flooded with a sea of green and red lines and
+have to reverse engineer the changes to identify how the pieces fit together,
+what changed behavior, etc.</p>
+<p>Identifying and splitting out refactors can provide guideposts
+to help the reviewer step through the change in smaller, faster to understand pieces.
+Ideally, they would be broken down into individual refactor steps
+(e.g. &quot;rename a variable&quot; or &quot;extract a method&quot;).
+It can even be helpful to split out the adding or removing of a scope.
+For example, say a group of logic is going to be gated by an <code>if</code> condition,
+you can have a refactor commit that moves that logic into an indented block
+and then have the commit that adds the needed <code>if</code> before it.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
+</ul>
+<p><a id="c-isolate"></a></p>
+<h2>Isolate controversy (C-ISOLATE)</h2>
+<p>Isolate changes that are likely to generate a lot of discussion to PRs with the fewest commits possible,
+If refactors make sense independent of the controversial part of the PR,
+split them out into a separate PR.</p>
+<p>The most controversial part of a PR draws the most attention,
+causing other parts of the PR to be neglected,
+serializing the review feedback cycles.</p>
+<p>It can also be difficult to track the state of many different threads and some things are likely to be forgotten until the very end, causing extra feedback cycles or PRs that aren't ready to be merged.</p>
+<p>The longer the PR review takes,
+the higher the chance of merge conflicts building up.
+These are likely isolated to refactors commits,
+thanks to <a href="#c-split">C-SPLIT</a>,
+and a fairly good likelihood that they can be justified without the controversial part,
+making them quick to merge when split out into a separate PR.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/cargo/pull/13993">cargo#13993</a>,
+<a href="https://github.com/rust-lang/cargo/pull/14169">cargo#14169</a>,
+<a href="https://github.com/rust-lang/cargo/pull/14231">cargo#14231</a>,
+<a href="https://github.com/rust-lang/cargo/pull/14234">cargo#14234</a>,
+<a href="https://github.com/rust-lang/cargo/pull/14239">cargo#14239</a></li>
+<li><a href="https://github.com/rust-lang/cargo/pull/13589">cargo#13589</a>,
+<a href="https://github.com/rust-lang/cargo/pull/13664">cargo#13664</a>,
+<a href="https://github.com/rust-lang/cargo/pull/13666">cargo#13666</a>,
+<a href="https://github.com/rust-lang/cargo/pull/13693">cargo#13693</a>,
+<a href="https://github.com/rust-lang/cargo/pull/13701">cargo#13701</a>,
+<a href="https://github.com/rust-lang/cargo/pull/13713">cargo#13713</a>,
+<a href="https://github.com/rust-lang/cargo/pull/13849">cargo#13849</a></li>
+</ul>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
