@@ -208,6 +208,10 @@ making it faster to scan for the commit and find ways that the commit didn't mat
 Start the PR with one or more commits that introduce any additional tests needed for the PR,
 with the tests reproducing the existing behavior.
 
+![split commits in PR]({{site.base_url}}/talks/contrib-test-fix-split.png)
+
+![the fix]({{site.base_url}}/talks/contrib-test-after.png)
+
 This applies the concept of "a picture is worth a thousand words" to your PR.
 As future commits change the behavior,
 this gets visualized in the diff of the test results.
