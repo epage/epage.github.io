@@ -201,6 +201,9 @@ This helps the reviewer know what to look for or not look for,
 making it faster to scan for the commit and find ways that the commit didn't match the intent
 (e.g. a refactor changing an error message).
 
+Examples:
+- [annotate-snippets-rs#380](https://github.com/rust-lang/annotate-snippets-rs/pull/380)
+
 <a id="c-test"></a>
 
 ## Reproduce the problem (C-TEST)
