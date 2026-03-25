@@ -280,15 +280,15 @@ and a fairly good likelihood that they can be justified without the controversia
 making them quick to merge when split out into a separate PR.
 
 Examples:
-- [cargo#13993](https://github.com/rust-lang/cargo/pull/13993),
-  [cargo#14169](https://github.com/rust-lang/cargo/pull/14169),
-  [cargo#14231](https://github.com/rust-lang/cargo/pull/14231),
-  [cargo#14234](https://github.com/rust-lang/cargo/pull/14234),
-  [cargo#14239](https://github.com/rust-lang/cargo/pull/14239)
-- [cargo#13589](https://github.com/rust-lang/cargo/pull/13589),
-  [cargo#13664](https://github.com/rust-lang/cargo/pull/13664),
-  [cargo#13666](https://github.com/rust-lang/cargo/pull/13666),
-  [cargo#13693](https://github.com/rust-lang/cargo/pull/13693),
-  [cargo#13701](https://github.com/rust-lang/cargo/pull/13701),
-  [cargo#13713](https://github.com/rust-lang/cargo/pull/13713),
-  [cargo#13849](https://github.com/rust-lang/cargo/pull/13849)
+- [cargo#13993](https://github.com/rust-lang/cargo/pull/13993) (refactor),
+  [cargo#14169](https://github.com/rust-lang/cargo/pull/14169) (refactor),
+  [cargo#14231](https://github.com/rust-lang/cargo/pull/14231) (refactor),
+  [cargo#14234](https://github.com/rust-lang/cargo/pull/14234) (fix),
+  [cargo#14239](https://github.com/rust-lang/cargo/pull/14239) (fix)
+- [cargo#13589](https://github.com/rust-lang/cargo/pull/13589) (refactor),
+  [cargo#13664](https://github.com/rust-lang/cargo/pull/13664) (fix),
+  [cargo#13666](https://github.com/rust-lang/cargo/pull/13666) (refactor),
+  [cargo#13693](https://github.com/rust-lang/cargo/pull/13693) (refactor),
+  [cargo#13701](https://github.com/rust-lang/cargo/pull/13701) (refactor),
+  [cargo#13713](https://github.com/rust-lang/cargo/pull/13713) (fix),
+  [cargo#13849](https://github.com/rust-lang/cargo/pull/13849) (fix)
