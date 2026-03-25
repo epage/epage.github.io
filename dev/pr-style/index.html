@@ -162,7 +162,7 @@ It stands enough on its own to build, pass tests, pass formatters, etc.</p>
 <p>Symptoms of a non-atomic commit:</p>
 <ul>
 <li>&quot;and&quot; is in the commit description: likely fulfilling two purposes and should be split</li>
-<li>contains dead code: not complete, making it harder to review the appropriateness of without the caller</li>
+<li>contains dead code: not complete, making it harder to review the appropriateness without the caller</li>
 <li>common operations during a <code>git bisect</code> would fail (or mangle the commit like formatters)</li>
 <li>being followed by commits that address CI failures or review feedback</li>
 </ul>
@@ -258,6 +258,10 @@ These are likely isolated to refactors commits,
 thanks to <a href="#c-split">C-SPLIT</a>,
 and a fairly good likelihood that they can be justified without the controversial part,
 making them quick to merge when split out into a separate PR.</p>
+<p>By splitting a PR up into smaller chunks,
+any other work dependent on those earlier PRs is now unblocked.</p>
+<p>If a change needs to be reverted,
+you've made it clear what the minimally invasive set of commits is for reverting.</p>
 <p>You don't know what will be controversial before you post your PR.
 Familiarity with the culture and practices of a project makes this easier to predict.</p>
 <p>Examples:</p>
