@@ -88,6 +88,10 @@ Some contributors are less familiar with git and create a new PR each time they 
 Some will try out multiple solutions.
 Some will abandon their work and another will pick it up.
 
+If someone does walk away from a PR,
+we are no longer tracking the need in our backlog.
+Someone looking for existing conversations is unlikely to find it among the PRs.
+
 PRs also create social pressure on reviewers to quickly merge them.
 The contributor is invested in the problem and there being a solution and presumably put effort into that particular solution.
 Catering to these contributors can lead to burnout or emotional disengagement of reviewers.
