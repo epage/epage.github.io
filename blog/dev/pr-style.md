@@ -81,7 +81,8 @@ reviewers and contributors can needlessly iterate on the implementation in paral
 
 Discussing use cases, challenges, and solutions on a PR can fracture the conversation,
 making it harder to follow,
-making it less likely a reviewer will feel confident moving forward with your change.
+making it take more work to come up to speed when looking at it,
+likely leading the reviewer to avoid your PR.
 Not all PRs get merged and a different PR might finally address the problem.
 Some contributors are less familiar with git and create a new PR each time they try to update it.
 Some contributors will try out multiple solutions.
