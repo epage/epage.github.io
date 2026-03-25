@@ -293,6 +293,9 @@ making them quick to merge when split out into a separate PR.
 By splitting a PR up into smaller chunks,
 any other work dependent on those earlier PRs is now unblocked.
 
+If a change needs to be reverted,
+you've made it clear what the minimally invasive set of commits is for reverting.
+
 You don't know what will be controversial before you post your PR.
 Familiarity with the culture and practices of a project makes this easier to predict.
 
