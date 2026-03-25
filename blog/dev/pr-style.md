@@ -279,6 +279,9 @@ thanks to [C-SPLIT](#c-split),
 and a fairly good likelihood that they can be justified without the controversial part,
 making them quick to merge when split out into a separate PR.
 
+You don't know what will be controversial before you post your PR.
+Familiarity with the culture and practices of a project makes this easier to predict.
+
 Examples:
 - [cargo#13993](https://github.com/rust-lang/cargo/pull/13993) (refactor),
   [cargo#14169](https://github.com/rust-lang/cargo/pull/14169) (refactor),
