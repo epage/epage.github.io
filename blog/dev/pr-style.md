@@ -173,7 +173,7 @@ It stands enough on its own to build, pass tests, pass formatters, etc.
 
 Symptoms of a non-atomic commit:
 - "and" is in the commit description: likely fulfilling two purposes and should be split
-- contains dead code: not complete, making it harder to review the appropriateness of without the caller
+- contains dead code: not complete, making it harder to review the appropriateness without the caller
 - common operations during a `git bisect` would fail (or mangle the commit like formatters)
 - being followed by commits that address CI failures or review feedback
 
