@@ -140,6 +140,11 @@ It can also help to separately post a proposed solution derived from the above.
 
 Be careful about too lightly dismissing roadblocks as irrelevant as that can erode trust in your summary with the reviewer.
 
+Examples
+- <https://github.com/rust-lang/cargo/issues/2644#issuecomment-1489371226>
+- <https://github.com/rust-lang/cargo/issues/8728#issuecomment-1610265047>
+- <https://github.com/rust-lang/cargo/issues/9930#issuecomment-1489089277>
+
 <a id = "d-discuss"></a>
 
 ## Discuss (D-DISCUSS)
