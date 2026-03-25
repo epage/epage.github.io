@@ -155,6 +155,8 @@ you have a unique perspective that the reviewer lacks as they are viewing this f
 Don't blindly accept everything they say but share with them that personal knowledge.
 However, recognize that in the end it is the reviewers decision and accept final decisions.
 
+Similarly, respond to questions instead of making assumptions about their intent and pushing new code changes.
+
 # Commit structure
 
 <a id="c-atomic"></a>
