@@ -133,7 +133,7 @@ Go beyond your personal need and look through the thread with that lens, coverin
 - Use cases
 - Requirements derived from those use cases
 - Relevant requirements of the project that impact this issue
-- Prior art from outside of the project
+- Relevant prior art from inside and outside of the project
 - Solutions and their trade offs
 
 It can also help to separately post a proposed solution derived from the above.
