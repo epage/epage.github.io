@@ -255,6 +255,16 @@ For example, say a group of logic is going to be gated by an `if` condition,
 you can have a refactor commit that moves that logic into an indented block
 and then have the commit that adds the needed `if` before it.
 
+If a lot of refactors touch the same section of code,
+this means that a merge conflict on that section of code needs to be resolved multiple times.
+However, resolving each conflict is much easier.
+With [C-ISOLATE](#c-isolate),
+the review can also go much faster, reducing the risk of conflicts.
+
+For refactors that only make sense in the context of a feature or fix,
+structuring all of this can be throwaway work if the PR is not accepted.
+This is less likely to happen with [D-ISSUE](#d-issue).
+
 Examples:
 - [annotate-snippets-rs#380](https://github.com/rust-lang/annotate-snippets-rs/pull/380)
 
