@@ -85,7 +85,7 @@ making it take more work to come up to speed when looking at it,
 likely leading the reviewer to avoid your PR.
 Not all PRs get merged and a different PR might finally address the problem.
 Some contributors are less familiar with git and create a new PR each time they try to update it.
-Some contributors will try out multiple solutions.
+Some will try out multiple solutions.
 Some will abandon their work and another will pick it up.
 
 PRs also create social pressure on reviewers to quickly merge them.
