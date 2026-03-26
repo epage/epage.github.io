@@ -43,6 +43,7 @@ If the reviewer values your authority in any form,
 they could be concerned for how a perceived slight might get amplified
 they may be more cautious in what they say, causing longer feedback loops.
 A contributor can borrow authority by looking towards prior art but that can lead to cargo culting.
+Prior art should be backed by analysis, making it part of your logos.
 
 Contributors relying on pathos has led to many negative outcomes for reviewers.
 For some, they take on a guilt that pressures them to do more and they burn out.
