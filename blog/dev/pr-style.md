@@ -21,7 +21,7 @@ Commit structure
 
 # Principles
 
-Problems we are trying to avoid include:
+Problems we are trying to avoid include with these guidelines include:
 - PRs immediately rejected
 - PRs sitting in limbo for years
 - Back and forth that burns you out from your contribution
@@ -89,7 +89,7 @@ Some will try out multiple solutions.
 Some will abandon their work and another will pick it up.
 
 If someone does walk away from a PR,
-we are no longer tracking the need in our backlog.
+the need is no longer being tracked in the reviewer's backlog.
 Someone looking for existing conversations is unlikely to find it among the PRs.
 
 PRs also create social pressure on reviewers to quickly merge them.
