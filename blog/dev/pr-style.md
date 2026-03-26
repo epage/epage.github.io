@@ -301,6 +301,8 @@ you've made it clear what the minimally invasive set of commits is for reverting
 You don't know what will be controversial before you post your PR.
 Familiarity with the culture and practices of a project makes this easier to predict.
 
+Commits should not be split out into a dependency PR if there is an assumption that the now dependent PR will be merged in the future.
+
 Examples:
 - [cargo#13993](https://github.com/rust-lang/cargo/pull/13993) (refactor),
   [cargo#14169](https://github.com/rust-lang/cargo/pull/14169) (refactor),
