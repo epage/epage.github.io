@@ -181,6 +181,7 @@ the reader is given a cohesive picture of what that commit is intended to do for
 With atomic commits, the user running <code>git bisect</code> is likely to get a more precise result.</p>
 <p>Exceptions:</p>
 <ul>
+<li>A &quot;fix&quot; to the main behavior-changing commit is purely additive and intentionally created as a separate commit more to break down the problem into smaller pieces for the reviewer to follow</li>
 <li>Pedantic linters may fail due to expected changes in upcoming commits within the PR</li>
 <li>If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes</li>
 </ul>
@@ -233,6 +234,9 @@ the review can also go much faster, reducing the risk of conflicts.</p>
 <p>For refactors that only make sense in the context of a feature or fix,
 structuring all of this can be throwaway work if the PR is not accepted.
 This is less likely to happen with <a href="#d-issue">D-ISSUE</a>.</p>
+<p>How far to split up commits is subjective,
+based on the complexity of the problem and
+the familiarity of your reviewer with that section of code.</p>
 <p>Examples:</p>
 <ul>
 <li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
@@ -271,9 +275,9 @@ making them quick to merge when split out into a separate PR.</p>
 any other work dependent on those earlier PRs is now unblocked.</p>
 <p>If a change needs to be reverted,
 you've made it clear what the minimally invasive set of commits is for reverting.</p>
+<p>Commits should not be split out into a dependency PR if there is an assumption that the now dependent PR will be merged in the future.</p>
 <p>You don't know what will be controversial before you post your PR.
 Familiarity with the culture and practices of a project makes this easier to predict.</p>
-<p>Commits should not be split out into a dependency PR if there is an assumption that the now dependent PR will be merged in the future.</p>
 <p>Examples:</p>
 <ul>
 <li><a href="https://github.com/rust-lang/cargo/pull/13993">cargo#13993</a> (refactor),
