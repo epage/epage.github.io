@@ -105,6 +105,7 @@ Exceptions:
 
 Examples:
 - [RFC 3537](https://rust-lang.github.io/rfcs/3537-msrv-resolver.html#status-quo) includes an anecdote in the collapsed text
+- [winnow#131](https://github.com/winnow-rs/winnow/issues/131) had one contributor work through multiple solutions ([reference](https://github.com/winnow-rs/winnow/issues/131#issuecomment-2483705925)) and was resolved by another pair of contributors in [winnow#804](https://github.com/winnow-rs/winnow/pull/804)
 
 <a id="d-noise"></a>
 
