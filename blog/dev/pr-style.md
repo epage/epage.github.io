@@ -177,10 +177,12 @@ Symptoms of a non-atomic commit:
 - common operations during a `git bisect` would fail (or mangle the commit like formatters)
 - being followed by commits that address CI failures or review feedback
 
-Commits within a PR serve as guideposts for explaining your change to the reviewer and future readers as well as are the unit for root causing a problem with `git bisect`.
+Commits within a PR serve as guideposts for explaining your change to the reviewer and future readers.
 By focusing on atomic commits,
 the reader is given a cohesive picture of what that commit is intended to do for properly evaluating all of the pieces.
-For `git bisect`, the caller is likely to get a more precise result.
+
+Commits are the unit for root causing a problem with `git bisect`.
+With atomic commits, the user running `git bisect` is likely to get a more precise result.
 
 Exceptions:
 - Pedantic linters may fail due to expected changes in upcoming commits within the PR
