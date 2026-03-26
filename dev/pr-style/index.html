@@ -23,6 +23,7 @@
 <li>Start with an Issue (<a href="#d-issue">D-ISSUE</a>)</li>
 <li>Avoid noise (<a href="#d-noise">D-NOISE</a>)</li>
 <li>Enable decisions (<a href="#d-summarize">D-SUMMARIZE</a>)</li>
+<li>Prepare the reviewer (<a href="#d-prepare">D-PREPARE</a>)</li>
 <li>These are two-way discussions (<a href="#d-discuss">D-DISCUSS</a>)</li>
 </ul>
 <p>Commit structure</p>
@@ -34,7 +35,7 @@
 <li>Isolate controversy (<a href="#c-isolate">C-ISOLATE</a>)</li>
 </ul>
 <h1>Principles</h1>
-<p>Problems we are trying to avoid include with these guidelines include:</p>
+<p>Problems we are trying to avoid with these guidelines include:</p>
 <ul>
 <li>PRs immediately rejected</li>
 <li>PRs sitting in limbo for years</li>
@@ -153,6 +154,18 @@ and making it likely that reviewers avoid the topic.</p>
 <li><a href="https://github.com/rust-lang/cargo/issues/8728#issuecomment-1610265047">https://github.com/rust-lang/cargo/issues/8728#issuecomment-1610265047</a></li>
 <li><a href="https://github.com/rust-lang/cargo/issues/9930#issuecomment-1489089277">https://github.com/rust-lang/cargo/issues/9930#issuecomment-1489089277</a></li>
 </ul>
+<p><a id = "d-prepare"></a></p>
+<h2>Prepare the reviewer (D-PREPARE)</h2>
+<p>Set expectations for the reviewer through the PR description and inline comments.</p>
+<p>Example topics to explore include:</p>
+<ul>
+<li>Where did you diverge from previous discussions and why?</li>
+<li>What is deferred and why?</li>
+<li>What decisions did you end up making along the way and why?</li>
+<li>What does not have automated testing and why?  What manual testing was done for it?</li>
+</ul>
+<p>The answer to some of these questions may best be left attached to related lines of code as inline comments.</p>
+<p>You may also want to add inline comments to acknowledge and start discussions on controversial topics.</p>
 <p><a id = "d-discuss"></a></p>
 <h2>These are two-way discussions (D-DISCUSS)</h2>
 <p>Issues and PRs are discussions and communication should go both ways.
