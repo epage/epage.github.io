@@ -102,6 +102,9 @@ Contributors waiting on the resolution of an Issue gives reviewers the opportuni
 Exceptions:
 - Obvious cases, on the order of typos.  In practice, many people over-estimate how obvious their case is, even for seemingly "simple" documentation changes.
 
+Examples:
+- [RFC 3537](https://rust-lang.github.io/rfcs/3537-msrv-resolver.html#status-quo) includes an anecdote in the collapsed text
+
 <a id="d-noise"></a>
 
 ## Avoid noise (D-NOISE)
