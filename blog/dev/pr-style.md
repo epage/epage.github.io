@@ -184,6 +184,8 @@ Don't blindly accept everything they say but share with them that personal knowl
 However, recognize that in the end it is the reviewers decision and accept final decisions.
 
 Similarly, respond to questions instead of making assumptions about their intent and pushing new code changes.
+Even if you decide to act on a question,
+still provide an answer and recognize that it might not be fully resolved.
 
 # Commit structure
 
