@@ -88,6 +88,7 @@ Not all PRs get merged and a different PR might finally address the problem.
 Some contributors are less familiar with git and create a new PR each time they try to update it.
 Some will try out multiple solutions.
 Some will abandon their work and another will pick it up.
+The reviewer does not know whether the PR they are looking at will be one of these.
 
 If someone does walk away from a PR,
 the need is no longer being tracked in the reviewer's backlog.
