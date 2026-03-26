@@ -28,9 +28,9 @@
 <p>Commit structure</p>
 <ul>
 <li>Atomic commits (<a href="#c-atomic">C-ATOMIC</a>)</li>
-<li>Be clear in a commit's intent (<a href="#c-intent">C-INTENT</a>)</li>
 <li>Reproduce the problem (<a href="#c-test">C-TEST</a>)</li>
 <li>Split out refactors (<a href="#c-split">C-SPLIT</a>)</li>
+<li>Be clear in a commit's intent (<a href="#c-intent">C-INTENT</a>)</li>
 <li>Isolate controversy (<a href="#c-isolate">C-ISOLATE</a>)</li>
 </ul>
 <h1>Principles</h1>
@@ -166,29 +166,15 @@ It stands enough on its own to build, pass tests, pass formatters, etc.</p>
 <li>common operations during a <code>git bisect</code> would fail (or mangle the commit like formatters)</li>
 <li>being followed by commits that address CI failures or review feedback</li>
 </ul>
-<p>Commits within a PR serve as guideposts for explaining your change to the reviewer and future readers as well as are the unit for root causing a problem with <code>git bisect</code>.
+<p>Commits within a PR serve as guideposts for explaining your change to the reviewer and future readers.
 By focusing on atomic commits,
-the reader is given a cohesive picture of what that commit is intended to do for properly evaluating all of the pieces.
-For <code>git bisect</code>, the caller is likely to get a more precise result.</p>
+the reader is given a cohesive picture of what that commit is intended to do for properly evaluating all of the pieces.</p>
+<p>Commits are the unit for root causing a problem with <code>git bisect</code>.
+With atomic commits, the user running <code>git bisect</code> is likely to get a more precise result.</p>
 <p>Exceptions:</p>
 <ul>
 <li>Pedantic linters may fail due to expected changes in upcoming commits within the PR</li>
 <li>If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes</li>
-</ul>
-<p><a id="c-intent"></a></p>
-<h2>Be clear in a commit's intent (C-INTENT)</h2>
-<p>The commit summary should clearly state the intent of the commit,
-particularly the visibility of the impact.
-This is where methods like <a href="https://www.conventionalcommits.org/">Conventional Commit</a> help
-which provides a way for describing the impact
-(e.g. <code>feat</code>, <code>fix</code>, <code>refactor</code>)
-and the scope of that impact.</p>
-<p>This helps the reviewer know what to look for or not look for,
-making it faster to scan for the commit and find ways that the commit didn't match the intent
-(e.g. a refactor changing an error message).</p>
-<p>Examples:</p>
-<ul>
-<li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
 </ul>
 <p><a id="c-test"></a></p>
 <h2>Reproduce the problem (C-TEST)</h2>
@@ -243,6 +229,21 @@ This is less likely to happen with <a href="#d-issue">D-ISSUE</a>.</p>
 <ul>
 <li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
 </ul>
+<p><a id="c-intent"></a></p>
+<h2>Be clear in a commit's intent (C-INTENT)</h2>
+<p>The commit summary should clearly state the intent of the commit,
+particularly the visibility of the impact.
+This is where methods like <a href="https://www.conventionalcommits.org/">Conventional Commit</a> help
+which provides a way for describing the impact
+(e.g. <code>feat</code>, <code>fix</code>, <code>refactor</code>)
+and the scope of that impact.</p>
+<p>This helps the reviewer know what to look for or not look for,
+making it faster to scan for the commit and find ways that the commit didn't match the intent
+(e.g. a refactor changing an error message).</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
+</ul>
 <p><a id="c-isolate"></a></p>
 <h2>Isolate controversy (C-ISOLATE)</h2>
 <p>Isolate changes that are likely to generate a lot of discussion to PRs with the fewest commits possible.
@@ -264,6 +265,7 @@ any other work dependent on those earlier PRs is now unblocked.</p>
 you've made it clear what the minimally invasive set of commits is for reverting.</p>
 <p>You don't know what will be controversial before you post your PR.
 Familiarity with the culture and practices of a project makes this easier to predict.</p>
+<p>Commits should not be split out into a dependency PR if there is an assumption that the now dependent PR will be merged in the future.</p>
 <p>Examples:</p>
 <ul>
 <li><a href="https://github.com/rust-lang/cargo/pull/13993">cargo#13993</a> (refactor),
