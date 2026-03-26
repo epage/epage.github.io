@@ -12,6 +12,7 @@ Discussion
 - Enable decisions ([D-SUMMARIZE](#d-summarize))
 - Prepare the reviewer ([D-PREPARE](#d-prepare))
 - These are two-way discussions ([D-DISCUSS](#d-discuss))
+- Exercise caution in marking comments as resolved ([D-RESOLVE](#d-resolve))
 
 Commit structure
 - Atomic commits ([C-ATOMIC](#c-atomic))
@@ -186,6 +187,15 @@ However, recognize that in the end it is the reviewers decision and accept final
 Similarly, respond to questions instead of making assumptions about their intent and pushing new code changes.
 Even if you decide to act on a question,
 still provide an answer and recognize that it might not be fully resolved.
+
+<a id = "d-resolve"></a>
+
+## Exercise caution in marking comments as resolved (D-RESOLVE)
+
+Leave the resolving of threads to the reviewer unless you are extremely confident in your change and/or answer.
+
+The reviewer needs to confirm how the change was resolved.
+Leaving it open keeps it visible in their backlog.
 
 # Commit structure
 
