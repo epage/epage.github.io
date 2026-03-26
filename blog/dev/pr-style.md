@@ -258,6 +258,10 @@ For refactors that only make sense in the context of a feature or fix,
 structuring all of this can be throwaway work if the PR is not accepted.
 This is less likely to happen with [D-ISSUE](#d-issue).
 
+How far to split up commits is subjective,
+based on the complexity of the problem and
+the familiarity of your reviewer with that section of code.
+
 Examples:
 - [annotate-snippets-rs#380](https://github.com/rust-lang/annotate-snippets-rs/pull/380)
 
@@ -306,10 +310,10 @@ any other work dependent on those earlier PRs is now unblocked.
 If a change needs to be reverted,
 you've made it clear what the minimally invasive set of commits is for reverting.
 
+Commits should not be split out into a dependency PR if there is an assumption that the now dependent PR will be merged in the future.
+
 You don't know what will be controversial before you post your PR.
 Familiarity with the culture and practices of a project makes this easier to predict.
-
-Commits should not be split out into a dependency PR if there is an assumption that the now dependent PR will be merged in the future.
 
 Examples:
 - [cargo#13993](https://github.com/rust-lang/cargo/pull/13993) (refactor),
