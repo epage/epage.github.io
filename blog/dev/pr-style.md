@@ -14,9 +14,9 @@ Discussion
 
 Commit structure
 - Atomic commits ([C-ATOMIC](#c-atomic))
-- Be clear in a commit's intent ([C-INTENT](#c-intent))
 - Reproduce the problem ([C-TEST](#c-test))
 - Split out refactors ([C-SPLIT](#c-split))
+- Be clear in a commit's intent ([C-INTENT](#c-intent))
 - Isolate controversy ([C-ISOLATE](#c-isolate))
 
 # Principles
@@ -188,24 +188,6 @@ Exceptions:
 - Pedantic linters may fail due to expected changes in upcoming commits within the PR
 - If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes
 
-<a id="c-intent"></a>
-
-## Be clear in a commit's intent (C-INTENT)
-
-The commit summary should clearly state the intent of the commit,
-particularly the visibility of the impact.
-This is where methods like [Conventional Commit](https://www.conventionalcommits.org/) help
-which provides a way for describing the impact
-(e.g. `feat`, `fix`, `refactor`)
-and the scope of that impact.
-
-This helps the reviewer know what to look for or not look for,
-making it faster to scan for the commit and find ways that the commit didn't match the intent
-(e.g. a refactor changing an error message).
-
-Examples:
-- [annotate-snippets-rs#380](https://github.com/rust-lang/annotate-snippets-rs/pull/380)
-
 <a id="c-test"></a>
 
 ## Reproduce the problem (C-TEST)
@@ -267,6 +249,24 @@ the review can also go much faster, reducing the risk of conflicts.
 For refactors that only make sense in the context of a feature or fix,
 structuring all of this can be throwaway work if the PR is not accepted.
 This is less likely to happen with [D-ISSUE](#d-issue).
+
+Examples:
+- [annotate-snippets-rs#380](https://github.com/rust-lang/annotate-snippets-rs/pull/380)
+
+<a id="c-intent"></a>
+
+## Be clear in a commit's intent (C-INTENT)
+
+The commit summary should clearly state the intent of the commit,
+particularly the visibility of the impact.
+This is where methods like [Conventional Commit](https://www.conventionalcommits.org/) help
+which provides a way for describing the impact
+(e.g. `feat`, `fix`, `refactor`)
+and the scope of that impact.
+
+This helps the reviewer know what to look for or not look for,
+making it faster to scan for the commit and find ways that the commit didn't match the intent
+(e.g. a refactor changing an error message).
 
 Examples:
 - [annotate-snippets-rs#380](https://github.com/rust-lang/annotate-snippets-rs/pull/380)
