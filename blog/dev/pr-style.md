@@ -10,7 +10,7 @@ Discussion
 - Start with an Issue ([D-ISSUE](#d-issue))
 - Avoid noise ([D-NOISE](#d-noise))
 - Enable decisions ([D-SUMMARIZE](#d-summarize))
-- Discuss ([D-DISCUSS](#d-discuss))
+- These are two-way discussions ([D-DISCUSS](#d-discuss))
 
 Commit structure
 - Atomic commits ([C-ATOMIC](#c-atomic))
@@ -151,7 +151,7 @@ Examples
 
 <a id = "d-discuss"></a>
 
-## Discuss (D-DISCUSS)
+## These are two-way discussions (D-DISCUSS)
 
 Issues and PRs are discussions and communication should go both ways.
 As the user and/or the contributor,
