@@ -10,6 +10,7 @@ Discussion
 - Start with an Issue ([D-ISSUE](#d-issue))
 - Avoid noise ([D-NOISE](#d-noise))
 - Enable decisions ([D-SUMMARIZE](#d-summarize))
+- Prepare the reviewer ([D-PREPARE](#d-prepare))
 - These are two-way discussions ([D-DISCUSS](#d-discuss))
 
 Commit structure
@@ -155,6 +156,22 @@ Examples
 - <https://github.com/rust-lang/cargo/issues/2644#issuecomment-1489371226>
 - <https://github.com/rust-lang/cargo/issues/8728#issuecomment-1610265047>
 - <https://github.com/rust-lang/cargo/issues/9930#issuecomment-1489089277>
+
+<a id = "d-prepare"></a>
+
+## Prepare the reviewer (D-PREPARE)
+
+Set expectations for the reviewer through the PR description and inline comments.
+
+Example topics to explore include:
+- Where did you diverge from previous discussions and why?
+- What is deferred and why?
+- What decisions did you end up making along the way and why?
+- What does not have automated testing and why?  What manual testing was done for it?
+
+The answer to some of these questions may best be left attached to related lines of code as inline comments.
+
+You may also want to add inline comments to acknowledge and start discussions on controversial topics.
 
 <a id = "d-discuss"></a>
 
