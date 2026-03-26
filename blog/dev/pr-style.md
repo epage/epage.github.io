@@ -21,7 +21,7 @@ Commit structure
 
 # Principles
 
-Problems we are trying to avoid include with these guidelines include:
+Problems we are trying to avoid with these guidelines include:
 - PRs immediately rejected
 - PRs sitting in limbo for years
 - Back and forth that burns you out from your contribution
