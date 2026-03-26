@@ -72,6 +72,7 @@ Each PR should link to an issue with a reviewer's buy-in on the solution, either
 
 When creating the issue,
 the focus should be on the relevant use cases and the challenges within them.
+Provide anecdotes to add some ethos.
 Potential solutions can and will be discussed but as exploration of options.
 Do not be too attached to a specific solution.
 
