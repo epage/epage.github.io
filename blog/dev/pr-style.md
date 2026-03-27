@@ -42,8 +42,8 @@ they will distrust you and your contribution.
 Coercing through authority can lead to resentment or disengagement
 (e.g. relying on management pressure to push your PRs through).
 If the reviewer values your authority in any form,
-they could be concerned for how a perceived slight might get amplified
-they may be more cautious in what they say, causing longer feedback loops.
+they could be concerned for how a perceived slight might get amplified.
+They may be more cautious in what they say, causing longer feedback loops.
 A contributor can borrow authority by looking towards prior art but that can lead to cargo culting.
 Prior art should be backed by analysis, making it part of your logos.
 
