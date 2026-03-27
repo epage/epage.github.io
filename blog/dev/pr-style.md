@@ -286,14 +286,14 @@ How far to split up commits is subjective,
 based on the complexity of the problem and
 the familiarity of your reviewer with that section of code.
 
-If a lot of refactors touch the same section of code,
-this means that a merge conflict on that section of code needs to be resolved multiple times.
+If a lot of the refactor commits touch the same section of code,
+then a merge conflict on that section of code needs to be resolved multiple times.
 However, resolving each conflict is much easier.
 With [C-ISOLATE](#c-isolate),
 the review can also go much faster, reducing the risk of conflicts.
 
 For refactors that only make sense in the context of a feature or fix,
-structuring all of this can be throwaway work if the PR is not accepted.
+carefully crafting small refactor commits can be throwaway work if the PR is not accepted.
 This is less likely to happen with [D-ISSUE](#d-issue).
 
 Examples:
