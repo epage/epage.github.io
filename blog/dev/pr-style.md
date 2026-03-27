@@ -239,7 +239,7 @@ Any feature or fix commits will then update the tests as behavior changes.
 *Example commits:*
 ![test and fix commits in PR]({{site.base_url}}/talks/contrib-test-fix-split.png)
 
-*Only text change in the above `fix` commit:*
+*Only text change in the above "fix" commit:*
 ![impact of fix on tests]({{site.base_url}}/talks/contrib-test-after.png)
 
 This applies the concept of "a picture is worth a thousand words" to your PR.
