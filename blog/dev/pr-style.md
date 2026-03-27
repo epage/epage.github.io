@@ -107,6 +107,7 @@ Creating an Issue and then immediately posting a PR shows you are not taking thi
 
 Exceptions:
 - Obvious cases, on the order of typos.  In practice, many people over-estimate how obvious their case is, even for seemingly "simple" documentation changes.
+- *Sometimes* it can be useful to have a personal branch or a Draft PR to illustrate something in the Issue but this can also lead to or come across as being too attached to a particular solution.
 
 Examples:
 - [RFC 3537](https://rust-lang.github.io/rfcs/3537-msrv-resolver.html#status-quo) includes an anecdote in the collapsed text
