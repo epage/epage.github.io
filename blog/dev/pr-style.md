@@ -275,12 +275,16 @@ what changed behavior, etc.
 
 Identifying and splitting out refactors can provide guideposts
 to help the reviewer step through the change in smaller, faster to understand pieces.
-Ideally, they would be broken down into individual refactor steps
+
+The ideal case would be to break it down into individual refactor steps
 (e.g. "rename a variable" or "extract a method").
 It can even be helpful to split out the adding or removing of a scope.
 For example, say a group of logic is going to be gated by an `if` condition,
 you can have a refactor commit that moves that logic into an indented block
 and then have the commit that adds the needed `if` before it.
+How far to split up commits is subjective,
+based on the complexity of the problem and
+the familiarity of your reviewer with that section of code.
 
 If a lot of refactors touch the same section of code,
 this means that a merge conflict on that section of code needs to be resolved multiple times.
@@ -291,10 +295,6 @@ the review can also go much faster, reducing the risk of conflicts.
 For refactors that only make sense in the context of a feature or fix,
 structuring all of this can be throwaway work if the PR is not accepted.
 This is less likely to happen with [D-ISSUE](#d-issue).
-
-How far to split up commits is subjective,
-based on the complexity of the problem and
-the familiarity of your reviewer with that section of code.
 
 Examples:
 - [annotate-snippets-rs#380](https://github.com/rust-lang/annotate-snippets-rs/pull/380)
