@@ -204,9 +204,9 @@ the reader is given a cohesive picture of what that commit is intended to do for
 With atomic commits, the user running <code>git bisect</code> is likely to get a more precise result.</p>
 <p>Exceptions:</p>
 <ul>
-<li>A &quot;fix&quot; to the main behavior-changing commit is purely additive and intentionally created as a separate commit more to break down the problem into smaller pieces for the reviewer to follow</li>
-<li>Pedantic linters may fail due to expected changes in upcoming commits within the PR</li>
-<li>If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes</li>
+<li>Keeping commit that &quot;fixes&quot; the main behavior-changing commit when it is purely additive and intentionally created as a separate commit more to break down the problem into smaller pieces for the reviewer to follow</li>
+<li><em>Sometimes</em> there are pedantic lints that will naturally be resolved by later commits within a PR and resolving them immediately can make it harder for the reviewer to follow the changes</li>
+<li>If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes (<a href="https://github.com/rust-lang/cargo/pull/16600">example</a>)</li>
 </ul>
 <p><a id="c-test"></a></p>
 <h2>Reproduce the problem (C-TEST)</h2>
