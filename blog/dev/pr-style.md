@@ -95,7 +95,7 @@ The reviewer does not know whether the PR they are looking at will be one of the
 
 If someone does walk away from a PR,
 the need is no longer being tracked in the reviewer's backlog.
-Someone looking for existing conversations is unlikely to find it among the PRs.
+Someone looking for existing conversations is likely to look among the Issues and not find it.
 
 PRs also create social pressure on reviewers to quickly merge them.
 The contributor is invested in the problem and there being a solution and presumably put effort into that particular solution.
