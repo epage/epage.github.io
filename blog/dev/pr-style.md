@@ -71,9 +71,9 @@ A contributor's audience also extends to future readers, including
 
 ## Start with an Issue (D-ISSUE)
 
-Each PR should link to an issue with a reviewer's buy-in on the solution, either fixing it or being an incremental step (e.g. a refactor, see [C-ISOLATE](#c-isolate)).
+Each PR should link to an Issue with a reviewer's buy-in on the solution, either fixing it or being an incremental step (e.g. a refactor, see [C-ISOLATE](#c-isolate)).
 
-When creating the issue,
+When creating the Issue,
 the focus should be on the relevant use cases and the challenges within them.
 Provide anecdotes to add some ethos.
 Potential solutions can and will be discussed but as exploration of options.
@@ -145,7 +145,7 @@ Reviewers need to consider:
 Go beyond your personal need and look through the thread with that lens, covering topics like
 - Use cases
 - Requirements derived from those use cases
-- Relevant requirements of the project that impact this issue
+- Relevant requirements of the project that impact this Issue
 - Relevant prior art from inside and outside of the project
 - Solutions and their trade offs
 
