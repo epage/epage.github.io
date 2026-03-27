@@ -245,7 +245,7 @@ Any feature or fix commits will then update the tests as behavior changes.
 This applies the concept of "a picture is worth a thousand words" to your PR.
 As future commits change the behavior,
 this gets visualized in the diff of the test results,
-clarifying the intent of your PR better than most PR descriptions both to the reviewer and any community members looking to better understand the intent of change.
+clarifying the intent of your PR better than most PR descriptions to both the reviewer and any community members looking to better understand the intent of change.
 
 This also helps you in making sure you are testing the right behavior
 if you make a behavior change and the tests remain unchanged.
