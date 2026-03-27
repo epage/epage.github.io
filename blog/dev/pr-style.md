@@ -58,7 +58,7 @@ more than statistics would.
 Logos is the primary mode when contributing.
 Reviewers need to internalize your reasoning to help them make decisions in the future around your or related use cases.
 Look to prior art and the motivations behind them (inferred if needed).
-Provide guideposts within your contribution to help them step through and understand it.
+Provide guideposts within your contribution to step them through and understand your PR.
 
 A contributor's audience also extends to future readers, including
 - Users looking at PRs to better understand a change
