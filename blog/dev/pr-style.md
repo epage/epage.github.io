@@ -305,8 +305,8 @@ Examples:
 
 The commit summary should clearly state the intent of the commit,
 particularly the visibility of the impact.
-This is where methods like [Conventional Commit](https://www.conventionalcommits.org/) help
-which provides a way for describing the impact
+This is where conventions like [Conventional Commit](https://www.conventionalcommits.org/) help
+which specify a consistent and upfront way to describe the impact
 (e.g. `feat`, `fix`, `refactor`)
 and the scope of that impact.
 
