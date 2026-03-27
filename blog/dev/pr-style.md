@@ -224,9 +224,9 @@ Commits are the unit for root causing a problem with `git bisect`.
 With atomic commits, the user running `git bisect` is likely to get a more precise result.
 
 Exceptions:
-- A "fix" to the main behavior-changing commit is purely additive and intentionally created as a separate commit more to break down the problem into smaller pieces for the reviewer to follow
-- Pedantic linters may fail due to expected changes in upcoming commits within the PR
-- If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes
+- Keeping commit that "fixes" the main behavior-changing commit when it is purely additive and intentionally created as a separate commit more to break down the problem into smaller pieces for the reviewer to follow
+- *Sometimes* there are pedantic lints that will naturally be resolved by later commits within a PR and resolving them immediately can make it harder for the reviewer to follow the changes
+- If a commit is too large to easily understand, a well abstracted unused API may be a good place to split it to help guide the user through your changes ([example](https://github.com/rust-lang/cargo/pull/16600))
 
 <a id="c-test"></a>
 
