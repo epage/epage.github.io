@@ -194,7 +194,7 @@ still provide an answer and recognize that it might not be fully resolved.
 
 Leave the resolving of threads to the reviewer unless you are extremely confident in your change and/or answer.
 
-The reviewer needs to confirm how the change was resolved.
+The reviewer will likely want to confirm how their feedback was resolved to make sure it was fully understood.
 Leaving it open keeps it visible in their backlog.
 
 # Commit structure
