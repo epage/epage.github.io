@@ -103,6 +103,8 @@ Catering to these contributors can lead to burnout or emotional disengagement of
 Similarly, a large review backlog can burnout reviewers.
 Contributors waiting on the resolution of an Issue gives reviewers the opportunity to evaluate their capacity for reviewing changes.
 
+Creating an Issue and then immediately posting a PR shows you are not taking this seriously.
+
 Exceptions:
 - Obvious cases, on the order of typos.  In practice, many people over-estimate how obvious their case is, even for seemingly "simple" documentation changes.
 
