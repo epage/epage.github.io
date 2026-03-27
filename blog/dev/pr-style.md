@@ -48,7 +48,7 @@ A contributor can borrow authority by looking towards prior art but that can lea
 Prior art should be backed by analysis, making it part of your logos.
 
 Contributors relying on pathos has led to many negative outcomes for reviewers.
-For some, they take on a guilt that pressures them to do more and they burn out.
+For some, they take on a guilt that pressures them to do more and they burnout.
 Some avoid the guilt by emotionally shutting themselves off from contributors.
 A light touch is needed,
 like providing anecdotes when getting buy-in on the problem being solved
@@ -81,7 +81,7 @@ Do not be too attached to a specific solution.
 
 Starting with a PR causes the discussion of use cases, challenges, solutions, and the implementation of one particular solution to all be mixed together.
 Without discipline,
-reviewers and contributors can needlessly iterate on the implementation in parallel to conversations that can lead to more fundamental changes, causing extra iterations and delay that can lead to frustration and burn out on both sides.
+reviewers and contributors can needlessly iterate on the implementation in parallel to conversations that can lead to more fundamental changes, causing extra iterations and delay that can lead to frustration and burnout on both sides.
 
 Discussing use cases, challenges, and solutions on a PR can fracture the conversation,
 making it harder to follow,
