@@ -61,7 +61,7 @@ They may be more cautious in what they say, causing longer feedback loops.
 A contributor can borrow authority by looking towards prior art but that can lead to cargo culting.
 Prior art should be backed by analysis, making it part of your logos.</p>
 <p>Contributors relying on pathos has led to many negative outcomes for reviewers.
-For some, they take on a guilt that pressures them to do more and they burn out.
+For some, they take on a guilt that pressures them to do more and they burnout.
 Some avoid the guilt by emotionally shutting themselves off from contributors.
 A light touch is needed,
 like providing anecdotes when getting buy-in on the problem being solved
@@ -73,22 +73,22 @@ Look to prior art and the motivations behind them (inferred if needed).
 Provide guideposts within your contribution to step them through and understand your PR.</p>
 <p>A contributor's audience also extends to future readers, including</p>
 <ul>
-<li>Users looking at PRs to better understand a change</li>
+<li>Users looking at PRs to better understand a CHANGELOG entry</li>
 <li>Contributors seeking to better understand the motives for the code they are changing</li>
 <li>Contributors root causing behavior, like with <code>git bisect</code></li>
 </ul>
 <h1>Discussion</h1>
 <p><a id="d-issue"></a></p>
 <h2>Start with an Issue (D-ISSUE)</h2>
-<p>Each PR should link to an issue with a reviewer's buy-in on the solution, either fixing it or being an incremental step (e.g. a refactor, see <a href="#c-isolate">C-ISOLATE</a>).</p>
-<p>When creating the issue,
+<p>Each PR should link to an Issue with a reviewer's buy-in on the solution, either fixing it or being an incremental step (e.g. a refactor, see <a href="#c-isolate">C-ISOLATE</a>).</p>
+<p>When creating the Issue,
 the focus should be on the relevant use cases and the challenges within them.
 Provide anecdotes to add some ethos.
 Potential solutions can and will be discussed but as exploration of options.
 Do not be too attached to a specific solution.</p>
 <p>Starting with a PR causes the discussion of use cases, challenges, solutions, and the implementation of one particular solution to all be mixed together.
 Without discipline,
-reviewers and contributors can needlessly iterate on the implementation in parallel to conversations that can lead to more fundamental changes, causing extra iterations and delay that can lead to frustration and burn out on both sides.</p>
+reviewers and contributors can needlessly iterate on the implementation in parallel to conversations that can lead to more fundamental changes, causing extra iterations and delay that can lead to frustration and burnout on both sides.</p>
 <p>Discussing use cases, challenges, and solutions on a PR can fracture the conversation,
 making it harder to follow,
 making it take more work to come up to speed when looking at it,
@@ -100,15 +100,17 @@ Some will abandon their work and another will pick it up.
 The reviewer does not know whether the PR they are looking at will be one of these.</p>
 <p>If someone does walk away from a PR,
 the need is no longer being tracked in the reviewer's backlog.
-Someone looking for existing conversations is unlikely to find it among the PRs.</p>
+Someone looking for existing conversations is likely to look among the Issues and not find it.</p>
 <p>PRs also create social pressure on reviewers to quickly merge them.
 The contributor is invested in the problem and there being a solution and presumably put effort into that particular solution.
 Catering to these contributors can lead to burnout or emotional disengagement of reviewers.
 Similarly, a large review backlog can burnout reviewers.
 Contributors waiting on the resolution of an Issue gives reviewers the opportunity to evaluate their capacity for reviewing changes.</p>
+<p>Creating an Issue and then immediately posting a PR shows you are not taking this seriously.</p>
 <p>Exceptions:</p>
 <ul>
 <li>Obvious cases, on the order of typos.  In practice, many people over-estimate how obvious their case is, even for seemingly &quot;simple&quot; documentation changes.</li>
+<li><em>Sometimes</em> it can be useful to have a personal branch or a Draft PR to illustrate something in the Issue but this can also lead to or come across as being too attached to a particular solution.</li>
 </ul>
 <p>Examples:</p>
 <ul>
@@ -143,7 +145,7 @@ and making it likely that reviewers avoid the topic.</p>
 <ul>
 <li>Use cases</li>
 <li>Requirements derived from those use cases</li>
-<li>Relevant requirements of the project that impact this issue</li>
+<li>Relevant requirements of the project that impact this Issue</li>
 <li>Relevant prior art from inside and outside of the project</li>
 <li>Solutions and their trade offs</li>
 </ul>
