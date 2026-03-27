@@ -213,12 +213,14 @@ With atomic commits, the user running <code>git bisect</code> is likely to get a
 <p>Start the PR with one or more commits that introduce any additional tests needed for the PR,
 with the tests reproducing the existing behavior.
 Any feature or fix commits will then update the tests as behavior changes.</p>
-<p><img src="https://epage.github.io/talks/contrib-test-fix-split.png" alt="test and fix commits in PR" /></p>
-<p><img src="https://epage.github.io/talks/contrib-test-after.png" alt="impact of fix on tests" /></p>
+<p><em>Example commits:</em>
+<img src="https://epage.github.io/talks/contrib-test-fix-split.png" alt="test and fix commits in PR" /></p>
+<p><em>Only text change in the above <code>fix</code> commit:</em>
+<img src="https://epage.github.io/talks/contrib-test-after.png" alt="impact of fix on tests" /></p>
 <p>This applies the concept of &quot;a picture is worth a thousand words&quot; to your PR.
 As future commits change the behavior,
 this gets visualized in the diff of the test results,
-clarifying the intent of your PR better than most PR descriptions both to the reviewer and any community members looking to better understand the intent of change.</p>
+clarifying the intent of your PR better than most PR descriptions to both the reviewer and any community members looking to better understand the intent of change.</p>
 <p>This also helps you in making sure you are testing the right behavior
 if you make a behavior change and the tests remain unchanged.</p>
 <p>Depending on the type of change, the initial tests can take many shapes, including</p>
