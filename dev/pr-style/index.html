@@ -215,7 +215,7 @@ with the tests reproducing the existing behavior.
 Any feature or fix commits will then update the tests as behavior changes.</p>
 <p><em>Example commits:</em>
 <img src="https://epage.github.io/talks/contrib-test-fix-split.png" alt="test and fix commits in PR" /></p>
-<p><em>Only text change in the above <code>fix</code> commit:</em>
+<p><em>Only text change in the above &quot;fix&quot; commit:</em>
 <img src="https://epage.github.io/talks/contrib-test-after.png" alt="impact of fix on tests" /></p>
 <p>This applies the concept of &quot;a picture is worth a thousand words&quot; to your PR.
 As future commits change the behavior,
@@ -244,24 +244,24 @@ the reviewer can still be flooded with a sea of green and red lines and
 have to reverse engineer the changes to identify how the pieces fit together,
 what changed behavior, etc.</p>
 <p>Identifying and splitting out refactors can provide guideposts
-to help the reviewer step through the change in smaller, faster to understand pieces.
-Ideally, they would be broken down into individual refactor steps
+to help the reviewer step through the change in smaller, faster to understand pieces.</p>
+<p>The ideal case would be to break it down into individual refactor steps
 (e.g. &quot;rename a variable&quot; or &quot;extract a method&quot;).
 It can even be helpful to split out the adding or removing of a scope.
 For example, say a group of logic is going to be gated by an <code>if</code> condition,
 you can have a refactor commit that moves that logic into an indented block
-and then have the commit that adds the needed <code>if</code> before it.</p>
-<p>If a lot of refactors touch the same section of code,
-this means that a merge conflict on that section of code needs to be resolved multiple times.
+and then have the commit that adds the needed <code>if</code> before it.
+How far to split up commits is subjective,
+based on the complexity of the problem and
+the familiarity of your reviewer with that section of code.</p>
+<p>If a lot of the refactor commits touch the same section of code,
+then a merge conflict on that section of code needs to be resolved multiple times.
 However, resolving each conflict is much easier.
 With <a href="#c-isolate">C-ISOLATE</a>,
 the review can also go much faster, reducing the risk of conflicts.</p>
 <p>For refactors that only make sense in the context of a feature or fix,
-structuring all of this can be throwaway work if the PR is not accepted.
+carefully crafting small refactor commits can be throwaway work if the PR is not accepted.
 This is less likely to happen with <a href="#d-issue">D-ISSUE</a>.</p>
-<p>How far to split up commits is subjective,
-based on the complexity of the problem and
-the familiarity of your reviewer with that section of code.</p>
 <p>Examples:</p>
 <ul>
 <li><a href="https://github.com/rust-lang/annotate-snippets-rs/pull/380">annotate-snippets-rs#380</a></li>
@@ -270,8 +270,8 @@ the familiarity of your reviewer with that section of code.</p>
 <h2>Be clear in a commit's intent (C-INTENT)</h2>
 <p>The commit summary should clearly state the intent of the commit,
 particularly the visibility of the impact.
-This is where methods like <a href="https://www.conventionalcommits.org/">Conventional Commit</a> help
-which provides a way for describing the impact
+This is where conventions like <a href="https://www.conventionalcommits.org/">Conventional Commit</a> help
+which specify a consistent and upfront way to describe the impact
 (e.g. <code>feat</code>, <code>fix</code>, <code>refactor</code>)
 and the scope of that impact.</p>
 <p>This helps the reviewer know what to look for or not look for,
