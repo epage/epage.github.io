@@ -357,3 +357,5 @@ Examples:
   [cargo#13701](https://github.com/rust-lang/cargo/pull/13701) (refactor),
   [cargo#13713](https://github.com/rust-lang/cargo/pull/13713) (fix),
   [cargo#13849](https://github.com/rust-lang/cargo/pull/13849) (fix)
+- [RFC 3502](https://github.com/rust-lang/rfcs/pull/3502) (T-cargo),
+  [RFC 3503](https://github.com/rust-lang/rfcs/pull/3503) (T-lang)
