@@ -61,7 +61,7 @@ Look to prior art and the motivations behind them (inferred if needed).
 Provide guideposts within your contribution to step them through and understand your PR.
 
 A contributor's audience also extends to future readers, including
-- Users looking at PRs to better understand a change
+- Users looking at PRs to better understand a CHANGELOG entry
 - Contributors seeking to better understand the motives for the code they are changing
 - Contributors root causing behavior, like with `git bisect`
 
