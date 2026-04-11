@@ -215,14 +215,14 @@ with the tests reproducing the existing behavior.
 Any feature or fix commits will then update the tests as behavior changes.</p>
 <p><em>Example commits:</em>
 <img src="https://epage.github.io/talks/contrib-test-fix-split.png" alt="test and fix commits in PR" /></p>
-<p><em>Only text change in the above &quot;fix&quot; commit:</em>
+<p><em>Only test change in the above &quot;fix&quot; commit:</em>
 <img src="https://epage.github.io/talks/contrib-test-after.png" alt="impact of fix on tests" /></p>
 <p>This applies the concept of &quot;a picture is worth a thousand words&quot; to your PR.
 As future commits change the behavior,
 this gets visualized in the diff of the test results,
 clarifying the intent of your PR better than most PR descriptions to both the reviewer and any community members looking to better understand the intent of change.</p>
-<p>This also helps you in making sure you are testing the right behavior
-if you make a behavior change and the tests remain unchanged.</p>
+<p>This also helps you in making sure you are testing the right behavior.
+If you make a change and the tests remain unchanged then either the wrong thing is being tested or you haven't actually changed behavior.</p>
 <p>Depending on the type of change, the initial tests can take many shapes, including</p>
 <ul>
 <li>the fix commit just updates the expected output</li>
