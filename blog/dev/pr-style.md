@@ -160,6 +160,7 @@ Examples
 - <https://github.com/rust-lang/cargo/issues/2644#issuecomment-1489371226>
 - <https://github.com/rust-lang/cargo/issues/8728#issuecomment-1610265047>
 - <https://github.com/rust-lang/cargo/issues/9930#issuecomment-1489089277>
+- [Internals: Survey of organizational ownership and registry namespace designs for Cargo and Crates.io](https://internals.rust-lang.org/t/survey-of-organizational-ownership-and-registry-namespace-designs-for-cargo-and-crates-io/24027)
 
 <a id = "d-prepare"></a>
 
