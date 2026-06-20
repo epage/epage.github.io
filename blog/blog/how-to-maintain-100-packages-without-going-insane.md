@@ -100,11 +100,16 @@ of a focus area when you shouldn't.
 For me, I've found there is an implicit social pressure to merge PRs.
 Someone had a need and devoted their time to resolve it.
 Quickly reviewing and merging PRs encourages further contributions and use of your package.
-PRs can take a lot of time whether from not having consensus on the problem or
+However, PRs can take a lot of time, whether from not having consensus on the problem or
 requirements, to problems with the implementation, to just the work it takes to
 re-acquainting with some intricacies.
-I've seen some who dealt with this pressure by becoming apathetic to
-these users.
+When it comes to AI contributions,
+this can turn into a DoS on the maintainer.
+
+As I've seen it put, PRs are "free as in puppies": given by love but come with a cost.
+Some maintainers setup boundaries by emotionally cutting them off from their users,
+becoming apathetic.
+Others burn them out to satisfy their users.
 
 I'm trying to find a middle ground for this.
 So far, my approach is to [document](https://github.com/clap-rs/clap/blob/master/CONTRIBUTING.md#where-to-start)
@@ -131,6 +136,46 @@ Some highlights include:
 - Separate out bugs and features
 - Focus bugs on behavior differences
 - Call out use cases for features
+
+TODO https://www.jlowin.dev/blog/oss-maintainers-guide-to-saying-no
+
+## Streamline Issues
+
+Something I picked up from the Rust Project is useful ways to leverage tags to make it easier to work with Issues.
+
+Track the status: `S-` prefixed tags, including
+- `S-triage`: brand new issue. Use templates to set this on new issues.
+- `S-needs-info`: need reproduction steps, deeper exploration of use cases, etc
+- `S-needs-design`: needs someone to step through the use cases, requirements, prior art, etc and come with with solution options and suggest a specific
+- `S-blocked`: cannot move forward for some reason
+- `S-needs-mentor`: designed is accepted but no maintainer has committed the capacity to move this forward yet
+- `S-accepted`: reviewer available
+
+Tracking the area of the code base: `A-` prefixed tags.
+This can help in finding issues, find duplicates, or features to work on together.
+
+Tracking the issue's category: `C-` prefixed tags, including
+- `C-bug`
+- `C-enhancement`
+- `C-tracking`
+
+## Time boxing
+
+A focus area may grow beyond what you expected, taking all of your time, snuffing out other efforts of interest.
+Or you may feel there is a reason to make an exception to your focus area.
+
+Time boxing is the act of setting aside a fixed time.
+Establishing a time box can help keep you on track with your long term goals.
+
+Sometimes you might not feel you need a timebox.
+Be sure to reevaluate.
+I've been working to improve the MSRV experience in Rust and
+`cfg_rust_version` would be an important piece in this puzzle.
+In 2025, I had a lot on my plate but there seemed to be a lot of interest from `T-lang` in a design I had for `cfg_rust_version` to unblock it so I took some time to work on it.
+There ended up being an unexpected amount of disagreement among `T-lang` on my RFC.
+In considering the remaining work and stress in working to achieve conesus among `T-lang`,
+I realized I had exceeded the time and stress time box that I had never formalized but had intended and stepped away.
+While I care a lot, that care can lead to burnout and I have to set aside those feelings.
 
 ## Automating
 
@@ -161,16 +206,9 @@ The main downside I've seen to this is the error reporting; its common for it to
 - RenovateBot
 - cargo release
 
-https://www.jlowin.dev/blog/oss-maintainers-guide-to-saying-no
-
 snapbox
-
-tags
 
 templates to encourage the right behavior
 - typos
-
-time boxing
-- like my rust_version RFC
 
 Dealing with load shifts
