@@ -159,7 +159,7 @@ Be careful about too lightly dismissing roadblocks as irrelevant as that can ero
 Ensure the summary is accessible to readers.
 Too much or unstructured content can overwhelm readers and make it hard to identify or reference important points.
 Consider how an [inverted pyramid](https://en.wikipedia.org/wiki/Inverted_pyramid_(journalism)) structure can apply to content in the summary.
-Liberally formatt with hierarchical bullet points.
+Liberally format with hierarchical bullet points.
 
 Examples
 - <https://github.com/rust-lang/cargo/issues/2644#issuecomment-1489371226>
