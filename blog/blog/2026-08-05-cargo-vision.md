@@ -535,9 +535,9 @@ name = "some-cli"
 
 [dependencies]
 clap_distribution = "4.6.0"
-clap.from = "clap_distributiona"
-clap_complete.from = "clap_distributiona"
-clap_mangen.from = "clap_distributiona"
+clap.from = "clap_distribution"
+clap_complete.from = "clap_distribution"
+clap_mangen.from = "clap_distribution"
 ```
 
 This is starting to look similar to [battery packs](https://battery-pack-rs.github.io/battery-pack/) and could possibly be a way of upstreaming the concept into Cargo.
