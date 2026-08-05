@@ -900,6 +900,7 @@ An opaque dependency has an independent set of dependency versions and feature a
 No unification happens.</p>
 <p>On its own, this provides us a story for reducing link times.
 With a <a href="#shared-caches">shared cache</a>, this offers opportunities for more reuse across projects.
+Maybe we could even have pre-built opaque dependencies.
 With <a href="#compilation-model">zig-style compilation</a>, maybe compilation starts with <code>main</code> and the public functions of each opaque dependency, making this a hybrid between our current eager and zig's lazy builds,
 allowing for some artifacts to be cached.</p>
 <p>This also provides a way to avoid unifying features and dependencies,
