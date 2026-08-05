@@ -390,7 +390,7 @@ whether changing the data between steps to outright replacing steps with a custo
 
 By having this pipeline of operations with clear inputs/outputs between them,
 we'll by necessity need to do the same thing for the Cargo code base.
-For example, feature resolution would be an isolated, pure transformation from inputs to outputs
+For example, feature resolution would be an isolated, pure transformation from inputs to outputs.
 This makes it so contributors and reviewers have a finite area of concern to work with,
 making it easier to contribute and making reviewers more confident in accepting changes.
 
