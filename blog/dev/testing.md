@@ -62,6 +62,8 @@ warning that a known bug cause death or dismemberment.
 
 - James O Coplien, ["Why Most Unit Testing is Waste"](https://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf)
 
+<a id="trade-offs-in-testing"></a>
+
 # Trade-offs in Testing
 
 Testing is a trade off.  Test coverage helps deliver a higher quality product
