@@ -1,4 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>toml v0.9</title><link>https://epage.github.io/blog/2025/07/toml-09/</link><description><![CDATA[<p><a href="https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#090---2025-07-08">toml v0.9</a>
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Ed&apos;s Home Page</title><link>https://epage.github.io</link><description>Programming and other misc</description><item><title>A Vision for Cargo</title><link>https://epage.github.io/blog/2026/08/cargo-vision/</link><description><![CDATA[<p>According to Stack Overflow, <a href="https://survey.stackoverflow.co/2025/technology#2-cloud-development">cargo is the most desired development tool</a>.
+Many people attribute their choice of Rust to Cargo.
+I've heard from many people that Cargo is already great and that they can't think of any way it could be improved.
+I want to set our sights higher.</p>
+<p>And I want to hear your thoughts on what an ideal workflow would look like and how we might get there.
+This is just some things I've been thinking about.
+I know I don't know or can't easily speak to <a href="#areas">all of the workflows</a>
+and others might have even better <a href="#ideas">ideas on how to solve them</a>.</p>
+<p>We can also use your help in getting there.
+These workflows are not isolated to just Cargo but also touch on Rust, crates.io, and more.
+There are plenty of opprtunities to dig in and help.</p>
+]]></description><guid>https://epage.github.io/blog/2026/08/cargo-vision/</guid><pubDate>Wed, 05 Aug 2026 12:50:30 -0500</pubDate></item><item><title>toml v0.9</title><link>https://epage.github.io/blog/2025/07/toml-09/</link><description><![CDATA[<p><a href="https://github.com/toml-rs/toml/blob/main/crates/toml/CHANGELOG.md#090---2025-07-08">toml v0.9</a>
 is a near-complete rewrite with dramatic performance improvements, <code>no_std</code> support, and many other improvements.</p>
 <p>This is where I've disappeared to over the last 3 months, trying to wrap up a years-old experiment that has been &quot;almost done&quot; for these last 3 months, with use case after use case building up encouraging me to finish this up rather than my regularly scheduled Cargo work.</p>
 ]]></description><guid>https://epage.github.io/blog/2025/07/toml-09/</guid><pubDate>Tue, 08 Jul 2025 11:50:30 -0500</pubDate></item><item><title>Are we GUI (build) yet?</title><link>https://epage.github.io/blog/2023/08/are-we-gui-build-yet/</link><description><![CDATA[<p><a href="https://areweguiyet.com/">&quot;Are we GUI yet?&quot;</a> is a topic that frequently comes

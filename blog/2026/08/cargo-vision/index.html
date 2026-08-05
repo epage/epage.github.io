@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Vision for Cargo</title>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg==" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<link rel="stylesheet" href="/style.css" type="text/css" media="all" />
+<link rel="alternate" href="/rss.xml" type="application/rss+xml" title="RSS" />
+
+	</head>
+	<body>
+		<nav class="container-fluid">
+			<ul>
+				<li><h2>A Vision for Cargo</h2></li>
+			</ul>
+		</nav>
+		<main class="container">
+			<p>According to Stack Overflow, <a href="https://survey.stackoverflow.co/2025/technology#2-cloud-development">cargo is the most desired development tool</a>.
+Many people attribute their choice of Rust to Cargo.
+I've heard from many people that Cargo is already great and that they can't think of any way it could be improved.
+I want to set our sights higher.</p>
+<p>And I want to hear your thoughts on what an ideal workflow would look like and how we might get there.
+This is just some things I've been thinking about.
+I know I don't know or can't easily speak to <a href="#areas">all of the workflows</a>
+and others might have even better <a href="#ideas">ideas on how to solve them</a>.</p>
+<p>We can also use your help in getting there.
+These workflows are not isolated to just Cargo but also touch on Rust, crates.io, and more.
+There are plenty of opprtunities to dig in and help.</p>
+<!-- more -->
+<p><a id="areas"></a></p>
+<h2>Some workflows to improve</h2>
+<p>I want to frame this discussion around a high level view of workflows.
+I'll cover specific problem areas (e.g. build scripts) as part of the <a href="#ideas">ideas on how to improve them</a>.</p>
+<p><code>#[non_exhaustive]</code></p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+<li><a href="#adaptability">Adaptability</a></li>
+<li><a href="#cargo-maintenance">Cargo maintenance</a></li>
+</ul>
+<p>Also, <a href="#agentic-development">a word on agentic development</a></p>
+<p><a id="dependency-management"></a></p>
+<h4>Dependency management</h4>
+<blockquote>
+<p>“Always bet on the ecosystem”</p>
+</blockquote>
+<p>- <a href="https://smallcultfollowing.com/babysteps/blog/2026/07/15/battery-packs/">Battery packs: Let's talk about crates, baby</a></p>
+<p>I feel strongly that the crates.io ecosystem has been one of Rust's superpowers,
+enabling applications to be rapidly created with more capabilities and polish than would be practical without this ecosystem.</p>
+<p>Applications can leverage not just the existing functionality but any future functionality and fixes.
+For example, <a href="https://github.com/BurntSushi/ripgrep/"><code>ripgrep</code></a> is being optimized for large monorepos and <a href="https://github.com/crate-ci/typos"><code>typos</code></a> automatically benefits due to reusing <a href="https://crates.io/crates/ignore"><code>ignore</code></a>.
+A fresh implementation or a fork would not see benefits like this.
+This also enables shared auditing.
+In your application,
+you can have one or two serialization frameworks also in use by others
+or you can audit ten bespoke ones spread across config systems, network communication, etc.</p>
+<p>Dependencies are not without their costs and risks which we should work to drive down.</p>
+<p><strong>How do you discover a quality dependency?</strong></p>
+<p>There are &quot;known&quot; dependencies to use,
+assuming you are in the know.
+Being productive shouldn't be gated on insider knowledge.</p>
+<p>When there isn't a &quot;known&quot; dependency,
+you are then left to find candidates which isn't always easy.
+To compare them, you then look for a smattering of signals to see if it is safe, fit for your purposes, and can be depended on for the long term.
+These may include download count, who depends on it, reviews performed, etc as well as trust carried over from other packages from the author.
+Knowing and aggregating these can take a lot of work.</p>
+<p>In the ideal world,
+all dependencies would be reviewed.
+We aren't in an ideal world but how do we get closer?
+In Rust, we have <code>unsafe</code> as a way to isolate code that needs further inspection.
+We need more types of audit points and to scale up their discoverability.
+Even better if you didn't need to review these audit points
+because they were opt-in where possible,
+with a fallback that didn't need audits at the cost of performance or features.
+Sometimes though,
+we will still want to take shortcuts and trust in others for reviews
+and tracking of our own or others' reviews should be integrated with using dependencies.</p>
+<p><strong>How do we minimize upgrade overhead?</strong></p>
+<p>First, we need to improve the state of linting and testing for maintainers so there are fewer bugs and unintended changes.</p>
+<p>Assuming we are now talking about intended changes,
+the easy answer would be to discourage breaking changes
+but that comes at a cost to the maintainer in not being able to clear out some types of technical debt
+and to users in the limits this places on features, fixes, and build performance.</p>
+<p>We should encourage documenting changes and better surface that.
+However, that is a stopgap that patches over the problem.
+How can we make this better?</p>
+<p>One source of inspiration is the Rust Language
+which also has a form of opt-in breaking changes through Editions.
+The Rust Project prepares for an edition with unstable features and by providing migrations for users.
+That should be viewed as the minimum experience we offer maintainers and users for packages.
+Going beyond that, we could better surface these changes to users,
+inline to their workflows and directed to their specific circumstances.
+This would especially be important for when migrations aren't possible.</p>
+<p>As an experiment in what can be done today,
+with clap I have adopted the practice of breaking changes being introduced as parallel features, deprecating the old behavior with a note in how to migrate, where possible.
+The deprecations have been put behind a <code>deprecated</code> feature flag because many people turn warnings into errors, including deprecations, and having them on by default coupled upgrading with resolving deprecations increasing costs and risks.
+This dramatically simplifies <a href="https://github.com/clap-rs/clap/blob/v4.6.4/CHANGELOG.md#migrating">migration guides</a> to &quot;enable a feature and do what it says&quot;.
+Where a parallel feature isn't possible, we use an <code>unstable-vX</code> feature to not block development on an eventual breaking change and to make it easier to get feedback.</p>
+<p>Problems I see with this:</p>
+<ul>
+<li>Awareness of the <code>deprecated</code> feature</li>
+<li>Discovering of the migration guide</li>
+<li>The migrations are still manual</li>
+<li><code>unstable-vX</code> features can have surprising effects and need more guard rails to scale up their use</li>
+<li>These are just conventions I made up; sustaining a culture around these ideas needs a paved path to raise awareness and encourage their use</li>
+</ul>
+<p><a id="build-performance"></a></p>
+<h4>Build performance</h4>
+<p>Improving build performance isn't about making things 2% faster
+but about changing how users work and making Rust attractive for more users.
+Users' points of comparison will range from C++,
+which is more similar until you account for pre-built frameworks,
+to scripting languages, where there are no builds.</p>
+<p>We also need to look beyond the performance of <code>rustc</code> to the user's workflow.</p>
+<p>Users are looking for instant feedback as they make small changes at the bottom of their stack
+but that unfortunately causes the entire stack to rebuild,
+taking some time even for <code>cargo check</code>.</p>
+<p>They are iterating on test failures until they get the behavior just right,
+either running all of <code>cargo test --workspace</code> in a loop (&quot;because it's easy&quot;)
+or hand constructing a command like <code>cargo test -p application-library --test area -- some::test::name</code> for each failure to give faster iteration time at the cost of a disruption.</p>
+<p>Maybe while working through either of the above,
+they rebase against <code>main</code> and now their whole stack is rebuilding because of a dependency update.
+Or maybe they ran out of disk space and had to run <code>rm -rf target</code>.
+Or maybe it rebuilt for no discernible reason.</p>
+<p>Or maybe while working through either of the above,
+Cargo blocks on a parallel invocation,
+whether from rust-analyzer,
+another worktree they want to share the cache with,
+or from another project on their system that they are sharing the cache with.</p>
+<p>Some users will task switch while they wait for CI to complete so they don't stack too many changes on top of unmerged code,
+increasing the risk of costly merge conflicts.
+CI systems have caches but caching too much can negate any of the benefits due to network transit and decompression times.
+Defaults that work well for local debugging will increase cache sizes and slow down builds.
+While build results get cached,
+test results do not and the entire test suite re-runs.</p>
+<p>See also my RustNL 2025 presentation:
+<a href="https://www.youtube.com/watch?v=-jy4HaNEJCo&amp;t=678s&amp;pp=ygUOcnVzdG5sIGVkIHBhZ2U%3D">video</a>
+/
+<a href="../../../../talks/2025/05/performance">slides</a></p>
+<p><a id="adaptability"></a></p>
+<h4>Adaptability</h4>
+<p>Cargo is <a href="https://doc.crates.io/contrib/design.html">intended to be opinionated</a>
+but between that and backwards compatibility,
+it can be hard to be adaptable to different needs,
+whether that is <a href="https://github.com/rust-lang/cargo/issues/2644">improved docker caching</a>,
+<a href="../../../2023/08/are-we-gui-build-yet/">complex application needs</a>,
+or integrating into a larger corporate environment.</p>
+<p>In git, they divide operations into <a href="https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain">plumbing and porcelain</a>.
+Cargo is almost all porcelain commands with very limited programmatic use.
+Adding plumbing commands and extending the programmatic output of the porcelain commands would go a long way to enabling people to adapt Cargo to meet their needs.</p>
+<p><a id="cargo-maintenance"></a></p>
+<h4>Cargo maintenance</h4>
+<p>Underlying any talk of improving Cargo is that the Cargo team needs enough capacity to support these efforts on top of keeping the lights on.
+Previously, Cargo went through a several year <a href="https://blog.rust-lang.org/inside-rust/2022/03/31/cargo-team-changes/">feature freeze</a> due to a lack of capacity from the team.
+I worry about how close we are to repeating that.</p>
+<p>During that feature freeze and for a while after,
+we had a focus on improving our processes and tooling to make us more effective in maintaining Cargo.
+For example, we made it easier to make sweeping UX changes 
+by developing and migrating to a snapshot testing library that met our needs
+(<a href="https://docs.rs/snapbox/">snapbox</a>, see <a href="https://github.com/rust-lang/cargo/issues/14039">#14039</a>).</p>
+<p>Now, the thing I see slowing us down the most and limiting what we change is Cargo's architecture.
+Cargo is old and has bespoke frameworks,
+constraints on concurrent operations,
+uses C libraries when Rust ones can replace them,
+and no clear boundaries that require global knowledge when making or reviewing a change.</p>
+<p>Not everyone can fund work like that
+and we can only build up new design and code reviewers so quickly.
+Where outside contributors can most help the Cargo team is not with code but with thinking.
+A major enabler for thinking is to have all the context in one place
+by gathering all of the relevant information from the thread
+and summarizing it for easy consumption.
+For example, I have a PR on another project that slowly makes progress and when I go back to look at it,
+I have to refresh myself on the behavior the PR is intended to implement by re-reading an entire Issue thread.
+That is a lot of work and makes it so I need Dedicated Time® to review it,
+putting it forever in that &quot;someday&quot; category.
+That might sound like the ideal job for an agent.
+It will still take time to vet the sourcing and think through any analysis it has made.
+See also <a href="../../../../dev/pr-style/#d-summarize">D-SUMMARIZE</a>.</p>
+<p><a id="agentic-development"></a></p>
+<h4>A word on agentic development</h4>
+<p>A large part of Rust's success is the effort in <a href="https://hachyderm.io/@ekuber/116970121496881903">talking to people as humans</a>.
+This has incidentally benefited Rust among agentic development as many of the needs overlap.
+I think continuing to focus on humans will be the best strategy in the long term,
+with the assumption that agents will continue to improve.
+Where examining the needs of agentic development can pay off
+is by seeing the same problems faced by humans
+but scaled to such a degree that it breaks us out of complacency with &quot;good enough&quot; 10% improvements.</p>
+<p>As I see it, the three pillars where humans and agents overlap are:</p>
+<p><strong>Signal quality:</strong> One reason that Rust works well for agentic development is the feedback it provides.
+We need to clarify Cargo's existing signals by not being so overly verbose.
+We also need to provide more signals through tools like lints, audit points (think: <code>unsafe</code>), and so on.</p>
+<p><strong>Dependency management:</strong> We also need to consider signals for selecting and auditing of dependencies as well as reducing the costs of having dependencies.</p>
+<p><strong>Build performance:</strong> While a lot of agentic development is done in the background,
+the performance of the commands that agents run matters,
+especially if you want a tighter feedback loop
+(e.g. <a href="https://bun.com/blog/bun-in-rust#false-starts">bun skipped <code>cargo check</code> in the first pass of its Rust port</a>).
+The faster the operations are, the closer to the inner loop they will be used, and the better quality of results will be.</p>
+<p><a id="ideas"></a></p>
+<h2>Potential steps to this future</h2>
+<p>While this list is long,
+it is not intended to be exhaustive.
+I got tired of writing.
+I am also less qualified to speak on some of these subjects 
+or I don't have enough experience with them to speak too much about them.</p>
+<p>I frequently see the sentiment that nothing is being merged into Rust these days that justifies raising an MSRV.
+Looking over this list,
+I see a lot to get excited about.</p>
+<p><code>#[non_exhaustive]</code></p>
+<ul>
+<li>Maintainability
+<ul>
+<li><a href="#asyncify-cargo"><code>async</code>-ify Cargo</a></li>
+<li><a href="#libgit2">Migrating away from <code>libgit2</code></a></li>
+<li><a href="#pubgrub">Resolving with PubGrub</a></li>
+<li><a href="#generated-completions">Generated shell completions</a></li>
+</ul>
+</li>
+<li><a href="#plumbing-commands">Plumbing commands</a></li>
+<li><a href="#structured-logging">Structured logging</a></li>
+<li><a href="#open-namespaces">Open namespaces</a></li>
+<li><a href="#registry-namespaces">Registry namespaces</a></li>
+<li><a href="#public-dependencies">Public dependencies</a></li>
+<li>Battery packs
+<ul>
+<li><a href="#package-distributions">Package distributions</a></li>
+<li><a href="#mod-templates">Mod templates</a></li>
+</ul>
+</li>
+<li>Auditing
+<ul>
+<li><a href="#crate-provenance">Crate provenance</a></li>
+<li><a href="#builtin-dependencies">Builtin dependencies</a></li>
+<li><a href="#lang-unsafe"><code>lang:unsafe</code></a></li>
+<li><a href="#declarative-derive-macros">Declarative derive macros</a></li>
+<li><a href="#access-controls">Proc-macro and build script access controls</a></li>
+<li><a href="#remove-build-scripts">Reducing the need for build scripts</a></li>
+<li><a href="#build-script-delegation">Reducing user build scripts</a></li>
+<li><a href="#build-script-allowlist">Proc-macro and build script allow list</a></li>
+<li><a href="#cargo-lints">Cargo lints</a></li>
+<li><a href="#test-coverage">Test coverage</a></li>
+</ul>
+</li>
+<li>API evolution
+<ul>
+<li><a href="#feature-lifecycle">Feature lifecycle</a></li>
+<li><a href="#api-lifecycle">API lifecycle</a></li>
+<li><a href="#source-inlining">Source inlining</a></li>
+<li><a href="#auditing-api-changes">Auditing API changes</a></li>
+</ul>
+</li>
+<li>Performance
+<ul>
+<li><a href="#improved-decomposition">Improved decomposition</a></li>
+<li><a href="#removing-unnecessary-rebuilds">Removing unnecessary rebuilds</a></li>
+<li><a href="#shared-caches">Shared caches</a></li>
+<li><a href="#build-cache-gc">Build cache GC</a></li>
+<li><a href="#fine-grained-cache-locking">Fine-grained cache locking</a></li>
+<li><a href="#compilation-model">Alternative compilation models</a></li>
+<li><a href="#opaque-dependencies">Opaque dependencies</a></li>
+<li><a href="#test-caching">Test result caching</a></li>
+<li><a href="#test-failures">Iterating on test failures</a></li>
+</ul>
+</li>
+</ul>
+<p><a id="asyncify-cargo"></a></p>
+<h4><code>async</code>-ify Cargo</h4>
+<p>Cargo predates <code>async</code> / <code>await</code> and has its own bespoke async framework,
+using <code>curl</code> as the executor.</p>
+<p>This means Cargo can't leverage existing tooling around async executors,
+the code base does not follow familiar patterns for contributors,
+and takes a lot of work to then extend the code base to support running more things in parallel, like parsing of thousands of manifests.</p>
+<p>We'd also want to switch from <code>curl</code> to a Rust native networking library but this is one of a couple of pieces holding us back.</p>
+<p>Areas:</p>
+<ul>
+<li><a href="#cargo-maintenance">Cargo maintenance</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/16845">#16845</a></p>
+<p><a id="libgit2"></a></p>
+<h4>Migrating away from <code>libgit2</code></h4>
+<p>When Cargo started, <code>git</code> was not deployed universally
+yet the Cargo team chose to use it as the transport mechanism for the registry index.
+<code>libgit2</code> helped to fill this gap and made it possible to have a custom UX for progress.
+An escape hatch to use <code>git</code> was provided for any feature gaps users ran into.</p>
+<p>Over 10 years later, <code>git</code> is everywhere and no longer used for most Cargo registries.
+There is a high likelihood that those who have git dependencies will have <code>git</code> installed.
+It seems the right time to make the <code>git</code> escape hatch the default,
+improving fetch performance and network compatibility.</p>
+<p>Maybe we eventually remove the <code>libgit2</code> network transport entirely.
+This would remove another dependency on <code>curl</code>,
+unblocking Cargo to switch to a Rust native networking library and a regular async executor.</p>
+<p>Maybe we can even remove <code>libgit2</code> one day,
+either replacing it with <a href="https://crates.io/crates/gix">gix</a> or <code>git</code>,
+removing yet another C component from the build of Cargo.
+This will also reduce Cargo startup overhead.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#cargo-maintenance">Cargo maintenance</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/17227">#17227</a></p>
+<p><a id="pubgrub"></a></p>
+<h4>Resolving with PubGrub</h4>
+<p>Cargo's dependency resolver has bugs, poor errors, and missing features.
+However, people don't feel confident making or reviewing changes
+It can also be difficult to know how to update the reference SAT implementation in the
+differential test suite.</p>
+<p>PubGrub is a generalized dependency resolver.
+We would be able to decouple the Cargo logic from the algorithm,
+making it easier to change and removing our need to do differential testing.
+The output is much richer, allowing for better errors.</p>
+<p>PubGrub has been proven out by Astral with uv,
+including the ease of making changes like <a href="https://github.com/astral-sh/uv/releases/tag/0.12.0">changing how prerelease works</a>.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#cargo-maintenance">Cargo maintenance</a></li>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/5284">#5284</a></p>
+<p><a id="generated-completions"></a></p>
+<h4>Generated shell completions</h4>
+<p>Cargo offers bash and zsh completions but these are written by hand with the expectation that any CLI changes are mirrored in these without a good testing story.
+Contributors and reviewers should not be expected to be bash and zsh completion experts or have every shell installed on their system.</p>
+<p>Cargo uses clap which offers generated completions but Cargo has some dynamically generated completions which clap only supports through an in-development feature.
+Stabilizing that feature and switching Cargo's completions over to the new system will make them more maintainable and more feature rich as it is much easier to provide dynamic completions with the new system.</p>
+<p>Areas:</p>
+<ul>
+<li><a href="#cargo-maintenance">Cargo maintenance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/14520">#14520</a></p>
+<p><a id="plumbing-commands"></a></p>
+<h4>Plumbing commands</h4>
+<p>We want to break up <code>cargo check</code> into the smallest units of work possible and expose that as an API through a pipeline of plumbing commands.
+This would put callers in charge of what Cargo is doing,
+whether changing the data between steps to outright replacing steps with a custom implementation.</p>
+<p>By having this pipeline of operations with clear inputs/outputs between them,
+we'll by necessity need to do the same thing for the Cargo code base.
+For example, feature resolution would be an isolated, pure transformation from inputs to outputs
+This makes it so contributors and reviewers have a finite area of concern to work with,
+making it easier to contribute and making reviewers more confident in accepting changes.</p>
+<p>Maybe one day, this refactoring will lead to breaking up Cargo into smaller libraries
+that people can use.
+There are trade offs with this though as it constrains the design within <code>cargo</code>,
+possibly makes it more complicated to abstract out CLI-specific assumptions,
+and locks callers into one version of <code>cargo</code>.
+I've maintained third-party tools that had called into <code>cargo</code>
+and it was annoying to users to get &quot;unknown key&quot; warnings or &quot;this feature is unstable&quot; errors (despite being stable within their toolchain).
+Plumbing commands should likely remain the assumed route for general purpose extensions.</p>
+<p>Areas:</p>
+<ul>
+<li><a href="#cargo-maintenance">Cargo maintenance</a></li>
+<li><a href="#adaptability">Adaptability</a></li>
+</ul>
+<p>Project Goal: <a href="https://rust-lang.github.io/rust-project-goals/2026/cargo-plumbing.html">Prototype a new set of Cargo “plumbing” commands</a></p>
+<p><a id="structured-logging"></a></p>
+<h4>Structured logging</h4>
+<p><code>cargo check --timings</code> can only show you how long that build took.
+Similarly, <code>cargo check -v</code> can only tell you why something rebuilt in that build.
+Many times, you don't know a build will be a problem until it is happening.
+With structured logging,
+you can get reports on previous builds to better diagnose problems.</p>
+<p>There is a large overlap in our needs for structured logging and programmatic output for our porcelain commands.
+In iterating on structured logging,
+we are also exploring how we can improve our programmatic output.</p>
+<p>Areas:</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+<li><a href="#adaptability">Adaptability</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/15844">#15844</a></p>
+<p><a id="open-namespaces"></a></p>
+<h4>Open namespaces</h4>
+<p>In other languages, namespaces are explicit and open to extension.
+In Rust, they are coupled to the module system and closed to extension.</p>
+<p>This feature is about making Rust's namespaces partially open to extension where a another package can look as if it is a mod in another package.</p>
+<p>For example, take Clap:</p>
+<table><thead><tr><th>existing name</th><th>potential name</th><th>notes</th></tr></thead><tbody>
+<tr><td><code>clap</code></td><td><code>clap</code></td><td></td></tr>
+<tr><td><code>clap_derive</code></td><td><code>clap::derive</code></td><td></td></tr>
+<tr><td><code>clap_complete</code></td><td><code>clap::complete</code></td><td></td></tr>
+<tr><td><code>clap_mangen</code></td><td><code>clap::man</code></td><td></td></tr>
+<tr><td><code>clap_lex</code></td><td><code>clap_lex</code></td><td>first-party but a private dependency of clap</td></tr>
+<tr><td><code>clap-cargo</code></td><td><code>clap-cargo</code></td><td>third-party though an extension of clap's API</td></tr>
+</tbody></table>
+<p>This is more of a language feature impacting API design.
+This bleeds into dependency management in terms of providing an alternative to compose a cohesive API besides features,
+which have their drawbacks,
+and without coupling together the major version of all of the pieces,
+allowing for breaking changes with a smaller impact.</p>
+<p>This can further help dependency management if we extend the package UX in places like crates.io and docs.rs to make these navigable between them,
+extending the cohesion to our UX.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/13576">#13576</a></p>
+<p><a id="registry-namespaces"></a></p>
+<h4>Registry namespaces</h4>
+<p>There are many reasons people may want this.
+Within the scope of this document,
+the most relevant is knowing a package came from a trusted source
+and finding other packages from that source, like disjoint APIs from a company.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Reference: <a href="https://internals.rust-lang.org/t/survey-of-organizational-ownership-and-registry-namespace-designs-for-cargo-and-crates-io/24027">Survey of organizational ownership and registry namespace designs for Cargo and Crates.io</a></p>
+<p><a id="public-dependencies"></a></p>
+<h4>Public dependencies</h4>
+<p>Being able to mark that a dependency (and its public dependencies) are part of your public API feels like a small, incremental improvement.</p>
+<p>At its most basic, it helps catch accidentally leaking dependencies in your public API.
+The most innocent example is an <code>impl From&lt;dep::Error&gt; for Error</code>.</p>
+<p>Tools, like <a href="https://github.com/obi1kenobi/cargo-semver-checks/">cargo-semver-checks</a>,
+can build on this to help identify unintended breaking changes by upgrading a dependency.
+It can be understandable to make a mistake and it helps to have tools catch the problem.
+Where this turns from a &quot;you mistake&quot; to a &quot;systemic failure&quot; is with
+<a href="https://doc.rust-lang.org/cargo/reference/workspaces.html#the-dependencies-table"><code>workspace.dependencies</code></a>.
+When changing them, it is easy to overlook where they are used.
+When preparing a library for release with an inherited dependency,
+you can no longer look at only the library to tell what all changed since the last release.
+I hesitate in further ingraining <code>workspace.dependencies</code>, like through <code>cargo add</code> (<a href="https://github.com/rust-lang/cargo/issues/10608">#10608</a>),
+until this problem is solved as I fear we would be setting people up for failure.</p>
+<p>This also affects performance.
+If you want to generate documentation while developing,
+the simplest thing to do is <code>cargo doc</code> but that generates documentation for all dependencies, including slow to build dependencies like <code>windows-sys</code>.
+If you care to look, you may discover <code>cargo doc --no-deps</code> and maybe that will be good enough for you but happy paths shouldn't be gated by knowledge.
+With public dependencies, Cargo knows what dependencies are reachable by your project and can instead only generate documentation for those dependencies,
+speeding up your documentation builds.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/rust/issues/44663">#44663</a></p>
+<p><a id="package-distributions"></a></p>
+<h4>Package distributions</h4>
+<p>Some packages need to be upgraded in lockstep and there isn't any tooling to assist with that today.
+We can improve this by allowing users to specify that a dependency's source comes from another dependency, like:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">[package]
+</span><span style="color:#c0c5ce;">name = &quot;some-cli&quot;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">[dependencies]
+</span><span style="color:#c0c5ce;">clap = { from = [&quot;clap_complete&quot;, &quot;clap_mangen&quot;] }
+</span><span style="color:#c0c5ce;">clap_complete = &quot;4.6.0&quot;
+</span><span style="color:#c0c5ce;">clap_mangen = &quot;4.6.0&quot;
+</span></code></pre>
+<p>That declaration is a bit backwards and could be improved with maintainers providing &quot;distribution&quot; packages:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">[package]
+</span><span style="color:#c0c5ce;">name = &quot;some-cli&quot;
+</span><span style="color:#c0c5ce;">
+</span><span style="color:#c0c5ce;">[dependencies]
+</span><span style="color:#c0c5ce;">clap_distribution = &quot;4.6.0&quot;
+</span><span style="color:#c0c5ce;">clap.from = &quot;clap_distributiona&quot;
+</span><span style="color:#c0c5ce;">clap_complete.from = &quot;clap_distributiona&quot;
+</span><span style="color:#c0c5ce;">clap_mangen.from = &quot;clap_distributiona&quot;
+</span></code></pre>
+<p>This is starting to look similar to <a href="https://battery-pack-rs.github.io/battery-pack/">battery packs</a> and could possibly be a way of upstreaming the concept into Cargo.</p>
+<p>Blocked on:</p>
+<ul>
+<li><a href="#public-dependencies">Public dependencies</a></li>
+</ul>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Referenced at: <a href="https://rust-lang.github.io/rfcs/3516-public-private-dependencies.html#caller-declared-relations">RFC 3516: Future possibilities</a></p>
+<p><a id="mod-templates"></a></p>
+<h4>Mod templates</h4>
+<p><code>cargo new</code> only does whole-package generation from a fixed template.</p>
+<p>There are multiple kinds of templating though:</p>
+<ul>
+<li>Repo</li>
+<li>Package</li>
+<li>Crate</li>
+<li>Module</li>
+</ul>
+<p>Typically, these all get bundled together into repo or package templates
+(see also <a href="https://github.com/rust-lang/cargo/issues/5151">#5151</a>),
+keeping the design scope quite large,
+making it harder to move a design forward for Cargo.</p>
+<p>One particular problem with repo templates is that they try to cover the needs of all of the other kinds of templates,
+either giving users a &quot;full stack&quot; application template that they then have to pare down to meet their needs or making the system complicated through templating logic and user prompts.</p>
+<p>We could extend <code>cargo new</code> with crate/module templates,
+leveraging examples as templates.</p>
+<p>Say you had a <code>rust_cli</code> <a href="#package-distributions">package distribution</a> with topical examples, you could startup a package with:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">$ cargo new --bin --from rust_cli:async_main
+</span><span style="color:#c0c5ce;">$ cargo new --mod --from rust_cli:args
+</span><span style="color:#c0c5ce;">$ cargo new --mod --from rust_cli:watch
+</span><span style="color:#c0c5ce;">$ cargo new --test --from rust_cli:cli_tests
+</span><span style="color:#c0c5ce;">$ fd
+</span><span style="color:#c0c5ce;">Cargo.toml
+</span><span style="color:#c0c5ce;">src/main.rs
+</span><span style="color:#c0c5ce;">src/args.rs
+</span><span style="color:#c0c5ce;">src/watch.rs
+</span><span style="color:#c0c5ce;">tests/cli_tests.rs
+</span></code></pre>
+<p><em>Note: this is only a rough sketch to highlight the idea</em></p>
+<p>What you get:</p>
+<ul>
+<li>Package metadata is inherited from a workspace, if it exists (already present)</li>
+<li>Dependencies populated from the given examples</li>
+<li>A runnable <code>src/main.rs</code> from the <code>main</code> example</li>
+<li>Additional modules that need to be edited and <code>mod</code>ed into <code>src/main.rs</code></li>
+</ul>
+<p>You would still need to edit the various mods and <code>mod</code> them into <code>src/main.rs</code></p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p><a id="crate-provenance"></a></p>
+<h4>Crate provenance</h4>
+<p>The <a href="https://en.wikipedia.org/wiki/XZ_Utils_backdoor">xz backdoor</a> highlighted, among other problems, the danger of releases diverging from VCS.
+We need an audit point for when a published <code>.crate</code> file has no associated git sha, when it diverges from the source for that sha, and when that sha is an <a href="https://docs.zizmor.sh/audits/#impostor-commit">imposter commit</a>.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Referenced at: <a href="https://lawngno.me/blog/2024/06/10/divine-provenance.html">blog: 999 crates of Rust on the wall</a></p>
+<p><a id="builtin-dependencies"></a></p>
+<h4>Builtin dependencies</h4>
+<p>Identifying impure packages (those that can access files, the environment, networks, RNGs, etc) can serve as another audit point.
+We can get this through the <code>build-std</code> projects efforts to integrate dependencies on <code>core</code>, <code>alloc</code>, and <code>std</code> into Cargo's <code>[dependencies]</code>.</p>
+<p>This becomes especially important for proc-macros which your environment may run while you are reviewing a package and so Cargo can know if a run of a proc-macro is safe to cache, particularly if a caching system needs binary reproducibility which can be defeated by a simple <code>HashMap</code>.</p>
+<p>Of course, an <code>alloc</code>-only package only tells us some of the story due to <code>unsafe</code>, FFI, and <code>asm!</code>.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/16960">#16960</a></p>
+<p><a id="lang-unsafe"></a></p>
+<h4><code>lang:unsafe</code></h4>
+<p>As just covered, even with <code>alloc</code>-only dependencies, there are still holes in our audit point coverage, like <code>unsafe</code>, FFI, and <code>asm!</code>.
+The idea here is to integrate access to language features into Cargo.</p>
+<p>One way we could do this is to migrate to where <code>[features]</code> could activate <code>&quot;lang:unsafe&quot;</code>, e.g.</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">[features]
+</span><span style="color:#c0c5ce;">unsafe = [&quot;lang:unsafe&quot;]
+</span></code></pre>
+<p>This wouldn't be to shame those packages
+but to serve as a higher level <code>unsafe</code> audit point accessible from the package's metadata
+and encourage providing safe-only alternative implementations for those who might not need some of the benefits gained by <code>unsafe</code> implementations.
+Of course, not every package can make use of <code>unsafe</code> optional and we would need to provide a way to work use <code>unsafe</code> with <code>default-features = false</code>.</p>
+<p>Maybe this could even be extended to language preview features (e.g. the proposed <a href="https://github.com/rust-lang/rfcs/pull/3965">RFC 3965</a>).
+While there is a lot of risk with allowing access to language features before stabilization,
+it would help if the default was for them to be opt-in by callers and easily discovered by the Rust Project.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p><a id="declarative-derive-macros"></a></p>
+<h4>Declarative derive macros</h4>
+<p>Even better would be declarative derive and attribute macros as the compiler will ensure they are pure.
+While these may not be able to handle every pure proc-macro case,
+every bit would help especially among foundational macros.</p>
+<p>This has the added bonus that there won't be a proc-macro crate and its dependencies that need building and linking,
+even in <code>cargo check</code>.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/rust/issues/143549">rust#143549</a></p>
+<p><a id="access-controls"></a></p>
+<h4>Proc-macro and build script access controls</h4>
+<p>Not all proc-macros can be pure.
+Build scripts can never be pure.
+But any problem with that is not specialized to these cases.
+You will eventually run the rest of a dependency's code with <code>cargo test</code>, <code>cargo run</code>, and with production deployment.
+What is special about proc-macros and build scripts is they are required to run to build the code.
+You might want to build as part of your auditing.
+Their non-determinism may impact caching solutions.</p>
+<p>We need to be able to have audit points for these impure operations.
+Even better if it can be extended towards tests.
+Even better if it also helps with regular dependencies.</p>
+<p>One approach is an access control system like <a href="https://davidlattimore.github.io/posts/2023/10/09/making-supply-chain-attacks-harder.html">Cackle</a>.
+This would work for your entire build.</p>
+<p>Maybe Cargo can use OS features to restrict build script and proc-macros access as a way to highlight these audit points.
+Cargo should support a wide variety of OSs and they have different capabilities which may change with time,
+likely making enforcement be best-effort.
+We will need to provide some way for build scripts and proc-macros to specify the resources they wish to access.
+Maybe we could make this also work for tests and <code>cargo run</code> but it wouldn't help with deploying your production binary.</p>
+<p>Maybe we go all the way to a wasm sandbox.
+This is trivial for pure proc-macros though other ideas mentioned here will help.
+The big challenge is supporting what is needed by impure proc-macros as well as build scripts.
+Like with using OS enforcement,
+we will need a way to specify what resources can be accessed.
+Wasm sandboxing can likely lead to slower builds and not just because of having to run a wasm interpreter.
+Cargo goes out of its way to try to allow proc-macros and build scripts to reuse intermediate build artifacts with a user's application.
+When we've previously benchmarked diverging these builds more for &quot;build performance&quot;,
+the results ended up being a wash because of the extra builds that happen.
+This is also limited in what it helps; 
+it would not extend to your tests, <code>cargo run</code>, or your production binary.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>References:</p>
+<ul>
+<li><a href="https://davidlattimore.github.io/posts/2023/10/09/making-supply-chain-attacks-harder.html">Cackle</a></li>
+<li><a href="https://github.com/rust-lang/compiler-team/issues/1017">compiler-team#1017</a></li>
+</ul>
+<p><a id="remove-build-scripts"></a></p>
+<h4>Reducing the need for build scripts</h4>
+<p>Cargo has provided build scripts as an escape hatch to allow rapid iteration without requiring upfront design work for first-class features within Cargo.
+Cargo would likely have failed without this.</p>
+<p>With hindsight, we can look back and identify patterns so we can design features to replace them,
+greatly reducing the use of build scripts.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issues:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/cargo/issues/14948">#14948</a></li>
+</ul>
+<p><a id="build-script-delegation"></a></p>
+<h4>Reducing user build scripts</h4>
+<p>Even when build scripts are still needed,
+it would help if we only had to audit one build script,
+rather than 20 build scripts that end up being wrappers around a library.</p>
+<p>This is the idea behind build script delegation.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issues:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/cargo/issues/14903">#14903</a></li>
+</ul>
+<p><a id="build-script-allowlist"></a></p>
+<h4>Proc-macro and build script allow list</h4>
+<p>With enough of the above features,
+it wouldn't be too painful to make proc-macros and build scripts opt-in.
+For when a build script isn't opted into,
+maintainers could provide a fallback of a static set of build script directives to fill in just enough to move along on the happy path.</p>
+<p>I see two benefits here:</p>
+<ul>
+<li>Avoid accidentally running these before they are audited</li>
+<li>Faster builds for those who don't care about the benefits afforded by a build script</li>
+</ul>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Reference:</p>
+<ul>
+<li><a href="https://rust-lang.zulipchat.com/#narrow/channel/246057-t-cargo/topic/build.20script.20and.20proc.20macro.20allow.20list/near/595506317">Build script allowlist</a></li>
+</ul>
+<p><a id="cargo-lints"></a></p>
+<h4>Cargo lints</h4>
+<p>While clippy has a few lints for Cargo,
+it is at a disadvantage in terms of what data it has access to.
+Adding a <a href="#cargo-lints">linting system to Cargo</a> would increase the number of quality signals users and agents can receive.</p>
+<p>These signals will improve the quality and build performance of dependencies.
+In particular, the linting system will come with built-in unused dependency detection.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/12235">#12235</a></p>
+<p><a id="test-coverage"></a></p>
+<h4>Test coverage</h4>
+<p>To help improve the quality of your dependencies,
+we should have a paved path for test coverage reporting.</p>
+<p>I am also curious what the impact to agentic development would be to have first-class coverage reporting.
+I've observed that agent output can look good on the surface but it is in the small details where it is likely to fail.
+I have a theory that tests would amplify absurd output,
+making it easier to spot in review.
+I am unsure where all this might lead as there are <a href="../../../../dev/testing#trade-offs-in-testing">problems with overly focusing on coverage</a>.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/13040">#13040</a></p>
+<p><a id="feature-lifecycle"></a></p>
+<h4>Feature lifecycle</h4>
+<p>Features exist or they don't.
+The act of adding a feature for what already exists is a breaking change.
+Maintainers need to be able to evolve the feature set of their library over time,
+minimizing breaking changes and helping users through breaking changes.</p>
+<p>We could even restrict language preview features (see <a href="#lang-unsafe"><code>lang:unsafe</code></a>) to only unstable features,
+ensuring they remain opt-in.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Tracking issues:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/cargo/issues/7130">#7130: Deprecating features</a></li>
+<li><a href="https://github.com/rust-lang/cargo/issues/10881">#10881: Stable and unstable features</a></li>
+</ul>
+<p><a id="api-lifecycle"></a></p>
+<h4>API lifecycle</h4>
+<p>Today, the only stable API lifecycle attribute is <code>#[deprecated]</code>.
+<code>#[stable]</code> and <code>#[unstable]</code> remain unstable,
+limiting them to only the standard library.</p>
+<p>Like with the idea of language preview features (see <a href="#feature-lifecycle">Feature lifecycle</a>),
+we could make <code>unstable</code> APIs enabled through unstable features in Cargo,
+ensuring they remain opt-in.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Reference:</p>
+<ul>
+<li><a href="https://github.com/rust-lang/all-hands-2026/issues/14">all-hands-2026#14</a></li>
+</ul>
+<p><a id="source-inlining"></a></p>
+<h4>Source inlining</h4>
+<p>While a <code>#[deprecated(note)]</code> helps with migrating off of an API,
+it is still a manual process.
+Migrating away from deprecated APIs is a manual process.
+The ideal would be like Editions where you run <code>cargo fix</code> and you are ready to go.</p>
+<p>While we may want to eventually allow maintainers to specify larger source transformations with <code>#[deprecated]</code>,
+like what <a href="https://rust-for-linux.com/coccinelle-for-rust">Coccinelle</a> or <a href="https://astgrep.com/guide/rewrite-code">ast-grep</a> allow,
+Go's <a href="https://go.dev/blog/inliner">source inlining</a> is likely to get us pretty far while being
+intuitive,
+easy to validate,
+and a small surface area to stabilize.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Reference:</p>
+<ul>
+<li><a href="https://go.dev/blog/inliner">blog: //go:fix inline and the source-level inliner</a></li>
+</ul>
+<p><a id="auditing-api-changes"></a></p>
+<h4>Auditing API changes</h4>
+<p>When reviewing a PR or making a release,
+it can be easy to overlook a breaking change.</p>
+<p>Conversely,
+we could do a better job exposing API changes to callers on upgrade to help them through migrations or to discover new features.</p>
+<p>There are multiple routes for improving this that need further exploration.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+</ul>
+<p>Reference:</p>
+<ul>
+<li><a href="https://crates.io/crates/cargo-public-api">cargo-public-api</a></li>
+<li><a href="https://github.com/obi1kenobi/cargo-semver-checks/">cargo-semver-checks/</a></li>
+</ul>
+<p><a id="improved-decomposition"></a></p>
+<h4>Improved decomposition</h4>
+<p>In C++, a <code>.cpp</code> file is the unit of compilation.
+Rust crates are a unit of compilation but
+the larger the compilation unit, the longer code-gen takes.
+This makes it so splitting crates can speed up compilation time at the cost of less visibility for optimizations though there is LTO to help with that.</p>
+<p>Splitting isn't without its costs:</p>
+<ul>
+<li>May run into limitations with the Orphan rules</li>
+<li>Loss of dead code detection</li>
+<li>More boilerplate to manage</li>
+</ul>
+<p>We either need to find an alternative way to express compilation units
+(e.g. <a href="https://blog.yoshuawuyts.com/inline-crates">&quot;inline crates&quot;</a>) or
+to remove the friction in managing an application split into crates.</p>
+<p>Some progress has been made on this, including</p>
+<ul>
+<li>workspace publishing</li>
+<li>workspace inheritance</li>
+</ul>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Reference:</p>
+<ul>
+<li><a href="https://github.com/astral-sh/hawk">hawk: A workspace-aware Cargo lint for unnecessary public Rust APIs.</a></li>
+<li><a href="https://smallcultfollowing.com/babysteps/blog/2022/04/17/coherence-and-crate-level-where-clauses/">blog: Coherence and crate-level where-clauses</a></li>
+</ul>
+<p><a id="removing-unnecessary-rebuilds"></a></p>
+<h4>Removing unnecessary rebuilds</h4>
+<p>When you change a package in your dependency graph,
+you might not need to rebuild all dependents.</p>
+<p>In C++, the interface (stored in <code>.h</code> file) is kept separate from the implementation (in a <code>.cpp</code> file).
+There is more to this but it is enough of an explanation to serve our purposes.
+Each <code>.cpp</code> file gets its own intermediate build artifact.
+Each of these artifacts only needs to rebuild if a <code>.h</code> they depend on changes.</p>
+<p>We don't have this concept in Rust yet but maybe we can do better.
+The compiler already generates an <code>.rmeta</code> file for a package which is everything that is needed to build dependent,
+intermediate build artifacts without the need for the full <code>.rlib</code>.
+Cargo uses this today for what we call &quot;pipelined compilation&quot;,
+where dependent builds can start in parallel to their dependency finalizing compilation.</p>
+<p>Could we get the same benefits of the <code>.h</code> / <code>.cpp</code> split, automatically?
+Yes, with a lot of a compiler work and some Cargo work.
+A polyfill already exists that demonstrates a portion of the build time improvements by replacing <code>--workspace</code> with the specific packages final artifacts that would be impacted.
+A real solution would be able to skip building some intermediate dependencies.</p>
+<p>This is a form of build output hashing.
+When applied more generally,
+Cargo can skip building artifacts, even linking, of dependents if the code change didn't change the output.
+However, this can only work for packages that are binary reproducible.
+Build scripts and proc-macros add some uncertainty here.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/14604">#14604</a></p>
+<p><a id="shared-caches"></a></p>
+<h4>Shared caches</h4>
+<p>To share build caches across workspaces today, you need to share the <code>build-dir</code>.
+This is not without its downsides:</p>
+<ul>
+<li>This will serialize builds due to the locks.</li>
+<li>If something poisons the cache, you need to remove the entire cache to fix it</li>
+<li>This can interfere with incremental compilation</li>
+<li>Some cache entries will collide, causing extra rebuilds</li>
+</ul>
+<p>This is intentionally not documented by the Cargo team.</p>
+<p>If Cargo provided an append-only local cache for <a href="#builtin-dependencies">pure builds</a>,
+a lot of these problems would be resolved.</p>
+<p>The main downside to a local cache is that you won't get much reuse.
+Just one dependency change can cause all dependents to have new cache entries.
+This isn't so much an issue for sharing a cache across multiple worktrees of the same repo.</p>
+<p>This would also be improved by having a remote cache that you trust,
+like the CI for the project you are contributing to.</p>
+<p>Why not pre-built binaries stored on crates.io?
+Besides issues of trust,
+almost no one would be able to use it.
+They have to be on the exact same version of every package in their dependency tree
+with the exact same features enabled
+with the exact same compiler flags
+with the exact same compiler version.
+More on this <a href="#opaque-dependencies">later</a>.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/5931">#5931</a></p>
+<p><a id="build-cache-gc"></a></p>
+<h4>Build cache GC</h4>
+<p>The more Cargo caches, the more disk space it eats up.
+Cargo needs to be a better citizen with respect to disk space.</p>
+<p>This becomes even more important in CI where any extra content cached with the
+CI provider is extra compression, upload, download, and decompression time
+wasted.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/5026">#5026</a></p>
+<p><a id="fine-grained-cache-locking"></a></p>
+<h4>Fine-grained cache locking</h4>
+<p>Locking of the build-dir is all-or-nothing,
+causing contention between builds in a user's terminal and rust-analyzer
+or between git worktrees.</p>
+<p>Today, cache entries are mutable and read while still being written to (for pipelined compilation).</p>
+<p>Mutable entries give Cargo a cheap form of cache GC on local edits;
+without them Cargo would need a <a href="#build-cache-gc">build cache GC</a> to replace it.
+Solving that would help when switching between branches.
+Mutable entries also mean that Cargo does not need to know all build inputs a priori;
+we can look to other build systems that have already solved this problem.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/4282">#4282</a></p>
+<p><a id="compilation-model"></a></p>
+<h4>Alternative compilation models</h4>
+<p>Zig will parse to AST, identify the entry points, like <code>main</code>, and then recurse until done.
+This is the ultimate form of dead code elimination where platform conditionals don't need to be viral.</p>
+<p>We use features for this today.
+They avoid needing to parse to AST but are difficult to work with and aren't as fine grained as Zig's builds.</p>
+<p>We have a polyfill present today in the form of <a href="https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#profile-hint-mostly-unused-option"><code>-Zhint-mostly-unused</code></a>.
+This only offers benefits in extreme cases (e.g. <code>windows-sys</code>) and still benefits from activating specific features.</p>
+<p>Another polyfill, <a href="https://github.com/yijunyu/cargo-slicer"><code>cargo-slicer</code></a>, has taken a couple different forms.
+One more extreme version would vendor your dependencies and strip them down to only what you used.
+Each time you change how you use a dependency, you must re-slice your dependencies which requires an initial build to identify what is used.</p>
+<p>This isn't an automatic win.
+The compiler would need to instead do the work of <a href="#removing-unnecessary-rebuilds">reducing unnecessary rebuilds</a>.
+Cargo couldn't use <a href="#shared-caches">local or remote caches</a>.
+Compilation steps would become redundant between different binaries (like all tests).</p>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p><a id="opaque-dependencies"></a></p>
+<h4>Opaque dependencies</h4>
+<p>Line for line and feature for feature, C++ and Rust may have similar compile times
+but you generally don't rebuild Unity from scratch while everyone does rebuild Bevy from scratch.
+You are also generally relinking all of Bevy as well.
+What Cargo is missing is a good story for working with dynamic libraries.
+Or in their more general form, opaque dependencies.</p>
+<p>Rust dependencies today are transparent like headers-only libraries in C++.
+Every detail of the dependency tree affects a developer's build.</p>
+<p>An opaque dependency appears to you as a single package, independent of how many packages it is made up of.
+An opaque dependency has an independent set of dependency versions and feature activations.
+No unification happens.</p>
+<p>On its own, this provides us a story for reducing link times.
+With a <a href="#shared-caches">shared cache</a>, this offers opportunities for more reuse across projects.
+With <a href="#compilation-model">zig-style compilation</a>, maybe compilation starts with <code>main</code> and the public functions of each opaque dependency, making this a hybrid between our current eager and zig's lazy builds,
+allowing for some artifacts to be cached.</p>
+<p>This also provides a way to avoid unifying features and dependencies,
+a long standing request.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#dependency-management">Dependency management</a></li>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p>Tracking issue: <a href="https://github.com/rust-lang/cargo/issues/3573">#3573</a></p>
+<p><a id="test-caching"></a></p>
+<h4>Test result caching</h4>
+<p>Cargo already has caching, including output, for builds.
+Cargo could do the same for tests so long as Cargo knew all of the inputs to a test binary.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+<p><a id="test-failures"></a></p>
+<h4>Iterating on test failures</h4>
+<p>If we are more directly integrating libtest with <code>cargo test</code>,
+Cargo can do basic things like running multiple test binaries at once.</p>
+<p>We can go a step further and define new workflows.
+For myself, I frequently run <code>cargo test</code>, figure out how to call the failure I'm focusing on, iterate until it passes, and then work on the next.
+If Cargo had a fail-fast / run-failures-first mode,
+this would remove a lot of friction to people having a faster test loop.</p>
+<p>Areas</p>
+<ul>
+<li><a href="#build-performance">Build performance</a></li>
+</ul>
+
+		</main>
+			<nav>
+		<ul>
+			<li><a href="https://epage.github.io/about"><img class="footer-about" src="https://epage.github.io/img/me.jpg" alt="Headshot"/></a></li>
+			<li>
+				<a href="https://epage.github.io/rss.xml"><i class="fa fa-rss-square"></i> feed</a>
+				<a href="https://github.com/epage"><i class="fa fa-github-square"></i> github</a>
+				<a href="https://www.linkedin.com/in/eopage"><i class="fa fa-linkedin-square"></i> linkedin</a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="https://epage.github.io/license">CC BY-SA 4.0 / MIT</a><br/>
+			</li>
+		</ul>
+	</nav>
+
+	</body>
+</html>
