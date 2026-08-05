@@ -1065,6 +1065,7 @@ No unification happens.
 
 On its own, this provides us a story for reducing link times.
 With a [shared cache](#shared-caches), this offers opportunities for more reuse across projects.
+Maybe we could even have pre-built opaque dependencies.
 With [zig-style compilation](#compilation-model), maybe compilation starts with `main` and the public functions of each opaque dependency, making this a hybrid between our current eager and zig's lazy builds,
 allowing for some artifacts to be cached.
 
