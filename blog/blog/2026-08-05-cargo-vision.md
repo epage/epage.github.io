@@ -1,7 +1,8 @@
 ---
 title: A Vision for Cargo
+published_date: "2026-08-05 12:50:30 -0500"
 layout: default.liquid
-is_draft: true
+is_draft: false
 data:
   tags:
   - programming
