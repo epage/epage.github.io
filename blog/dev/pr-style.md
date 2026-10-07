@@ -229,6 +229,9 @@ the reader is given a cohesive picture of what that commit is intended to do for
 Commits are the unit for root causing a problem with `git bisect`.
 With atomic commits, the user running `git bisect` is likely to get a more precise result.
 
+For larger changes,
+One approach to breaking it up without dead code is to create a "tracer bullet", a minimal end-to-end solution, and follow it up with features and fixes that build on top of that minimal solution.
+
 Exceptions:
 - Keeping commit that "fixes" the main behavior-changing commit when it is purely additive and intentionally created as a separate commit more to break down the problem into smaller pieces for the reviewer to follow
 - *Sometimes* there are pedantic lints that will naturally be resolved by later commits within a PR and resolving them immediately can make it harder for the reviewer to follow the changes
