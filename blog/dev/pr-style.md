@@ -350,7 +350,7 @@ any other work dependent on those earlier PRs is now unblocked.
 If a change needs to be reverted,
 you've made it clear what the minimally invasive set of commits is for reverting.
 
-Commits should not be split out into a dependency PR if there is an assumption that the now dependent PR will be merged in the future.
+Commits should not be split out into a dependency PR if merging it is done under the assumption that the now dependent PR will be merged in the future.
 
 You don't know what will be controversial before you post your PR.
 Familiarity with the culture and practices of a project makes this easier to predict.
